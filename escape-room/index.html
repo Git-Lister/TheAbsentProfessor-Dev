@@ -7,22 +7,37 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="game-container">
-        <header>
+    <!-- Team name entry screen -->
+    <div id="teamEntryScreen" class="team-entry-overlay">
+        <div class="team-entry-card">
             <h1>The Case of the Absent Professor</h1>
-            <div class="team-input">
-                <label>Team name:</label>
-                <input type="text" id="teamName" placeholder="Enter your team name" autocomplete="off">
-            </div>
-        </header>
-
-        <div class="puzzles-grid" id="puzzlesGrid">
-            <!-- Puzzle cards injected here -->
+            <p>Enter your team name to begin:</p>
+            <input type="text" id="initialTeamName" placeholder="e.g., Brainy Bunch" autocomplete="off">
+            <button id="startGameBtn">Start Quest</button>
         </div>
+    </div>
 
-        <div class="lockbox-section" id="lockboxSection" style="display: none;">
-            <h2>Professor's Lockbox</h2>
-            <div class="lockbox-container" id="lockboxContainer"></div>
+    <!-- Main game UI (hidden until team name is set) -->
+    <div id="mainGameUI" style="display: none;">
+        <div class="game-container">
+            <header>
+                <h1>The Case of the Absent Professor</h1>
+                <div class="team-info">
+                    Team: <span id="displayTeamName"></span>
+                    <button id="resetGameBtn" class="reset-btn">⟳ Reset Game</button>
+                </div>
+            </header>
+
+            <div class="puzzles-grid" id="puzzlesGrid">
+                <!-- Puzzle cards injected here -->
+            </div>
+
+            <div class="lockbox-section" id="lockboxSection" style="display: none;">
+                <h2>Professor's Lockbox</h2>
+                <div class="lootbox-container" id="lockboxContainer">
+                    <!-- Dynamic lockbox content -->
+                </div>
+            </div>
         </div>
     </div>
 

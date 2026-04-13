@@ -1,6 +1,123 @@
-// Puzzle implementations
+// Puzzle implementations (basic but functional)
 // Each function receives a container (modal content div) and a callback `onSolve(answerString)`
 
+// ------------------- Puzzle 1: Number Grid -------------------
+function renderPuzzle1(container, onSolve) {
+    container.innerHTML = `
+        <div style="text-align: center;">
+            <h3>Number Grid Puzzle</h3>
+            <p style="margin-bottom: 15px;">"1, 5 and 8 are all identical – the others are all odd – there is no other one like it."</p>
+            <div style="display: grid; grid-template-columns: repeat(3, 80px); gap: 10px; justify-content: center; margin: 20px auto;">
+                <button class="grid-btn" data-value="1">1</button>
+                <button class="grid-btn" data-value="5">5</button>
+                <button class="grid-btn" data-value="8">8</button>
+                <button class="grid-btn" data-value="1">1</button>
+                <button class="grid-btn" data-value="5">5</button>
+                <button class="grid-btn" data-value="8">8</button>
+                <button class="grid-btn" data-value="1">1</button>
+                <button class="grid-btn" data-value="5">5</button>
+                <button class="grid-btn" data-value="8">8</button>
+            </div>
+            <p>The odd one out appears only once. Click on it.</p>
+            <div id="puzzle1Feedback" style="margin-top: 15px; font-style: italic;"></div>
+        </div>
+    `;
+
+    const btns = container.querySelectorAll('.grid-btn');
+    const feedback = container.querySelector('#puzzle1Feedback');
+    const expected = appConfig.puzzles.find(p => p.id === 1).expectedAnswer; // "158"
+
+    btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const clickedValue = btn.getAttribute('data-value');
+            // The correct "odd one out" is the number that appears only once? Actually the puzzle yields three digits: 1,5,8 in order.
+            // But for simplicity, we ask the user to enter the three digits in order.
+            // We'll change to a text input to avoid confusion.
+            // Better: show instruction to enter the three numbers.
+            feedback.innerHTML = `You clicked ${clickedValue}. But this puzzle expects a three‑digit code. Let's simplify.`;
+            // Replace with a proper input method
+            container.innerHTML = `
+                <div style="text-align: center;">
+                    <h3>Number Grid Puzzle</h3>
+                    <p>The grid contains the numbers 1, 5, and 8 repeated. One of them is the "odd one out" because it appears in a different orientation. What are the three numbers in the correct order?</p>
+                    <input type="text" id="puzzle1Answer" placeholder="e.g., 158" maxlength="3" pattern="\\d{3}" style="padding: 8px; font-size: 1rem; text-align: center;">
+                    <button id="submitPuzzle1">Submit</button>
+                    <div id="puzzle1Feedback" style="margin-top: 15px;"></div>
+                </div>
+            `;
+            const submitBtn = container.querySelector('#submitPuzzle1');
+            const answerInput = container.querySelector('#puzzle1Answer');
+            const newFeedback = container.querySelector('#puzzle1Feedback');
+            submitBtn.addEventListener('click', () => {
+                const answer = answerInput.value.trim();
+                if (answer === expected) {
+                    onSolve(expected);
+                } else {
+                    const clue = appConfig.puzzles.find(p => p.id === 1).clues.fallback;
+                    newFeedback.innerHTML = `❌ ${clue}`;
+                    reportWrongAttempt(1, answer, clue);
+                }
+            });
+        });
+    });
+    // Initial instruction
+    feedback.innerHTML = "Click any number above for more instructions.";
+}
+
+// ------------------- Puzzle 2: Library Layers Poem -------------------
+function renderPuzzle2(container, onSolve) {
+    const poem = `In Manchester's heart, where knowledge flows,
+A library stands where ambition grows.
+Each floor a realm, each space designed,
+To suit the needs of every mind.
+
+Where silence reigns and thoughts run deep,
+The first and fourth are calm and still,
+For focused minds and scholarly will.
+No chatter here, just quiet grace,
+A haven built for study's pace.
+
+Where voices blend and ideas are caught,
+The second and third invite the crowd,
+Where learning thrives in shared insight.
+Collaboration finds its home,
+In open zones of shared workspace.
+
+From hushed retreats to lively aisles,
+Each level plays its vital part,
+In shaping minds and stirring hearts.
+So choose your floor, your pace, your way---
+The Library meets you every day.`;
+
+    container.innerHTML = `
+        <div style="text-align: center; max-height: 60vh; overflow-y: auto;">
+            <h3>Library Layers</h3>
+            <pre style="font-family: monospace; white-space: pre-wrap; background: #f0e6d2; color: #2c241a; padding: 15px; border-radius: 10px; text-align: left;">${poem}</pre>
+            <p>What is the four‑digit code from the floors? (Hint: order of silent floors then collaborative floors)</p>
+            <input type="text" id="puzzle2Answer" placeholder="e.g., 1423" maxlength="4" pattern="\\d{4}" style="padding: 8px; font-size: 1rem; text-align: center;">
+            <button id="submitPuzzle2">Submit</button>
+            <div id="puzzle2Feedback" style="margin-top: 15px;"></div>
+        </div>
+    `;
+
+    const submitBtn = container.querySelector('#submitPuzzle2');
+    const answerInput = container.querySelector('#puzzle2Answer');
+    const feedback = container.querySelector('#puzzle2Feedback');
+    const expected = appConfig.puzzles.find(p => p.id === 2).expectedAnswer; // "1423"
+
+    submitBtn.addEventListener('click', () => {
+        const answer = answerInput.value.trim();
+        if (answer === expected) {
+            onSolve(expected);
+        } else {
+            const clue = appConfig.puzzles.find(p => p.id === 2).clues.fallback;
+            feedback.innerHTML = `❌ ${clue}`;
+            reportWrongAttempt(2, answer, clue);
+        }
+    });
+}
+
+// ------------------- Puzzle 3: Email Chain (already implemented) -------------------
 function renderPuzzle3(container, onSolve) {
     // Email content (from original Word doc)
     const emailsHTML = `
@@ -85,18 +202,62 @@ function renderPuzzle3(container, onSolve) {
     });
 }
 
-// Placeholder for other puzzles (to be implemented later)
-function renderPuzzle1(container, onSolve) {
-    container.innerHTML = `<p>Puzzle 1 will be implemented soon.</p><button id="dummySolve">Demo solve (set answer "158")</button>`;
-    container.querySelector('#dummySolve')?.addEventListener('click', () => onSolve("158"));
-}
-
-function renderPuzzle2(container, onSolve) {
-    container.innerHTML = `<p>Puzzle 2 will be implemented soon.</p><button id="dummySolve">Demo solve (set answer "1423")</button>`;
-    container.querySelector('#dummySolve')?.addEventListener('click', () => onSolve("1423"));
-}
-
+// ------------------- Puzzle 4: Blank Page (UV Torch) -------------------
 function renderPuzzle4(container, onSolve) {
-    container.innerHTML = `<p>Puzzle 4 (UV torch) will be implemented soon.</p><button id="dummySolve">Demo solve (set answer "247")</button>`;
-    container.querySelector('#dummySolve')?.addEventListener('click', () => onSolve("247"));
+    container.innerHTML = `
+        <div style="text-align: center;">
+            <h3>Blank Page (UV Torch)</h3>
+            <div id="torchCanvas" style="width: 300px; height: 200px; background: #f5f5dc; margin: 20px auto; border: 2px solid #b5926a; position: relative; overflow: hidden; cursor: none;">
+                <div id="hiddenNumber" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-weight: bold; color: #f5f5dc; text-shadow: none; transition: none;">247</div>
+            </div>
+            <p>Move your mouse (or finger) over the blank page to reveal the hidden number.</p>
+            <button id="revealManually">I see the number! Enter it</button>
+            <div id="puzzle4Area" style="margin-top: 15px;"></div>
+        </div>
+    `;
+
+    const canvas = container.querySelector('#torchCanvas');
+    const hiddenDiv = container.querySelector('#hiddenNumber');
+    const revealBtn = container.querySelector('#revealManually');
+    const area = container.querySelector('#puzzle4Area');
+
+    // Torch effect: on mousemove, change the hidden number's color to black (reveal) only near cursor
+    // For simplicity, we'll just make the entire number visible when mouse enters canvas, and hide when leaves.
+    // But a more immersive effect: a circular spotlight.
+    // Basic version: on mouseenter, show number; on mouseleave, hide.
+    canvas.addEventListener('mouseenter', () => {
+        hiddenDiv.style.color = '#000';
+    });
+    canvas.addEventListener('mouseleave', () => {
+        hiddenDiv.style.color = '#f5f5dc';
+    });
+    // For touch devices
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        hiddenDiv.style.color = '#000';
+    });
+    canvas.addEventListener('touchend', () => {
+        hiddenDiv.style.color = '#f5f5dc';
+    });
+
+    revealBtn.addEventListener('click', () => {
+        area.innerHTML = `
+            <label>Enter the three‑digit number you found:</label>
+            <input type="text" id="puzzle4Answer" maxlength="3" pattern="\\d{3}" placeholder="e.g., 247">
+            <button id="submitPuzzle4">Submit</button>
+        `;
+        const submitBtn = area.querySelector('#submitPuzzle4');
+        const answerInput = area.querySelector('#puzzle4Answer');
+        submitBtn.addEventListener('click', () => {
+            const answer = answerInput.value.trim();
+            const expected = appConfig.puzzles.find(p => p.id === 4).expectedAnswer; // "247"
+            if (answer === expected) {
+                onSolve(expected);
+            } else {
+                const clue = appConfig.puzzles.find(p => p.id === 4).clues.fallback;
+                alert(`❌ ${clue}`);
+                reportWrongAttempt(4, answer, clue);
+            }
+        });
+    });
 }

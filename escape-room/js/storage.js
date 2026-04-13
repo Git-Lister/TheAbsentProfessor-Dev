@@ -52,3 +52,8 @@ function setLockboxUnlocked(unlocked) {
 function isLockboxUnlocked() {
     return loadState().lockboxUnlocked;
 }
+
+function resetGame() {
+    localStorage.removeItem(STORAGE_KEY);
+    // Also clear any other session data if needed
+}

@@ -197,3 +197,79 @@ h1 {
         font-size: 1.2rem;
     }
 }
+
+/* Team entry screen */
+.team-entry-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #2e3b3e 0%, #1a1f1f 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+.team-entry-card {
+    background: #4a3b2c;
+    border-radius: 40px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+    max-width: 400px;
+    width: 90%;
+}
+.team-entry-card h1 {
+    margin-top: 0;
+}
+.team-entry-card input {
+    padding: 10px;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    border: none;
+    width: 80%;
+    margin: 20px 0;
+    text-align: center;
+}
+.team-entry-card button {
+    background: #3c6e47;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+}
+.team-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #4a3b2c;
+    padding: 10px 20px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+}
+.reset-btn {
+    background: #8b3a3a;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+}
+.lootbox-container {
+    background: #2c241a;
+    border-radius: 30px;
+    padding: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    transition: all 0.3s;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    border: 2px solid #b5926a;
+}
+.lootbox-container.unlocked {
+    background: #3c6e47;
+    border-color: gold;
+    box-shadow: 0 0 20px gold;
+}
