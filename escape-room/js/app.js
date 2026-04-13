@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check if a team name already exists (from previous session)
     const existingTeam = getTeamName();
     if (existingTeam) {
-        // Skip entry screen and go directly to game
         teamEntryScreen.style.display = 'none';
         mainGameUI.style.display = 'block';
         displayTeamSpan.textContent = existingTeam;
@@ -63,14 +62,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Update lockbox visibility and init lockbox
-        updateLockboxVisibility();
+        // Lockbox is always visible – no hiding logic
+        // Ensure the lockbox section is shown (it already has no style="display:none")
         initLockbox(); // defined in lockbox.js
     }
 
-    // Make openPuzzle and updateLockboxVisibility available globally (they are already in this scope)
+    // Make openPuzzle available globally (if needed)
     window.openPuzzle = openPuzzle;
-    window.updateLockboxVisibility = updateLockboxVisibility;
 
     function openPuzzle(puzzleId) {
         const puzzle = appConfig.puzzles.find(p => p.id === puzzleId);
@@ -100,8 +98,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 card.querySelector('.status').textContent = 'Solved';
             }
             modalOverlay.style.display = 'none';
-            updateLockboxVisibility();
-            initLockbox(); // re-init lockbox to reflect new solved count
+            // Re-render lockbox grid to show the newly entered digits
+            initLockbox();
         };
 
         switch (puzzleId) {
@@ -113,13 +111,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         modalOverlay.style.display = 'flex';
-    }
-
-    function updateLockboxVisibility() {
-        const allCollected = allAnswersCollected();
-        const lockboxSection = document.getElementById('lockboxSection');
-        if (lockboxSection) {
-            lockboxSection.style.display = allCollected ? 'block' : 'none';
-        }
     }
 });
