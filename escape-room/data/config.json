@@ -1,0 +1,51 @@
+{
+  "puzzles": [
+    {
+      "id": 1,
+      "title": "Number Grid",
+      "expectedAnswer": "158",
+      "clues": {
+        "wrongDigits": {},
+        "fallback": "The odd one out gives three digits. Check the grid pattern."
+      },
+      "hintTimer": 120,
+      "hintText": "Look at the shapes of the numbers – which one is different?"
+    },
+    {
+      "id": 2,
+      "title": "Library Layers",
+      "expectedAnswer": "1423",
+      "clues": {
+        "wrongDigits": {},
+        "fallback": "The poem mentions floor numbers. Read it again carefully."
+      },
+      "hintTimer": 120,
+      "hintText": "Which floors are silent? Which are collaborative? The order matters."
+    },
+    {
+      "id": 3,
+      "title": "Email Chain",
+      "expectedAnswer": "2024",
+      "clues": {
+        "wrongDigits": {},
+        "fallback": "That's not the correct publication year. Search again for the 6th edition."
+      },
+      "hintTimer": 120,
+      "hintText": "The 6th edition of 'The Study Skills Handbook' was published in 2024."
+    },
+    {
+      "id": 4,
+      "title": "Blank Page",
+      "expectedAnswer": "247",
+      "clues": {
+        "wrongDigits": {},
+        "fallback": "The UV torch reveals three numbers. Keep moving the light."
+      },
+      "hintTimer": 120,
+      "hintText": "Shine the torch over the blank page – a number will appear."
+    }
+  ],
+  "targetCode": "8227",
+  "googleScriptUrl": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
+  "wrongAttemptScriptUrl": "https://script.google.com/macros/s/YOUR_WRONG_SCRIPT_ID/exec"
+}
