@@ -46,6 +46,5 @@
     }
   ],
   "targetCode": "8227",
-  "googleScriptUrl": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
-  "wrongAttemptScriptUrl": "https://script.google.com/macros/s/YOUR_WRONG_SCRIPT_ID/exec"
+  "googleScriptUrl": "https://script.google.com/macros/s/AKfycbzTpzci0u7Tzz668nY2AgR8akKL5a5kq21KLIYo6YHiyN1OpUQVQRQ5pIp0vcikjXXP/exec"
 }
