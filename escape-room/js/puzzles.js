@@ -3,120 +3,293 @@
 
 // ------------------- Puzzle 1: Number Grid -------------------
 function renderPuzzle1(container, onSolve) {
+    // Target positions (1-indexed, top-left to bottom-right)
+    const TARGETS = [1, 5, 8];      // positions to click in order
+    const EXPECTED_ORDER = [1, 5, 8]; // same as targets because order is 1→5→8
+    const ANSWER = "158";
+
+    let selectedOrder = [];          // stores positions clicked in sequence
+    let lockedCells = new Set();      // positions that have been correctly clicked
+
+    // Clear any previous content
     container.innerHTML = `
         <div style="text-align: center;">
             <h3>Number Grid Puzzle</h3>
-            <p style="margin-bottom: 15px;">"1, 5 and 8 are all identical – the others are all odd – there is no other one like it."</p>
-            <div style="display: grid; grid-template-columns: repeat(3, 80px); gap: 10px; justify-content: center; margin: 20px auto;">
-                <button class="grid-btn" data-value="1">1</button>
-                <button class="grid-btn" data-value="5">5</button>
-                <button class="grid-btn" data-value="8">8</button>
-                <button class="grid-btn" data-value="1">1</button>
-                <button class="grid-btn" data-value="5">5</button>
-                <button class="grid-btn" data-value="8">8</button>
-                <button class="grid-btn" data-value="1">1</button>
-                <button class="grid-btn" data-value="5">5</button>
-                <button class="grid-btn" data-value="8">8</button>
-            </div>
-            <p>The odd one out appears only once. Click on it.</p>
-            <div id="puzzle1Feedback" style="margin-top: 15px; font-style: italic;"></div>
+            <p style="margin-bottom: 15px;">Click the three special images <strong>in the correct order</strong> (1st, 5th, 8th).</p>
+            <div id="puzzle1Grid" class="puzzle1-grid"></div>
+            <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
+            <div id="puzzle1Status" class="puzzle1-status">Click the first special image (position 1).</div>
         </div>
     `;
 
-    const btns = container.querySelectorAll('.grid-btn');
-    const feedback = container.querySelector('#puzzle1Feedback');
-    const expected = appConfig.puzzles.find(p => p.id === 1).expectedAnswer; // "158"
+    const gridContainer = container.querySelector('#puzzle1Grid');
+    const resetBtn = container.querySelector('#puzzle1ResetBtn');
+    const statusDiv = container.querySelector('#puzzle1Status');
 
-    btns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const clickedValue = btn.getAttribute('data-value');
-            // The correct "odd one out" is the number that appears only once? Actually the puzzle yields three digits: 1,5,8 in order.
-            // But for simplicity, we ask the user to enter the three digits in order.
-            // We'll change to a text input to avoid confusion.
-            // Better: show instruction to enter the three numbers.
-            feedback.innerHTML = `You clicked ${clickedValue}. But this puzzle expects a three‑digit code. Let's simplify.`;
-            // Replace with a proper input method
-            container.innerHTML = `
-                <div style="text-align: center;">
-                    <h3>Number Grid Puzzle</h3>
-                    <p>The grid contains the numbers 1, 5, and 8 repeated. One of them is the "odd one out" because it appears in a different orientation. What are the three numbers in the correct order?</p>
-                    <input type="text" id="puzzle1Answer" placeholder="e.g., 158" maxlength="3" pattern="\\d{3}" style="padding: 8px; font-size: 1rem; text-align: center;">
-                    <button id="submitPuzzle1">Submit</button>
-                    <div id="puzzle1Feedback" style="margin-top: 15px;"></div>
-                </div>
-            `;
-            const submitBtn = container.querySelector('#submitPuzzle1');
-            const answerInput = container.querySelector('#puzzle1Answer');
-            const newFeedback = container.querySelector('#puzzle1Feedback');
-            submitBtn.addEventListener('click', () => {
-                const answer = answerInput.value.trim();
-                if (answer === expected) {
-                    onSolve(expected);
-                } else {
-                    const clue = appConfig.puzzles.find(p => p.id === 1).clues.fallback;
-                    newFeedback.innerHTML = `❌ ${clue}`;
-                    reportWrongAttempt(1, answer, clue);
-                }
-            });
+    // Generate 9 cells (1-indexed)
+    for (let i = 1; i <= 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'puzzle1-cell';
+        cell.dataset.pos = i;
+        const img = document.createElement('img');
+        // Assuming images are named 1.png, 2.png, ... 9.png
+        img.src = `images/puzzle1/${i}.png`;
+        img.alt = `Grid cell ${i}`;
+        img.onerror = () => { img.src = `images/puzzle1/${i}.jpg`; }; // fallback if png missing
+        cell.appendChild(img);
+        cell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleCellClick(i);
         });
-    });
-    // Initial instruction
-    feedback.innerHTML = "Click any number above for more instructions.";
+        gridContainer.appendChild(cell);
+    }
+
+    function updateUI() {
+        // Update locked cells styling
+        const cells = container.querySelectorAll('.puzzle1-cell');
+        cells.forEach(cell => {
+            const pos = parseInt(cell.dataset.pos);
+            if (lockedCells.has(pos)) {
+                cell.classList.add('correct');
+            } else {
+                cell.classList.remove('correct');
+            }
+        });
+        // Update status message
+        const nextIndex = selectedOrder.length;
+        if (nextIndex === 0) {
+            statusDiv.innerHTML = 'Click the first special image (position 1).';
+        } else if (nextIndex === 1) {
+            statusDiv.innerHTML = 'Good! Now click the second special image (position 5).';
+        } else if (nextIndex === 2) {
+            statusDiv.innerHTML = 'Almost there! Click the final special image (position 8).';
+        } else {
+            statusDiv.innerHTML = '✓ Puzzle solved!';
+        }
+    }
+
+    function resetPuzzle() {
+        selectedOrder = [];
+        lockedCells.clear();
+        updateUI();
+        statusDiv.innerHTML = 'Puzzle reset. Click the first special image (position 1).';
+        // Remove any temporary flash classes
+        const cells = container.querySelectorAll('.puzzle1-cell');
+        cells.forEach(cell => cell.classList.remove('wrong-flash'));
+    }
+
+    function handleCellClick(pos) {
+        // If puzzle already solved, ignore clicks
+        if (lockedCells.size === 3) return;
+
+        const expectedPos = EXPECTED_ORDER[selectedOrder.length];
+
+        if (pos === expectedPos) {
+            // Correct click in sequence
+            selectedOrder.push(pos);
+            lockedCells.add(pos);
+            updateUI();
+
+            // Check if all three are selected
+            if (selectedOrder.length === 3) {
+                statusDiv.innerHTML = '✅ Correct! Puzzle solved. The code is 158. ✅';
+                // Call the solve callback with the answer
+                onSolve(ANSWER);
+            }
+        } else {
+            // Wrong click – flash red and reset
+            const clickedCell = container.querySelector(`.puzzle1-cell[data-pos='${pos}']`);
+            if (clickedCell) {
+                clickedCell.classList.add('wrong-flash');
+                setTimeout(() => clickedCell.classList.remove('wrong-flash'), 400);
+            }
+            // Show wrong message
+            statusDiv.innerHTML = `❌ Wrong click! You clicked position ${pos}. Expected position ${expectedPos}. Resetting...`;
+            // Reset sequence (but keep previously locked cells? No, full reset)
+            resetPuzzle();
+        }
+    }
+
+    resetBtn.addEventListener('click', resetPuzzle);
 }
 
 // ------------------- Puzzle 2: Library Layers Poem -------------------
 function renderPuzzle2(container, onSolve) {
-    const poem = `In Manchester's heart, where knowledge flows,
-A library stands where ambition grows.
-Each floor a realm, each space designed,
-To suit the needs of every mind.
+    const EXPECTED_ORDER = ['first', 'fourth', 'second', 'third']; // words to drop in order
+    const ANSWER = "1423"; // numeric answer for the lockbox grid
 
-Where silence reigns and thoughts run deep,
-The first and fourth are calm and still,
-For focused minds and scholarly will.
-No chatter here, just quiet grace,
-A haven built for study's pace.
-
-Where voices blend and ideas are caught,
-The second and third invite the crowd,
-Where learning thrives in shared insight.
-Collaboration finds its home,
-In open zones of shared workspace.
-
-From hushed retreats to lively aisles,
-Each level plays its vital part,
-In shaping minds and stirring hearts.
-So choose your floor, your pace, your way---
-The Library meets you every day.`;
+    let dropSequence = []; // stores words dropped in order
+    let zoneSequence = []; // stores which zone each drop went to ('silent' or 'collab')
 
     container.innerHTML = `
-        <div style="text-align: center; max-height: 60vh; overflow-y: auto;">
-            <h3>Library Layers</h3>
-            <pre style="font-family: monospace; white-space: pre-wrap; background: #f0e6d2; color: #2c241a; padding: 15px; border-radius: 10px; text-align: left;">${poem}</pre>
-            <p>What is the four‑digit code from the floors? (Hint: order of silent floors then collaborative floors)</p>
-            <input type="text" id="puzzle2Answer" placeholder="e.g., 1423" maxlength="4" pattern="\\d{4}" style="padding: 8px; font-size: 1rem; text-align: center;">
-            <button id="submitPuzzle2">Submit</button>
-            <div id="puzzle2Feedback" style="margin-top: 15px;"></div>
+        <div class="puzzle2-container">
+            <div class="puzzle2-poem">
+                <p>In Manchester's heart, where knowledge flows,<br>
+                A library stands where ambition grows.<br>
+                Each floor a realm, each space designed,<br>
+                To suit the needs of every mind.</p>
+                <p>Where silence reigns and thoughts run deep,<br>
+                The <span class="highlight" draggable="true" data-word="first">first</span> and <span class="highlight" draggable="true" data-word="fourth">fourth</span> are calm and still,<br>
+                For focused minds and scholarly will.<br>
+                No chatter here, just quiet grace,<br>
+                A haven built for study's pace.</p>
+                <p>Where voices blend and ideas are caught,<br>
+                The <span class="highlight" draggable="true" data-word="second">second</span> and <span class="highlight" draggable="true" data-word="third">third</span> invite the crowd,<br>
+                Where learning thrives in shared insight.<br>
+                Collaboration finds its home,<br>
+                In open zones of shared workspace.</p>
+                <p>From hushed retreats to lively aisles,<br>
+                Each level plays its vital part,<br>
+                In shaping minds and stirring hearts.<br>
+                So choose your floor, your pace, your way---<br>
+                The Library meets you every day.</p>
+            </div>
+            <div class="puzzle2-zones">
+                <div class="puzzle2-zone" data-zone="silent">
+                    <h4>🔇 Silent Study (Calm & Still)</h4>
+                    <div class="zone-slots" id="silentSlots"></div>
+                </div>
+                <div class="puzzle2-zone" data-zone="collab">
+                    <h4>🗣️ Group Study (Voices Blend)</h4>
+                    <div class="zone-slots" id="collabSlots"></div>
+                </div>
+            </div>
+            <button id="puzzle2ResetBtn" class="puzzle2-reset">Reset Puzzle</button>
+            <div id="puzzle2Status" class="puzzle2-status">Drag the highlighted words from the poem into the correct study zones, in order.</div>
         </div>
     `;
 
-    const submitBtn = container.querySelector('#submitPuzzle2');
-    const answerInput = container.querySelector('#puzzle2Answer');
-    const feedback = container.querySelector('#puzzle2Feedback');
-    const expected = appConfig.puzzles.find(p => p.id === 2).expectedAnswer; // "1423"
+    const silentSlots = container.querySelector('#silentSlots');
+    const collabSlots = container.querySelector('#collabSlots');
+    const statusDiv = container.querySelector('#puzzle2Status');
+    const resetBtn = container.querySelector('#puzzle2ResetBtn');
 
-    submitBtn.addEventListener('click', () => {
-        const answer = answerInput.value.trim();
-        if (answer === expected) {
-            onSolve(expected);
-        } else {
-            const clue = appConfig.puzzles.find(p => p.id === 2).clues.fallback;
-            feedback.innerHTML = `❌ ${clue}`;
-            reportWrongAttempt(2, answer, clue);
+    // Map word to floor number
+    const wordToNumber = {
+        'first': '1',
+        'fourth': '4',
+        'second': '2',
+        'third': '3'
+    };
+
+    // Expected zone for each word (silent for 1,4; collab for 2,3)
+    function expectedZone(word) {
+        return (word === 'first' || word === 'fourth') ? 'silent' : 'collab';
+    }
+
+    function updateUI() {
+        // Show placed words in zones
+        const silentPlaced = dropSequence.filter((_, idx) => zoneSequence[idx] === 'silent');
+        const collabPlaced = dropSequence.filter((_, idx) => zoneSequence[idx] === 'collab');
+        
+        silentSlots.innerHTML = '';
+        collabSlots.innerHTML = '';
+        
+        for (let i = 0; i < 2; i++) {
+            const silentSlot = document.createElement('div');
+            silentSlot.className = 'puzzle2-tile placed';
+            silentSlot.textContent = silentPlaced[i] ? wordToNumber[silentPlaced[i]] : '⬚';
+            silentSlot.style.backgroundColor = silentPlaced[i] ? '#6a9e7b' : '#4a3b2c';
+            silentSlots.appendChild(silentSlot);
+            
+            const collabSlot = document.createElement('div');
+            collabSlot.className = 'puzzle2-tile placed';
+            collabSlot.textContent = collabPlaced[i] ? wordToNumber[collabPlaced[i]] : '⬚';
+            collabSlot.style.backgroundColor = collabPlaced[i] ? '#6a9e7b' : '#4a3b2c';
+            collabSlots.appendChild(collabSlot);
         }
+        
+        // Check if puzzle solved
+        if (dropSequence.length === 4) {
+            const orderCorrect = dropSequence.every((word, idx) => word === EXPECTED_ORDER[idx]);
+            if (orderCorrect) {
+                statusDiv.innerHTML = '✅ Perfect! You’ve arranged the floors correctly. Puzzle solved! ✅';
+                onSolve(ANSWER);
+            }
+        }
+    }
+
+    // Drag and drop handlers
+    const draggables = container.querySelectorAll('.highlight');
+    const dropZones = container.querySelectorAll('.puzzle2-zone');
+    
+    draggables.forEach(dragEl => {
+        dragEl.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', dragEl.getAttribute('data-word'));
+            e.dataTransfer.effectAllowed = 'copy';
+        });
+        dragEl.addEventListener('dragend', (e) => {
+            // Optional: remove temporary styling
+        });
     });
+    
+    dropZones.forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('drag-over');
+        });
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            const word = e.dataTransfer.getData('text/plain');
+            const targetZone = zone.getAttribute('data-zone');
+            
+            // Check if already used (cannot drop same word twice)
+            if (dropSequence.includes(word)) {
+                statusDiv.innerHTML = `❌ The word "${word}" has already been used. Reset to try again.`;
+                return;
+            }
+            
+            const nextExpected = EXPECTED_ORDER[dropSequence.length];
+            if (word !== nextExpected) {
+                statusDiv.innerHTML = `❌ Wrong order! Expected "${nextExpected}" next, but you dropped "${word}". Reset and try again.`;
+                return;
+            }
+            
+            const neededZone = expectedZone(word);
+            if (targetZone !== neededZone) {
+                statusDiv.innerHTML = `❌ "${word}" belongs in the ${neededZone === 'silent' ? 'Silent Study' : 'Group Study'} zone. Drop it there.`;
+                return;
+            }
+            
+            // Correct drop
+            dropSequence.push(word);
+            zoneSequence.push(targetZone);
+            updateUI();
+            statusDiv.innerHTML = `✓ Correct! Dropped "${word}" into ${targetZone === 'silent' ? 'Silent Study' : 'Group Study'}.`;
+            
+            // Disable drag of this word after use (optional: make it non-draggable)
+            const usedDraggable = Array.from(draggables).find(el => el.getAttribute('data-word') === word);
+            if (usedDraggable) {
+                usedDraggable.setAttribute('draggable', 'false');
+                usedDraggable.style.opacity = '0.5';
+                usedDraggable.style.cursor = 'default';
+            }
+        });
+    });
+    
+    function resetPuzzle() {
+        dropSequence = [];
+        zoneSequence = [];
+        // Re-enable drag for all words
+        draggables.forEach(el => {
+            el.setAttribute('draggable', 'true');
+            el.style.opacity = '1';
+            el.style.cursor = 'grab';
+        });
+        updateUI();
+        statusDiv.innerHTML = 'Puzzle reset. Drag the highlighted words from the poem into the correct zones, in order.';
+    }
+    
+    resetBtn.addEventListener('click', resetPuzzle);
+    updateUI();
 }
 
+// ------------------- Puzzle 3: Email Exchange -------------------//
 function renderPuzzle3(container, onSolve) {
     // Email content styled like typical email client
     const emailsHTML = `
@@ -194,60 +367,217 @@ function renderPuzzle3(container, onSolve) {
 
 // ------------------- Puzzle 4: Blank Page (UV Torch) -------------------
 function renderPuzzle4(container, onSolve) {
+    const EXPECTED_ANSWER = "2470";
+    const QUADRANTS = [
+        { x: 0, y: 0, w: 250, h: 150, digit: '2', revealed: false },
+        { x: 250, y: 0, w: 250, h: 150, digit: '4', revealed: false },
+        { x: 0, y: 150, w: 250, h: 150, digit: '7', revealed: false },
+        { x: 250, y: 150, w: 250, h: 150, digit: '0', revealed: false }
+    ];
+    let foundDigits = ['_', '_', '_', '_']; // order of quadrants 1-4
+    let hoverTimers = [null, null, null, null];
+    let puzzleSolved = false;
+
     container.innerHTML = `
         <div style="text-align: center;">
             <h3>Blank Page (UV Torch)</h3>
-            <div id="torchCanvas" style="width: 300px; height: 200px; background: #f5f5dc; margin: 20px auto; border: 2px solid #b5926a; position: relative; overflow: hidden; cursor: none;">
-                <div id="hiddenNumber" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-weight: bold; color: #f5f5dc; text-shadow: none; transition: none;">247</div>
+            <p style="margin-bottom: 10px;">Move the torch over the dark page to reveal the hidden numbers.<br>Hover over each section until the number stays visible.</p>
+            <div id="puzzle4CanvasWrapper" style="position: relative; display: inline-block;">
+                <canvas id="puzzle4Canvas" width="500" height="300" class="puzzle4-canvas" style="width:100%; height:auto; max-width:500px; border:2px solid #b5926a; border-radius:16px;"></canvas>
+                <div id="torchCursor" class="torch-cursor" style="display: none;"></div>
             </div>
-            <p>Move your mouse (or finger) over the blank page to reveal the hidden number.</p>
-            <button id="revealManually">I see the number! Enter it</button>
-            <div id="puzzle4Area" style="margin-top: 15px;"></div>
+            <div id="foundDigitsDisplay" style="margin: 15px 0; font-size: 1.5rem; letter-spacing: 8px;">Found: _ _ _ _</div>
+            <div id="puzzle4SubmitArea" style="margin-top: 15px;"></div>
+            <button id="puzzle4ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
+            <div id="puzzle4Status" style="margin-top: 10px; font-style: italic;"></div>
         </div>
     `;
 
-    const canvas = container.querySelector('#torchCanvas');
-    const hiddenDiv = container.querySelector('#hiddenNumber');
-    const revealBtn = container.querySelector('#revealManually');
-    const area = container.querySelector('#puzzle4Area');
+    const canvas = document.getElementById('puzzle4Canvas');
+    const ctx = canvas.getContext('2d');
+    const wrapper = document.getElementById('puzzle4CanvasWrapper');
+    const torchCursor = document.getElementById('torchCursor');
+    const foundDisplay = document.getElementById('foundDigitsDisplay');
+    const submitArea = document.getElementById('puzzle4SubmitArea');
+    const resetBtn = document.getElementById('puzzle4ResetBtn');
+    const statusDiv = document.getElementById('puzzle4Status');
 
-    // Torch effect: on mousemove, change the hidden number's color to black (reveal) only near cursor
-    // For simplicity, we'll just make the entire number visible when mouse enters canvas, and hide when leaves.
-    // But a more immersive effect: a circular spotlight.
-    // Basic version: on mouseenter, show number; on mouseleave, hide.
-    canvas.addEventListener('mouseenter', () => {
-        hiddenDiv.style.color = '#000';
-    });
-    canvas.addEventListener('mouseleave', () => {
-        hiddenDiv.style.color = '#f5f5dc';
-    });
-    // For touch devices
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        hiddenDiv.style.color = '#000';
-    });
-    canvas.addEventListener('touchend', () => {
-        hiddenDiv.style.color = '#f5f5dc';
-    });
+    let mouseX = 0, mouseY = 0;
+    let mouseInside = false;
 
-    revealBtn.addEventListener('click', () => {
-        area.innerHTML = `
-            <label>Enter the three‑digit number you found:</label>
-            <input type="text" id="puzzle4Answer" maxlength="3" pattern="\\d{3}" placeholder="e.g., 247">
-            <button id="submitPuzzle4">Submit</button>
-        `;
-        const submitBtn = area.querySelector('#submitPuzzle4');
-        const answerInput = area.querySelector('#puzzle4Answer');
-        submitBtn.addEventListener('click', () => {
-            const answer = answerInput.value.trim();
-            const expected = appConfig.puzzles.find(p => p.id === 4).expectedAnswer; // "247"
-            if (answer === expected) {
-                onSolve(expected);
-            } else {
-                const clue = appConfig.puzzles.find(p => p.id === 4).clues.fallback;
-                alert(`❌ ${clue}`);
-                reportWrongAttempt(4, answer, clue);
+    // Draw canvas (dark background with subtle quadrant borders)
+    function drawCanvas() {
+        ctx.clearRect(0, 0, 500, 300);
+        // Dark background
+        ctx.fillStyle = '#1a1f2c';
+        ctx.fillRect(0, 0, 500, 300);
+        // Draw faint grid lines to hint quadrants (optional)
+        ctx.strokeStyle = '#3a4a5a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(250, 0); ctx.lineTo(250, 300); ctx.stroke();
+        ctx.moveTo(0, 150); ctx.lineTo(500, 150); ctx.stroke();
+        // Draw any already revealed digits (persistent)
+        ctx.font = 'bold 48px monospace';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowBlur = 0;
+        for (let i = 0; i < QUADRANTS.length; i++) {
+            if (QUADRANTS[i].revealed) {
+                const q = QUADRANTS[i];
+                const centerX = q.x + q.w/2;
+                const centerY = q.y + q.h/2;
+                ctx.fillText(q.digit, centerX - 20, centerY + 15);
             }
-        });
-    });
+        }
+    }
+
+    // Update the found display
+    function updateFoundDisplay() {
+        let displayStr = 'Found: ';
+        for (let i = 0; i < foundDigits.length; i++) {
+            displayStr += foundDigits[i] + ' ';
+        }
+        foundDisplay.innerText = displayStr;
+        // Check if all digits found
+        const allFound = foundDigits.every(d => d !== '_');
+        if (allFound && !puzzleSolved) {
+            statusDiv.innerHTML = '✅ All four numbers revealed! Enter the 4-digit code below.';
+            // Show submit input
+            submitArea.innerHTML = `
+                <label>Enter the 4-digit code (in order from top-left to bottom-right):</label><br>
+                <input type="text" id="finalCodeInput" maxlength="4" pattern="\\d{4}" placeholder="e.g., 2470" style="padding: 8px; font-size: 1rem; text-align: center; margin-top: 8px;">
+                <button id="submitFinalCode" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-left: 8px;">Unlock</button>
+            `;
+            const finalInput = document.getElementById('finalCodeInput');
+            const finalSubmit = document.getElementById('submitFinalCode');
+            finalSubmit.addEventListener('click', () => {
+                const code = finalInput.value.trim();
+                if (code === EXPECTED_ANSWER) {
+                    onSolve(EXPECTED_ANSWER);
+                    puzzleSolved = true;
+                    statusDiv.innerHTML = '🎉 Correct! Puzzle solved. The answer is 2470.';
+                    submitArea.innerHTML = ''; // clear
+                } else {
+                    statusDiv.innerHTML = `❌ Wrong code. Expected 2470. Try again.`;
+                    reportWrongAttempt(4, code, "Wrong final code");
+                }
+            });
+        }
+    }
+
+    // Mark a quadrant as revealed
+    function revealQuadrant(index) {
+        if (QUADRANTS[index].revealed) return;
+        QUADRANTS[index].revealed = true;
+        foundDigits[index] = QUADRANTS[index].digit;
+        drawCanvas();
+        updateFoundDisplay();
+        statusDiv.innerHTML = `✨ You found the number ${QUADRANTS[index].digit}! ✨`;
+    }
+
+    // Check which quadrant the cursor is in
+    function getQuadrantIndex(mouseCanvasX, mouseCanvasY) {
+        for (let i = 0; i < QUADRANTS.length; i++) {
+            const q = QUADRANTS[i];
+            if (mouseCanvasX >= q.x && mouseCanvasX < q.x + q.w &&
+                mouseCanvasY >= q.y && mouseCanvasY < q.y + q.h) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // Mouse/touch move handler
+    function handleMove(clientX, clientY) {
+        if (!mouseInside) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;   // canvas physical width 500
+        const scaleY = canvas.height / rect.height;
+        let canvasX = (clientX - rect.left) * scaleX;
+        let canvasY = (clientY - rect.top) * scaleY;
+        canvasX = Math.min(Math.max(0, canvasX), canvas.width);
+        canvasY = Math.min(Math.max(0, canvasY), canvas.height);
+        
+        // Update torch position
+        torchCursor.style.left = clientX + 'px';
+        torchCursor.style.top = clientY + 'px';
+        
+        const quadrantIdx = getQuadrantIndex(canvasX, canvasY);
+        if (quadrantIdx !== -1 && !QUADRANTS[quadrantIdx].revealed) {
+            // Start or reset timer for this quadrant
+            if (hoverTimers[quadrantIdx] === null) {
+                hoverTimers[quadrantIdx] = setTimeout(() => {
+                    revealQuadrant(quadrantIdx);
+                    hoverTimers[quadrantIdx] = null;
+                }, 1000); // 1 second hover
+            }
+        } else {
+            // Clear any pending timer if not hovering over an unrevealed quadrant
+            for (let i = 0; i < hoverTimers.length; i++) {
+                if (hoverTimers[i] !== null) {
+                    clearTimeout(hoverTimers[i]);
+                    hoverTimers[i] = null;
+                }
+            }
+        }
+    }
+
+    // Mouse/touch events
+    function onMouseMove(e) {
+        handleMove(e.clientX, e.clientY);
+    }
+    function onTouchMove(e) {
+        e.preventDefault();
+        if (e.touches.length) {
+            handleMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    }
+    function onMouseEnter(e) {
+        mouseInside = true;
+        torchCursor.style.display = 'block';
+        canvas.style.cursor = 'none';
+    }
+    function onMouseLeave(e) {
+        mouseInside = false;
+        torchCursor.style.display = 'none';
+        canvas.style.cursor = 'default';
+        // Clear all timers
+        for (let i = 0; i < hoverTimers.length; i++) {
+            if (hoverTimers[i] !== null) {
+                clearTimeout(hoverTimers[i]);
+                hoverTimers[i] = null;
+            }
+        }
+    }
+
+    // Reset puzzle
+    function resetPuzzle() {
+        for (let i = 0; i < QUADRANTS.length; i++) {
+            QUADRANTS[i].revealed = false;
+            if (hoverTimers[i]) clearTimeout(hoverTimers[i]);
+            hoverTimers[i] = null;
+        }
+        foundDigits = ['_', '_', '_', '_'];
+        puzzleSolved = false;
+        drawCanvas();
+        updateFoundDisplay();
+        submitArea.innerHTML = '';
+        statusDiv.innerHTML = 'Puzzle reset. Move the torch over the dark page to find hidden numbers.';
+    }
+
+    // Attach events
+    canvas.addEventListener('mouseenter', onMouseEnter);
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('mouseleave', onMouseLeave);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onMouseEnter(); });
+    canvas.addEventListener('touchmove', onTouchMove);
+    canvas.addEventListener('touchend', onMouseLeave);
+    // Also handle global mouse move when torch is active? Already covered.
+
+    resetBtn.addEventListener('click', resetPuzzle);
+
+    // Initial draw
+    drawCanvas();
+    updateFoundDisplay();
+    statusDiv.innerHTML = 'Hover over the dark page with your mouse (or finger) to reveal hidden numbers. Hold still for 1 second on each quadrant.';
 }

@@ -207,3 +207,129 @@ h1 {
         grid-template-columns: 1fr;
     }
 }
+
+/* ---------- PUZZLE 1 SPECIFIC ---------- */
+/* Puzzle 1 – Number Grid */
+.puzzle1-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+.puzzle1-cell {
+    aspect-ratio: 1 / 1;
+    background: #f5f0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.puzzle1-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none; /* so clicks go to the div */
+}
+.puzzle1-cell:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.puzzle1-cell.correct {
+    box-shadow: 0 0 0 3px #4caf50, 0 0 0 6px #81c784;
+}
+.puzzle1-cell.correct::after {
+    content: "✓";
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2e7d32;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+.puzzle1-cell.wrong-flash {
+    animation: shakeFlash 0.3s ease;
+}
+@keyframes shakeFlash {
+    0% { background: #ffcccc; transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+    100% { background: #f5f0e0; transform: translateX(0); }
+}
+.puzzle1-reset {
+    display: block;
+    margin: 20px auto 0;
+    background: #8b3a3a;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+}
+.puzzle1-status {
+    text-align: center;
+    margin-top: 15px;
+    font-style: italic;
+    color: #ffecb3;
+}
+
+
+/* Puzzle 2 – Drag from poem */
+.puzzle2-poem .highlight {
+    display: inline-block;
+    cursor: grab;
+    user-select: none;
+}
+.puzzle2-poem .highlight:active {
+    cursor: grabbing;
+}
+.puzzle2-zone {
+    transition: background-color 0.2s;
+}
+.puzzle2-zone.drag-over {
+    background-color: #5f7a5c;
+    border-color: #ffecb3;
+}
+
+/* Puzzle 4 – UV Torch */
+.puzzle4-canvas {
+    position: relative;
+    cursor: none; /* hide default cursor */
+    background: #1a1f2c;
+    border-radius: 16px;
+    overflow: hidden;
+}
+.puzzle4-canvas canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #1a1f2c;
+}
+.torch-cursor {
+    position: fixed;
+    pointer-events: none;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,200,0.6) 0%, rgba(255,255,200,0) 70%);
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    mix-blend-mode: screen;
+}
+@media (max-width: 600px) {
+    .torch-cursor {
+        width: 100px;
+        height: 100px;
+    }
+}
