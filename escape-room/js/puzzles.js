@@ -367,217 +367,227 @@ function renderPuzzle3(container, onSolve) {
 
 // ------------------- Puzzle 4: Blank Page (UV Torch) -------------------
 function renderPuzzle4(container, onSolve) {
-    const EXPECTED_ANSWER = "2470";
-    const QUADRANTS = [
-        { x: 0, y: 0, w: 250, h: 150, digit: '2', revealed: false },
-        { x: 250, y: 0, w: 250, h: 150, digit: '4', revealed: false },
-        { x: 0, y: 150, w: 250, h: 150, digit: '7', revealed: false },
-        { x: 250, y: 150, w: 250, h: 150, digit: '0', revealed: false }
-    ];
-    let foundDigits = ['_', '_', '_', '_']; // order of quadrants 1-4
-    let hoverTimers = [null, null, null, null];
-    let puzzleSolved = false;
+    const EXPECTED_ANSWER = "2470"; // 0 represents infinity
+    const TARGETS = ['2', '4', '7', '∞'];
+    let collected = [];
+
+    const W = 500, H = 350;
+    let numbers = [];
+    const DECOYS = ['1', '3', '5', '6', '8', '9'];
+
+    function initNumbers() {
+        numbers = [];
+        TARGETS.forEach(sym => {
+            numbers.push({
+                symbol: sym,
+                x: Math.random() * (W - 60) + 30,
+                y: Math.random() * (H - 60) + 30,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: (Math.random() - 0.5) * 1.5,
+                isTarget: true,
+                caught: false
+            });
+        });
+        for (let i = 0; i < 8; i++) {
+            const decoy = DECOYS[Math.floor(Math.random() * DECOYS.length)];
+            numbers.push({
+                symbol: decoy,
+                x: Math.random() * (W - 60) + 30,
+                y: Math.random() * (H - 60) + 30,
+                vx: (Math.random() - 0.5) * 1.2,
+                vy: (Math.random() - 0.5) * 1.2,
+                isTarget: false,
+                caught: false
+            });
+        }
+    }
 
     container.innerHTML = `
         <div style="text-align: center;">
-            <h3>Blank Page (UV Torch)</h3>
-            <p style="margin-bottom: 10px;">Move the torch over the dark page to reveal the hidden numbers.<br>Hover over each section until the number stays visible.</p>
-            <div id="puzzle4CanvasWrapper" style="position: relative; display: inline-block;">
-                <canvas id="puzzle4Canvas" width="500" height="300" class="puzzle4-canvas" style="width:100%; height:auto; max-width:500px; border:2px solid #b5926a; border-radius:16px;"></canvas>
+            <h3>UV Torch – Catch the Numbers</h3>
+            <p>Move the torch (mouse/finger) over the dark canvas. When a <strong>hidden target number (2,4,7,∞)</strong> glows, <strong>click</strong> to catch it!</p>
+            <div class="puzzle4-catch-container">
+                <canvas id="puzzle4Canvas" width="${W}" height="${H}" class="puzzle4-canvas"></canvas>
                 <div id="torchCursor" class="torch-cursor" style="display: none;"></div>
             </div>
-            <div id="foundDigitsDisplay" style="margin: 15px 0; font-size: 1.5rem; letter-spacing: 8px;">Found: _ _ _ _</div>
-            <div id="puzzle4SubmitArea" style="margin-top: 15px;"></div>
-            <button id="puzzle4ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
+            <div class="puzzle4-collected" id="collectedDisplay">Caught: _ _ _ _</div>
+            <button id="puzzle4ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Game</button>
             <div id="puzzle4Status" style="margin-top: 10px; font-style: italic;"></div>
         </div>
     `;
 
     const canvas = document.getElementById('puzzle4Canvas');
     const ctx = canvas.getContext('2d');
-    const wrapper = document.getElementById('puzzle4CanvasWrapper');
     const torchCursor = document.getElementById('torchCursor');
-    const foundDisplay = document.getElementById('foundDigitsDisplay');
-    const submitArea = document.getElementById('puzzle4SubmitArea');
+    const collectedDisplay = document.getElementById('collectedDisplay');
     const resetBtn = document.getElementById('puzzle4ResetBtn');
     const statusDiv = document.getElementById('puzzle4Status');
 
-    let mouseX = 0, mouseY = 0;
+    let animationId = null;
+    let mouseX = -100, mouseY = -100;
     let mouseInside = false;
+    let glowTarget = null;
 
-    // Draw canvas (dark background with subtle quadrant borders)
-    function drawCanvas() {
-        ctx.clearRect(0, 0, 500, 300);
-        // Dark background
-        ctx.fillStyle = '#1a1f2c';
-        ctx.fillRect(0, 0, 500, 300);
-        // Draw faint grid lines to hint quadrants (optional)
-        ctx.strokeStyle = '#3a4a5a';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(250, 0); ctx.lineTo(250, 300); ctx.stroke();
-        ctx.moveTo(0, 150); ctx.lineTo(500, 150); ctx.stroke();
-        // Draw any already revealed digits (persistent)
-        ctx.font = 'bold 48px monospace';
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowBlur = 0;
-        for (let i = 0; i < QUADRANTS.length; i++) {
-            if (QUADRANTS[i].revealed) {
-                const q = QUADRANTS[i];
-                const centerX = q.x + q.w/2;
-                const centerY = q.y + q.h/2;
-                ctx.fillText(q.digit, centerX - 20, centerY + 15);
-            }
+    function updateCollectedDisplay() {
+        let display = 'Caught: ';
+        for (let t of TARGETS) {
+            if (collected.includes(t)) display += t + ' ';
+            else display += '_ ';
+        }
+        collectedDisplay.innerText = display.trim();
+        if (collected.length === TARGETS.length) {
+            statusDiv.innerHTML = '🎉 All numbers caught! Puzzle solved! 🎉';
+            onSolve(EXPECTED_ANSWER);
+            cancelAnimationFrame(animationId);
+            animationId = null;
         }
     }
 
-    // Update the found display
-    function updateFoundDisplay() {
-        let displayStr = 'Found: ';
-        for (let i = 0; i < foundDigits.length; i++) {
-            displayStr += foundDigits[i] + ' ';
-        }
-        foundDisplay.innerText = displayStr;
-        // Check if all digits found
-        const allFound = foundDigits.every(d => d !== '_');
-        if (allFound && !puzzleSolved) {
-            statusDiv.innerHTML = '✅ All four numbers revealed! Enter the 4-digit code below.';
-            // Show submit input
-            submitArea.innerHTML = `
-                <label>Enter the 4-digit code (in order from top-left to bottom-right):</label><br>
-                <input type="text" id="finalCodeInput" maxlength="4" pattern="\\d{4}" placeholder="e.g., 2470" style="padding: 8px; font-size: 1rem; text-align: center; margin-top: 8px;">
-                <button id="submitFinalCode" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-left: 8px;">Unlock</button>
-            `;
-            const finalInput = document.getElementById('finalCodeInput');
-            const finalSubmit = document.getElementById('submitFinalCode');
-            finalSubmit.addEventListener('click', () => {
-                const code = finalInput.value.trim();
-                if (code === EXPECTED_ANSWER) {
-                    onSolve(EXPECTED_ANSWER);
-                    puzzleSolved = true;
-                    statusDiv.innerHTML = '🎉 Correct! Puzzle solved. The answer is 2470.';
-                    submitArea.innerHTML = ''; // clear
-                } else {
-                    statusDiv.innerHTML = `❌ Wrong code. Expected 2470. Try again.`;
-                    reportWrongAttempt(4, code, "Wrong final code");
+    function draw() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#0a0c12';
+        ctx.fillRect(0, 0, W, H);
+
+        for (let n of numbers) {
+            if (n.caught) continue;
+            ctx.font = 'bold 28px monospace';
+            ctx.shadowBlur = 0;
+
+            let isGlowing = false;
+            if (mouseInside && !n.caught && n.isTarget) {
+                const dx = mouseX - n.x;
+                const dy = mouseY - n.y;
+                if (Math.hypot(dx, dy) < 45) {
+                    isGlowing = true;
+                    glowTarget = n;
                 }
-            });
-        }
-    }
-
-    // Mark a quadrant as revealed
-    function revealQuadrant(index) {
-        if (QUADRANTS[index].revealed) return;
-        QUADRANTS[index].revealed = true;
-        foundDigits[index] = QUADRANTS[index].digit;
-        drawCanvas();
-        updateFoundDisplay();
-        statusDiv.innerHTML = `✨ You found the number ${QUADRANTS[index].digit}! ✨`;
-    }
-
-    // Check which quadrant the cursor is in
-    function getQuadrantIndex(mouseCanvasX, mouseCanvasY) {
-        for (let i = 0; i < QUADRANTS.length; i++) {
-            const q = QUADRANTS[i];
-            if (mouseCanvasX >= q.x && mouseCanvasX < q.x + q.w &&
-                mouseCanvasY >= q.y && mouseCanvasY < q.y + q.h) {
-                return i;
             }
+
+            if (isGlowing) {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ffff80';
+                ctx.fillStyle = '#ffffaa';
+            } else {
+                // All numbers (targets and decoys) look identical when not glowing
+                ctx.fillStyle = '#6a7a8a';
+            }
+            ctx.fillText(n.symbol, n.x - 15, n.y + 10);
         }
-        return -1;
+
+        if (mouseInside) {
+            ctx.beginPath();
+            ctx.arc(mouseX, mouseY, 40, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(255,255,200,0.15)';
+            ctx.fill();
+            ctx.strokeStyle = '#ffecb3';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
     }
 
-    // Mouse/touch move handler
-    function handleMove(clientX, clientY) {
+    function updatePositions() {
+        for (let n of numbers) {
+            if (n.caught) continue;
+            n.x += n.vx;
+            n.y += n.vy;
+            if (n.x < 20 || n.x > W - 20) n.vx *= -1;
+            if (n.y < 20 || n.y > H - 20) n.vy *= -1;
+            n.x = Math.min(Math.max(n.x, 20), W - 20);
+            n.y = Math.min(Math.max(n.y, 20), H - 20);
+        }
+    }
+
+    function animate() {
+        updatePositions();
+        draw();
+        animationId = requestAnimationFrame(animate);
+    }
+
+    function handleCatch(e) {
         if (!mouseInside) return;
+        if (glowTarget && !glowTarget.caught && glowTarget.isTarget) {
+            const symbol = glowTarget.symbol;
+            if (!collected.includes(symbol)) {
+                collected.push(symbol);
+                glowTarget.caught = true;
+                updateCollectedDisplay();
+                statusDiv.innerHTML = `✅ Caught ${symbol}! ${4 - collected.length} left.`;
+                glowTarget = null;
+            }
+        } else {
+            statusDiv.innerHTML = '❌ No target under torch. Keep hunting!';
+            setTimeout(() => {
+                if (collected.length < TARGETS.length) statusDiv.innerHTML = 'Move torch over a glowing number and click.';
+            }, 800);
+        }
+    }
+
+    function getCanvasCoords(e) {
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;   // canvas physical width 500
+        const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
+        let clientX, clientY;
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
         let canvasX = (clientX - rect.left) * scaleX;
         let canvasY = (clientY - rect.top) * scaleY;
         canvasX = Math.min(Math.max(0, canvasX), canvas.width);
         canvasY = Math.min(Math.max(0, canvasY), canvas.height);
-        
-        // Update torch position
-        torchCursor.style.left = clientX + 'px';
-        torchCursor.style.top = clientY + 'px';
-        
-        const quadrantIdx = getQuadrantIndex(canvasX, canvasY);
-        if (quadrantIdx !== -1 && !QUADRANTS[quadrantIdx].revealed) {
-            // Start or reset timer for this quadrant
-            if (hoverTimers[quadrantIdx] === null) {
-                hoverTimers[quadrantIdx] = setTimeout(() => {
-                    revealQuadrant(quadrantIdx);
-                    hoverTimers[quadrantIdx] = null;
-                }, 1000); // 1 second hover
-            }
-        } else {
-            // Clear any pending timer if not hovering over an unrevealed quadrant
-            for (let i = 0; i < hoverTimers.length; i++) {
-                if (hoverTimers[i] !== null) {
-                    clearTimeout(hoverTimers[i]);
-                    hoverTimers[i] = null;
-                }
-            }
-        }
+        return { x: canvasX, y: canvasY };
     }
 
-    // Mouse/touch events
-    function onMouseMove(e) {
-        handleMove(e.clientX, e.clientY);
-    }
-    function onTouchMove(e) {
+    function onMove(e) {
         e.preventDefault();
-        if (e.touches.length) {
-            handleMove(e.touches[0].clientX, e.touches[0].clientY);
-        }
+        const { x, y } = getCanvasCoords(e);
+        mouseX = x;
+        mouseY = y;
+        const rect = canvas.getBoundingClientRect();
+        const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+        const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
+        torchCursor.style.left = clientX + 'px';
+        torchCursor.style.top = clientY + 'px';
     }
-    function onMouseEnter(e) {
+
+    function onEnter() {
         mouseInside = true;
         torchCursor.style.display = 'block';
         canvas.style.cursor = 'none';
     }
-    function onMouseLeave(e) {
+    function onLeave() {
         mouseInside = false;
         torchCursor.style.display = 'none';
         canvas.style.cursor = 'default';
-        // Clear all timers
-        for (let i = 0; i < hoverTimers.length; i++) {
-            if (hoverTimers[i] !== null) {
-                clearTimeout(hoverTimers[i]);
-                hoverTimers[i] = null;
-            }
-        }
+        glowTarget = null;
     }
 
-    // Reset puzzle
-    function resetPuzzle() {
-        for (let i = 0; i < QUADRANTS.length; i++) {
-            QUADRANTS[i].revealed = false;
-            if (hoverTimers[i]) clearTimeout(hoverTimers[i]);
-            hoverTimers[i] = null;
-        }
-        foundDigits = ['_', '_', '_', '_'];
-        puzzleSolved = false;
-        drawCanvas();
-        updateFoundDisplay();
-        submitArea.innerHTML = '';
-        statusDiv.innerHTML = 'Puzzle reset. Move the torch over the dark page to find hidden numbers.';
+    function resetGame() {
+        collected = [];
+        initNumbers();
+        updateCollectedDisplay();
+        statusDiv.innerHTML = 'Game reset. Hunt for hidden numbers (2,4,7,∞) with your torch.';
+        glowTarget = null;
+        if (animationId) cancelAnimationFrame(animationId);
+        animationId = requestAnimationFrame(animate);
     }
 
-    // Attach events
-    canvas.addEventListener('mouseenter', onMouseEnter);
-    canvas.addEventListener('mousemove', onMouseMove);
-    canvas.addEventListener('mouseleave', onMouseLeave);
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onMouseEnter(); });
-    canvas.addEventListener('touchmove', onTouchMove);
-    canvas.addEventListener('touchend', onMouseLeave);
-    // Also handle global mouse move when torch is active? Already covered.
+    canvas.addEventListener('mouseenter', onEnter);
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseleave', onLeave);
+    canvas.addEventListener('click', handleCatch);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onEnter(); onMove(e); handleCatch(e); });
+    canvas.addEventListener('touchmove', onMove);
+    canvas.addEventListener('touchend', onLeave);
 
-    resetBtn.addEventListener('click', resetPuzzle);
+    resetBtn.addEventListener('click', resetGame);
 
-    // Initial draw
-    drawCanvas();
-    updateFoundDisplay();
-    statusDiv.innerHTML = 'Hover over the dark page with your mouse (or finger) to reveal hidden numbers. Hold still for 1 second on each quadrant.';
+    initNumbers();
+    updateCollectedDisplay();
+    statusDiv.innerHTML = 'Move torch over the dark page – hidden numbers will glow. Click to catch 2,4,7,∞.';
+    animationId = requestAnimationFrame(animate);
 }

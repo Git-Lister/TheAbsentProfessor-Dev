@@ -1,42 +1,38 @@
+// lockbox.js – Safe dial mechanism with progressive joke warnings
+
 let lockboxUnlockedFlag = false;
+let wrongAttemptCount = 0; // for progressive warnings
+
+// Joke warning messages (cycle through these, then loop)
+const WRONG_MESSAGES = [
+    "Incorrect combination, try again.",
+    "STILL incorrect combination.",
+    "Nope, not this one either.",
+    "Are you trying to push my buttons?!",
+    "You've done it! I've run out of ways to tell you you're wrong. I hope you feel proud of yourself!"
+];
 
 function initLockbox() {
     const container = document.getElementById('lockboxContainer');
     if (!container) return;
 
-    // Check if already unlocked (persisted)
-    if (isLockboxUnlocked()) {
-        lockboxUnlockedFlag = true;
+    // If already unlocked globally, show unlocked state
+    if (isLockboxUnlocked() || lockboxUnlockedFlag) {
         renderUnlockedState(container);
         return;
     }
 
-    // Get current puzzle answers
-    const answers = loadState().puzzleAnswers; // array of strings, e.g. ["158", "1423", "2024", "247"]
+    // Get current puzzle answers and build grid
+    const answers = loadState().puzzleAnswers;
     const gridData = buildGridFromAnswers(answers);
-    const column3String = getColumn3String(gridData);
+    const targetCode = appConfig.targetCode; // "8227"
 
-    // Render the grid
-    renderGrid(container, gridData);
-
-    // Check if column3 equals "8227"
-    if (column3String === "8227" && !lockboxUnlockedFlag) {
-        unlockLockbox(container);
-    } else {
-        // Add a message showing progress
-        const msgDiv = container.querySelector('#lockboxMessage') || document.createElement('div');
-        if (!msgDiv.id) {
-            msgDiv.id = 'lockboxMessage';
-            msgDiv.className = 'message';
-            container.appendChild(msgDiv);
-        }
-        msgDiv.innerHTML = `Column 3: ${column3String} ${column3String === "8227" ? '✅' : '❌'} (need 8227 to unlock)`;
-    }
+    // Render grid + safe dials
+    renderLockboxUI(container, gridData, targetCode);
 }
 
 function buildGridFromAnswers(answers) {
-    // Each answer is a string of digits. Pad with empty strings for missing digits.
-    const maxCols = 4; // we need up to 4 columns (since 2024 has 4, 247 has 3)
+    const maxCols = 4;
     const grid = [];
     for (let i = 0; i < answers.length; i++) {
         const answer = answers[i] || '';
@@ -50,50 +46,149 @@ function buildGridFromAnswers(answers) {
     return grid;
 }
 
-function getColumn3String(grid) {
-    // column index 2 (third column)
-    let col3 = '';
-    for (let i = 0; i < grid.length; i++) {
-        col3 += grid[i][2] || '';
-    }
-    return col3;
-}
+function renderLockboxUI(container, gridData, targetCode) {
+    // Target digits as array of characters
+    const targetDigits = targetCode.split(''); // ['8','2','2','7']
+    // Current dial values (initially 0,0,0,0)
+    let currentDigits = ['0', '0', '0', '0'];
 
-function renderGrid(container, gridData) {
-    // Create table HTML
-    let html = `<table class="puzzle-grid" style="width:100%; border-collapse: collapse; margin-bottom: 20px;">`;
-    html += `<thead><tr><th>Puzzle</th><th>Col 1</th><th>Col 2</th><th>Col 3</th><th>Col 4</th></tr></thead><tbody>`;
-    const puzzleNames = ['Number Grid', 'Library Layers', 'Email Chain', 'Blank Page'];
-    for (let i = 0; i < gridData.length; i++) {
-        html += `<tr>
-            <td style="border:1px solid #b5926a; padding: 8px;">${puzzleNames[i]}</td>
-            ${gridData[i].map(cell => `<td style="border:1px solid #b5926a; padding: 8px; text-align: center; font-size: 1.2rem;">${cell || '▯'}</td>`).join('')}
-        </tr>`;
+    // Build HTML
+    container.innerHTML = `
+        <div class="lockbox-grid-section">
+            <h4 style="margin-bottom: 10px;">Your answers (grid)</h4>
+            <table class="puzzle-grid" style="width:100%; margin-bottom: 20px;">
+                <thead><tr><th>Puzzle</th><th>Col 1</th><th>Col 2</th><th>Col 3</th><th>Col 4</th></tr></thead>
+                <tbody>
+                    ${gridData.map((row, idx) => `
+                        <tr>
+                            <td style="border:1px solid #b5926a; padding:8px;">${['Number Grid', 'Library Layers', 'Email Chain', 'Blank Page'][idx]}</td>
+                            ${row.map(cell => `<td style="border:1px solid #b5926a; padding:8px; text-align:center;">${cell || '▯'}</td>`).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            <p><strong>Column 3 shows the safe code: ${targetCode}</strong></p>
+        </div>
+        <div class="safe-dials">
+            <h4>🔐 Enter the combination</h4>
+            <div class="dials-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 15px 0;">
+                ${targetDigits.map((_, idx) => `
+                    <div class="dial" data-idx="${idx}" style="text-align: center;">
+                        <button class="dial-up" data-idx="${idx}" style="background:#3a3228; color:#ffecb3; border:none; border-radius: 30px; padding: 5px 12px; cursor:pointer;">▲</button>
+                        <div class="dial-value" style="font-size: 2rem; font-weight: bold; margin: 5px 0; background:#0f0e0b; padding: 0 15px; border-radius: 20px;">0</div>
+                        <button class="dial-down" data-idx="${idx}" style="background:#3a3228; color:#ffecb3; border:none; border-radius: 30px; padding: 5px 12px; cursor:pointer;">▼</button>
+                    </div>
+                `).join('')}
+            </div>
+            <button id="checkCombinationBtn" style="background: #3c6e47; color: white; border: none; padding: 10px 25px; border-radius: 30px; font-size: 1.2rem; cursor: pointer;">🔓 Check Combination</button>
+            <div id="lockboxMessage" class="message" style="margin-top: 15px;">Set the dials to ${targetCode} and click Check.</div>
+        </div>
+    `;
+
+    // Update display of dial values
+    function updateDialUI() {
+        for (let i = 0; i < targetDigits.length; i++) {
+            const valueDiv = container.querySelector(`.dial[data-idx="${i}"] .dial-value`);
+            if (valueDiv) valueDiv.textContent = currentDigits[i];
+        }
     }
-    html += `</tbody></table>`;
-    html += `<div id="lockboxMessage" class="message"></div>`;
-    container.innerHTML = html;
+
+    // Increment/decrement handlers
+    for (let i = 0; i < targetDigits.length; i++) {
+        const upBtn = container.querySelector(`.dial-up[data-idx="${i}"]`);
+        const downBtn = container.querySelector(`.dial-down[data-idx="${i}"]`);
+        if (upBtn) {
+            upBtn.addEventListener('click', () => {
+                let val = parseInt(currentDigits[i], 10);
+                val = (val + 1) % 10;
+                currentDigits[i] = val.toString();
+                updateDialUI();
+            });
+        }
+        if (downBtn) {
+            downBtn.addEventListener('click', () => {
+                let val = parseInt(currentDigits[i], 10);
+                val = (val - 1 + 10) % 10;
+                currentDigits[i] = val.toString();
+                updateDialUI();
+            });
+        }
+    }
+
+    // Check combination button
+    const checkBtn = container.querySelector('#checkCombinationBtn');
+    const msgDiv = container.querySelector('#lockboxMessage');
+
+    checkBtn.addEventListener('click', () => {
+        if (lockboxUnlockedFlag) return;
+
+        const enteredCode = currentDigits.join('');
+        if (enteredCode === targetCode) {
+            // Success!
+            lockboxUnlockedFlag = true;
+            setLockboxUnlocked(true);
+            const team = getTeamName();
+            const answers = loadState().puzzleAnswers;
+            const code = answers.join(''); // concatenated answers
+            reportSuccess(team, code);
+            renderUnlockedState(container);
+        } else {
+            // Wrong combination – progressive joke warnings
+            const message = WRONG_MESSAGES[wrongAttemptCount % WRONG_MESSAGES.length];
+            msgDiv.innerHTML = `❌ ${message}`;
+            msgDiv.style.background = '#8b3a3a';
+            setTimeout(() => {
+                if (!lockboxUnlockedFlag) {
+                    msgDiv.style.background = '#000000aa';
+                    msgDiv.innerHTML = `Set the dials to ${targetCode} and click Check.`;
+                }
+            }, 2000);
+            wrongAttemptCount++;
+        }
+    });
 }
 
 function renderUnlockedState(container) {
+    const elapsed = getElapsedTime();
+    const timeString = elapsed ? `${elapsed.minutes}m ${elapsed.seconds}s` : "a fantastic effort";
+
+    // Trigger confetti
+    if (typeof canvasConfetti === 'function') {
+        canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.2 }, startVelocity: 15 });
+        canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.8 }, startVelocity: 15 });
+    }
+
     container.innerHTML = `
-        <div class="message success" style="text-align: center; padding: 20px;">
-            🎉🔓 LOCKBOX UNLOCKED! Grades revealed! 🔓🎉
-        </div>
-        <div style="text-align: center; margin-top: 15px;">
-            <span style="font-size: 2rem;">📦✨</span>
+        <div class="unlocked-celebration" style="text-align: center; animation: fadeInScale 0.5s ease;">
+            <div style="font-size: 4rem; margin-bottom: 10px;">🎓📜🎉</div>
+            <div class="message success" style="font-size: 1.4rem; padding: 20px;">
+                🔓 SAFE UNLOCKED! 🔓
+            </div>
+            <div style="background: #2c241a; border-radius: 30px; padding: 15px; margin: 20px 0;">
+                <h3 style="margin: 0 0 10px 0;">📊 Your Team's Stats</h3>
+                <p><strong>⏱️ Time taken:</strong> ${timeString}</p>
+                <p><strong>🔢 Code entered:</strong> ${appConfig.targetCode}</p>
+                <p><strong>📚 Puzzles solved:</strong> All 4 correctly!</p>
+            </div>
+            <div style="background: #4a3b2c; border-radius: 30px; padding: 15px;">
+                <p>✨ Professor Al Beback's grades have been revealed! ✨</p>
+                <p>🎁 Your prize (edible) is waiting with the facilitator.</p>
+                <p style="font-size: 0.8rem; margin-top: 10px;">Great teamwork, detectives!</p>
+            </div>
         </div>
     `;
     container.classList.add('unlocked');
-}
-
-function unlockLockbox(container) {
-    if (lockboxUnlockedFlag) return;
-    lockboxUnlockedFlag = true;
-    setLockboxUnlocked(true);
-    const team = getTeamName();
-    const answers = loadState().puzzleAnswers;
-    const code = answers.join('');
-    reportSuccess(team, code);
-    renderUnlockedState(container);
+    // Add a small animation keyframes if not already in CSS
+    if (!document.querySelector('#unlockedAnimationStyle')) {
+        const style = document.createElement('style');
+        style.id = 'unlockedAnimationStyle';
+        style.textContent = `
+            @keyframes fadeInScale {
+                from { opacity: 0; transform: scale(0.9); }
+                to { opacity: 1; transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 }

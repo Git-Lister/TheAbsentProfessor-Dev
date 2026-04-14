@@ -7,8 +7,9 @@ function loadState() {
     }
     return {
         teamName: '',
-        puzzleAnswers: ['', '', '', ''],  // strings like "158", "1423", etc.
-        lockboxUnlocked: false
+        puzzleAnswers: ['', '', '', ''],
+        lockboxUnlocked: false,
+        startTime: null          // <-- add this line
     };
 }
 
@@ -55,5 +56,26 @@ function isLockboxUnlocked() {
 
 function resetGame() {
     localStorage.removeItem(STORAGE_KEY);
-    // Also clear any other session data if needed
+}
+
+function setStartTime() {
+    const state = loadState();
+    if (!state.startTime) {
+        state.startTime = Date.now();
+        saveState(state);
+    }
+}
+
+function getStartTime() {
+    return loadState().startTime;
+}
+
+function getElapsedTime() {
+    const start = getStartTime();
+    if (!start) return null;
+    const elapsed = Date.now() - start;
+    const seconds = Math.floor(elapsed / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return { minutes, seconds: remainingSeconds };
 }

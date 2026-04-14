@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         teamEntryScreen.style.display = 'none';
         mainGameUI.style.display = 'block';
         initGame();
+        setStartTime(); // record when game starts
     });
 
     // Reset button logic

@@ -333,3 +333,26 @@ h1 {
         height: 100px;
     }
 }
+
+/* Puzzle 4 – Catch the Numbers */
+.puzzle4-catch-container {
+    position: relative;
+    display: inline-block;
+}
+.puzzle4-canvas {
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #b5926a;
+    border-radius: 16px;
+    background: #0a0c12;
+    cursor: none;
+}
+.puzzle4-collected {
+    margin-top: 15px;
+    font-size: 1.5rem;
+    letter-spacing: 8px;
+    background: #2c241a;
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 40px;
+}
