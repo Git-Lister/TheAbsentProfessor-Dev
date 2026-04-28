@@ -8,15 +8,27 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
 </head>
 <body>
-    <!-- Team name entry screen -->
-    <div id="teamEntryScreen" class="team-entry-overlay">
-        <div class="team-entry-card">
-            <h1>The Case of the Absent Professor</h1>
-            <p>Enter your team name to begin:</p>
-            <input type="text" id="initialTeamName" placeholder="e.g., Brainy Bunch" autocomplete="off">
-            <button id="startGameBtn">Start Quest</button>
-        </div>
+<!-- New & improved Team Entry Screen -->
+<div id="teamEntryScreen" class="team-entry-overlay">
+    <!-- Background layers -->
+    <div class="title-bg-image"></div>
+    <div class="dark-overlay"></div>
+
+    <!-- University branding – outside the card, fixed at top -->
+    <div class="uni-header">
+        <div class="uni-name">Manchester Metropolitan University</div>
+        <img src="images/mmu-logo.png" alt="MMU Logo" class="uni-logo">
     </div>
+
+    <!-- Centered content card (no logo inside) -->
+    <div class="team-entry-card">
+        <div class="game-title-hero">Library Unlocked</div>
+        <div class="game-subtitle">The Case of the Absent Professor</div>
+        <p class="entry-instruction">Enter your team name to begin:</p>
+        <input type="text" id="initialTeamName" placeholder="e.g., Brainy Bunch" autocomplete="off">
+        <button id="startGameBtn">Start Quest</button>
+    </div>
+</div>
 
     <!-- Main game UI (hidden until team name is set) -->
     <div id="mainGameUI" style="display: none;">

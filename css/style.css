@@ -356,3 +356,131 @@ h1 {
     padding: 5px 15px;
     border-radius: 40px;
 }
+
+/* ---------- TITLE SCREEN (Wood Panel + Overlay) ---------- */
+.team-entry-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #2e3b3e 0%, #1a1f1f 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.title-bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/wood-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.dark-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+/* University header – fixed at top, outside the card */
+.uni-header {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    z-index: 3;
+    pointer-events: none; /* so clicks pass through to the card */
+}
+
+.uni-name {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: white;
+    text-transform: uppercase;
+    background: rgba(0,0,0,0.5);
+    padding: 6px 12px;
+    border-radius: 30px;
+    backdrop-filter: blur(4px);
+}
+
+.uni-logo {
+    height: 50px;
+    width: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 4px;
+}
+
+/* Content card – no internal logo */
+.team-entry-card {
+    position: relative;
+    z-index: 2;
+    background: #4a3b2c;
+    border-radius: 40px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+    max-width: 450px;
+    width: 90%;
+}
+
+.game-title-hero {
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    margin: 0 0 10px;
+    color: white;
+}
+
+.game-subtitle {
+    font-size: 1.5rem;
+    font-weight: normal;
+    font-style: italic;
+    margin-bottom: 20px;
+    color: #ffecb3;
+}
+
+.entry-instruction {
+    margin: 20px 0 10px;
+    color: #f7e9c3;
+}
+
+/* Keep existing input/button styles – they already work */
+.team-entry-card input {
+    padding: 10px;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    border: none;
+    width: 80%;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.team-entry-card button {
+    background: #3c6e47;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+}

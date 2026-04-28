@@ -115,178 +115,189 @@ function renderPuzzle1(container, onSolve) {
 
 // ------------------- Puzzle 2: Library Layers Poem -------------------
 function renderPuzzle2(container, onSolve) {
-    const EXPECTED_ORDER = ['first', 'fourth', 'second', 'third']; // words to drop in order
-    const ANSWER = "1423"; // numeric answer for the lockbox grid
-
-    let dropSequence = []; // stores words dropped in order
-    let zoneSequence = []; // stores which zone each drop went to ('silent' or 'collab')
-
-    container.innerHTML = `
-        <div class="puzzle2-container">
-            <div class="puzzle2-poem">
-                <p>In Manchester's heart, where knowledge flows,<br>
-                A library stands where ambition grows.<br>
-                Each floor a realm, each space designed,<br>
-                To suit the needs of every mind.</p>
-                <p>Where silence reigns and thoughts run deep,<br>
-                The <span class="highlight" draggable="true" data-word="first">first</span> and <span class="highlight" draggable="true" data-word="fourth">fourth</span> are calm and still,<br>
-                For focused minds and scholarly will.<br>
-                No chatter here, just quiet grace,<br>
-                A haven built for study's pace.</p>
-                <p>Where voices blend and ideas are caught,<br>
-                The <span class="highlight" draggable="true" data-word="second">second</span> and <span class="highlight" draggable="true" data-word="third">third</span> invite the crowd,<br>
-                Where learning thrives in shared insight.<br>
-                Collaboration finds its home,<br>
-                In open zones of shared workspace.</p>
-                <p>From hushed retreats to lively aisles,<br>
-                Each level plays its vital part,<br>
-                In shaping minds and stirring hearts.<br>
-                So choose your floor, your pace, your way---<br>
-                The Library meets you every day.</p>
-            </div>
-            <div class="puzzle2-zones">
-                <div class="puzzle2-zone" data-zone="silent">
-                    <h4>🔇 Silent Study (Calm & Still)</h4>
-                    <div class="zone-slots" id="silentSlots"></div>
-                </div>
-                <div class="puzzle2-zone" data-zone="collab">
-                    <h4>🗣️ Group Study (Voices Blend)</h4>
-                    <div class="zone-slots" id="collabSlots"></div>
-                </div>
-            </div>
-            <button id="puzzle2ResetBtn" class="puzzle2-reset">Reset Puzzle</button>
-            <div id="puzzle2Status" class="puzzle2-status">Drag the highlighted words from the poem into the correct study zones, in order.</div>
-        </div>
-    `;
-
-    const silentSlots = container.querySelector('#silentSlots');
-    const collabSlots = container.querySelector('#collabSlots');
-    const statusDiv = container.querySelector('#puzzle2Status');
-    const resetBtn = container.querySelector('#puzzle2ResetBtn');
-
-    // Map word to floor number
-    const wordToNumber = {
+    const EXPECTED_WORD_ORDER = ['first', 'fourth', 'second', 'third'];
+    const ANSWER = "1423";
+    const wordToFloor = {
         'first': '1',
         'fourth': '4',
         'second': '2',
         'third': '3'
     };
+    // Floor slots: floor number, corresponding word, filled status, display value
+    const floorSlots = [
+        { floor: 1, word: 'first', filled: false, value: '' },
+        { floor: 2, word: 'second', filled: false, value: '' },
+        { floor: 3, word: 'third', filled: false, value: '' },
+        { floor: 4, word: 'fourth', filled: false, value: '' }
+    ];
 
-    // Expected zone for each word (silent for 1,4; collab for 2,3)
-    function expectedZone(word) {
-        return (word === 'first' || word === 'fourth') ? 'silent' : 'collab';
+    let clickSequence = [];
+    let puzzleSolved = false;
+
+    // New shortened poem
+    const poemHTML = `
+        <p>"A Library of Layers</p>
+        <p>The <span class="highlight" data-word="first">first</span> and <span class="highlight" data-word="fourth">fourth</span> floors are calm and still,<br>
+        Quiet spaces shaped for focussed thought,<br>
+        Where minds can settle, read, and write,<br>
+        And silence helps ideas form.</p>
+        <p>The <span class="highlight" data-word="second">second</span> and <span class="highlight" data-word="third">third</span> invite the crowd,<br>
+        Where thinking happens out loud,<br>
+        Through teamwork, talk, and common ground,<br>
+        New ideas are easily found.</p>
+    `;
+
+    container.innerHTML = `
+        <div class="puzzle2-container" style="text-align: center; max-width: 700px; margin: 0 auto;">
+            <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 15px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.6; margin-bottom: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
+                ${poemHTML}
+                <p style="margin-top: 10px;"><strong>Click the highlighted words in order:</strong> first → fourth → second → third</p>
+            </div>
+            <div style="background: #4a3b2c; border-radius: 20px; padding: 20px; display: inline-block; width: 100%;">
+                <h3>📚 Library Floors (enter the code)</h3>
+                <div id="buildingSlots" style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 20px 0;">
+                    <!-- slots injected bottom to top via CSS column-reverse? We'll render in natural order and reverse with CSS -->
+                </div>
+            </div>
+            <div style="margin-top: 20px; background: #2c241a; border-radius: 30px; padding: 10px;">
+                <strong>Your sequence:</strong> <span id="sequenceDisplay">_ _ _ _</span>
+            </div>
+            <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px;">Reset Puzzle</button>
+            <div id="puzzle2Status" style="margin-top: 15px; font-style: italic;"></div>
+        </div>
+    `;
+
+    const buildingSlots = document.getElementById('buildingSlots');
+    const sequenceSpan = document.getElementById('sequenceDisplay');
+    const resetBtn = document.getElementById('puzzle2ResetBtn');
+    const statusDiv = document.getElementById('puzzle2Status');
+    const highlights = container.querySelectorAll('.highlight');
+
+    // Render building with floor 1 at bottom, floor 4 at top using flex-direction column-reverse
+    function renderBuilding() {
+        buildingSlots.style.display = 'flex';
+        buildingSlots.style.flexDirection = 'column-reverse';
+        buildingSlots.style.alignItems = 'center';
+        buildingSlots.style.gap = '10px';
+        buildingSlots.innerHTML = '';
+        // Floors 1 to 4 in natural order (1 top? No, we want 1 at bottom, so we'll append in order 1,2,3,4 and rely on column-reverse)
+        const orderedSlots = [1,2,3,4];
+        for (let floor of orderedSlots) {
+            const slotData = floorSlots.find(s => s.floor === floor);
+            const slotDiv = document.createElement('div');
+            slotDiv.style.background = slotData.filled ? '#6a9e7b' : '#3a3228';
+            slotDiv.style.width = '100px';
+            slotDiv.style.height = '70px';
+            slotDiv.style.display = 'flex';
+            slotDiv.style.alignItems = 'center';
+            slotDiv.style.justifyContent = 'center';
+            slotDiv.style.borderRadius = '12px';
+            slotDiv.style.border = '2px solid #b5926a';
+            slotDiv.style.fontSize = '2rem';
+            slotDiv.style.fontWeight = 'bold';
+            slotDiv.style.color = '#ffecb3';
+            slotDiv.textContent = slotData.filled ? slotData.value : '?';
+            // Add label
+            const label = document.createElement('div');
+            label.style.fontSize = '0.7rem';
+            label.style.marginTop = '4px';
+            label.textContent = `Floor ${floor}`;
+            const wrapper = document.createElement('div');
+            wrapper.style.textAlign = 'center';
+            wrapper.appendChild(slotDiv);
+            wrapper.appendChild(label);
+            buildingSlots.appendChild(wrapper);
+        }
     }
 
-    function updateUI() {
-        // Show placed words in zones
-        const silentPlaced = dropSequence.filter((_, idx) => zoneSequence[idx] === 'silent');
-        const collabPlaced = dropSequence.filter((_, idx) => zoneSequence[idx] === 'collab');
-        
-        silentSlots.innerHTML = '';
-        collabSlots.innerHTML = '';
-        
-        for (let i = 0; i < 2; i++) {
-            const silentSlot = document.createElement('div');
-            silentSlot.className = 'puzzle2-tile placed';
-            silentSlot.textContent = silentPlaced[i] ? wordToNumber[silentPlaced[i]] : '⬚';
-            silentSlot.style.backgroundColor = silentPlaced[i] ? '#6a9e7b' : '#4a3b2c';
-            silentSlots.appendChild(silentSlot);
-            
-            const collabSlot = document.createElement('div');
-            collabSlot.className = 'puzzle2-tile placed';
-            collabSlot.textContent = collabPlaced[i] ? wordToNumber[collabPlaced[i]] : '⬚';
-            collabSlot.style.backgroundColor = collabPlaced[i] ? '#6a9e7b' : '#4a3b2c';
-            collabSlots.appendChild(collabSlot);
+    function updateSequenceDisplay() {
+        let display = '';
+        for (let i = 0; i < 4; i++) {
+            display += (clickSequence[i] ? wordToFloor[clickSequence[i]] : '_') + ' ';
         }
-        
-        // Check if puzzle solved
-        if (dropSequence.length === 4) {
-            const orderCorrect = dropSequence.every((word, idx) => word === EXPECTED_ORDER[idx]);
-            if (orderCorrect) {
-                statusDiv.innerHTML = '✅ Perfect! You’ve arranged the floors correctly. Puzzle solved! ✅';
+        sequenceSpan.innerText = display.trim();
+        if (clickSequence.length === 4 && clickSequence.join('') === EXPECTED_WORD_ORDER.join('')) {
+            if (!puzzleSolved) {
+                puzzleSolved = true;
+                statusDiv.innerHTML = '✅ Perfect! Library floors arranged correctly. Puzzle solved! ✅';
                 onSolve(ANSWER);
             }
         }
     }
 
-    // Drag and drop handlers
-    const draggables = container.querySelectorAll('.highlight');
-    const dropZones = container.querySelectorAll('.puzzle2-zone');
-    
-    draggables.forEach(dragEl => {
-        dragEl.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', dragEl.getAttribute('data-word'));
-            e.dataTransfer.effectAllowed = 'copy';
-        });
-        dragEl.addEventListener('dragend', (e) => {
-            // Optional: remove temporary styling
-        });
-    });
-    
-    dropZones.forEach(zone => {
-        zone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'copy';
-            zone.classList.add('drag-over');
-        });
-        zone.addEventListener('dragleave', () => {
-            zone.classList.remove('drag-over');
-        });
-        zone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            zone.classList.remove('drag-over');
-            const word = e.dataTransfer.getData('text/plain');
-            const targetZone = zone.getAttribute('data-zone');
-            
-            // Check if already used (cannot drop same word twice)
-            if (dropSequence.includes(word)) {
-                statusDiv.innerHTML = `❌ The word "${word}" has already been used. Reset to try again.`;
-                return;
-            }
-            
-            const nextExpected = EXPECTED_ORDER[dropSequence.length];
-            if (word !== nextExpected) {
-                statusDiv.innerHTML = `❌ Wrong order! Expected "${nextExpected}" next, but you dropped "${word}". Reset and try again.`;
-                return;
-            }
-            
-            const neededZone = expectedZone(word);
-            if (targetZone !== neededZone) {
-                statusDiv.innerHTML = `❌ "${word}" belongs in the ${neededZone === 'silent' ? 'Silent Study' : 'Group Study'} zone. Drop it there.`;
-                return;
-            }
-            
-            // Correct drop
-            dropSequence.push(word);
-            zoneSequence.push(targetZone);
-            updateUI();
-            statusDiv.innerHTML = `✓ Correct! Dropped "${word}" into ${targetZone === 'silent' ? 'Silent Study' : 'Group Study'}.`;
-            
-            // Disable drag of this word after use (optional: make it non-draggable)
-            const usedDraggable = Array.from(draggables).find(el => el.getAttribute('data-word') === word);
-            if (usedDraggable) {
-                usedDraggable.setAttribute('draggable', 'false');
-                usedDraggable.style.opacity = '0.5';
-                usedDraggable.style.cursor = 'default';
-            }
-        });
-    });
-    
-    function resetPuzzle() {
-        dropSequence = [];
-        zoneSequence = [];
-        // Re-enable drag for all words
-        draggables.forEach(el => {
-            el.setAttribute('draggable', 'true');
-            el.style.opacity = '1';
-            el.style.cursor = 'grab';
-        });
-        updateUI();
-        statusDiv.innerHTML = 'Puzzle reset. Drag the highlighted words from the poem into the correct zones, in order.';
+    function fillSlot(word) {
+        const floorNumber = wordToFloor[word];
+        const slot = floorSlots.find(s => s.floor === parseInt(floorNumber));
+        if (slot && !slot.filled) {
+            slot.filled = true;
+            slot.value = floorNumber;
+            renderBuilding();
+        }
     }
-    
+
+    function resetPuzzle() {
+        clickSequence = [];
+        puzzleSolved = false;
+        floorSlots.forEach(slot => {
+            slot.filled = false;
+            slot.value = '';
+        });
+        renderBuilding();
+        updateSequenceDisplay();
+        // Re-enable all highlighted words
+        highlights.forEach(span => {
+            span.style.opacity = '1';
+            span.style.cursor = 'pointer';
+            span.style.backgroundColor = '';
+            span.style.pointerEvents = 'auto';
+        });
+        statusDiv.innerHTML = 'Puzzle reset. Click the highlighted words in order: first → fourth → second → third.';
+    }
+
+    function handleWordClick(e) {
+        if (puzzleSolved) return;
+        const span = e.currentTarget;
+        const word = span.getAttribute('data-word');
+        if (clickSequence.includes(word)) {
+            statusDiv.innerHTML = `❌ You already used "${word}". Reset to try again.`;
+            return;
+        }
+        const nextExpected = EXPECTED_WORD_ORDER[clickSequence.length];
+        if (word !== nextExpected) {
+            statusDiv.innerHTML = `❌ Wrong order! Expected "${nextExpected}" next, but you clicked "${word}". Resetting puzzle.`;
+            resetPuzzle();
+            return;
+        }
+        // Correct click
+        clickSequence.push(word);
+        fillSlot(word);
+        updateSequenceDisplay();
+        statusDiv.innerHTML = `✓ Correct! "${word}" added.`;
+        // Disable the clicked word
+        span.style.opacity = '0.5';
+        span.style.cursor = 'default';
+        span.style.backgroundColor = '#6a9e7b';
+        span.style.pointerEvents = 'none';
+        if (clickSequence.length === 4) {
+            // already handled in updateSequenceDisplay
+        }
+    }
+
+    // Attach click listeners to highlighted words
+    highlights.forEach(span => {
+        span.style.cursor = 'pointer';
+        span.style.display = 'inline-block';
+        span.style.padding = '0 4px';
+        span.style.borderRadius = '12px';
+        span.style.transition = '0.1s';
+        span.addEventListener('click', handleWordClick);
+    });
+
     resetBtn.addEventListener('click', resetPuzzle);
-    updateUI();
+    // Initial render
+    renderBuilding();
+    updateSequenceDisplay();
+    statusDiv.innerHTML = 'Click the highlighted words in order: first → fourth → second → third.';
 }
 
 // ------------------- Puzzle 3: Email Exchange -------------------//
@@ -333,13 +344,13 @@ function renderPuzzle3(container, onSolve) {
             ${emailsHTML}
             <div style="text-align: center; margin: 20px 0;">
                 <p>🔍 <strong>Find the publication year of the 6th edition of <em>The Study Skills Handbook</em></strong> using the link below:</p>
-                <a href="https://mmu.on.worldcat.org/oclc/1437528165" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #3c6e47; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; margin: 10px 0;">📚 Search Library Catalogue</a>
+                <a href="https://www.mmu.ac.uk/library/search-tools/library-search" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #3c6e47; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; margin: 10px 0;">📚 Search Library Catalogue</a>
                 <p style="font-size: 0.9rem; color: #555;">(Opens in a new tab – look for the <strong>publication year</strong> of the 6th edition.)</p>
             </div>
             <div id="puzzle3AnswerArea" style="margin-top: 20px; text-align: center;">
                 <label>Once you have the year, enter the <strong>4-digit year</strong> below:</label>
                 <div style="margin-top: 10px;">
-                    <input type="text" id="yearInput" maxlength="4" pattern="\\d{4}" placeholder="e.g., 2024" style="padding: 8px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc;">
+                    <input type="text" id="yearInput" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 8px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc;">
                     <button id="submitYearBtn" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin-left: 10px;">Submit</button>
                 </div>
                 <div id="puzzle3Feedback" style="margin-top: 15px; font-style: italic;"></div>
@@ -367,51 +378,43 @@ function renderPuzzle3(container, onSolve) {
 
 // ------------------- Puzzle 4: Blank Page (UV Torch) -------------------
 function renderPuzzle4(container, onSolve) {
-    const EXPECTED_ANSWER = "2470"; // 0 represents infinity
-    const TARGETS = ['2', '4', '7', '∞'];
+    const EXPECTED_ANSWER = "247";
+    const TARGETS = ['2', '4', '7'];
     let collected = [];
 
-    const W = 500, H = 350;
-    let numbers = [];
-    const DECOYS = ['1', '3', '5', '6', '8', '9'];
+    // Canvas dimensions
+    const W = 600, H = 400;
 
-    function initNumbers() {
-        numbers = [];
-        TARGETS.forEach(sym => {
-            numbers.push({
-                symbol: sym,
-                x: Math.random() * (W - 60) + 30,
-                y: Math.random() * (H - 60) + 30,
-                vx: (Math.random() - 0.5) * 1.5,
-                vy: (Math.random() - 0.5) * 1.5,
-                isTarget: true,
-                caught: false
-            });
-        });
-        for (let i = 0; i < 8; i++) {
-            const decoy = DECOYS[Math.floor(Math.random() * DECOYS.length)];
-            numbers.push({
-                symbol: decoy,
-                x: Math.random() * (W - 60) + 30,
-                y: Math.random() * (H - 60) + 30,
-                vx: (Math.random() - 0.5) * 1.2,
-                vy: (Math.random() - 0.5) * 1.2,
-                isTarget: false,
-                caught: false
-            });
-        }
-    }
+    // Define fixed number positions (x, y, symbol, isTarget)
+    // Coordinates are relative to canvas (0,0 top-left). Adjust as needed.
+    const numbers = [
+        // Targets (2,4,7)
+        { x: 120, y: 150, symbol: '2', isTarget: true, caught: false },
+        { x: 300, y: 280, symbol: '4', isTarget: true, caught: false },
+        { x: 480, y: 90, symbol: '7', isTarget: true, caught: false },
+        // Decoys (0,1,3,5,6,8,9)
+        { x: 50, y: 350, symbol: '1', isTarget: false, caught: false },
+        { x: 220, y: 50, symbol: '3', isTarget: false, caught: false },
+        { x: 400, y: 370, symbol: '5', isTarget: false, caught: false },
+        { x: 540, y: 220, symbol: '6', isTarget: false, caught: false },
+        { x: 80, y: 80, symbol: '8', isTarget: false, caught: false },
+        { x: 350, y: 150, symbol: '9', isTarget: false, caught: false },
+        { x: 520, y: 320, symbol: '0', isTarget: false, caught: false },
+    ];
 
+    // Create container
     container.innerHTML = `
         <div style="text-align: center;">
-            <h3>UV Torch – Catch the Numbers</h3>
-            <p>Move the torch (mouse/finger) over the dark canvas. When a <strong>hidden target number (2,4,7,∞)</strong> glows, <strong>click</strong> to catch it!</p>
-            <div class="puzzle4-catch-container">
-                <canvas id="puzzle4Canvas" width="${W}" height="${H}" class="puzzle4-canvas"></canvas>
+            <h3>Library Entrance – Find the Hidden Numbers</h3>
+            <p>Move the torch (mouse/finger) over the image. When a <strong>target number (2,4,7)</strong> becomes visible, click to catch it!</p>
+            <div style="position: relative; display: inline-block;">
+                <canvas id="puzzle4Canvas" width="${W}" height="${H}" style="border: 2px solid #b5926a; border-radius: 16px; background: #2c241a; cursor: none;"></canvas>
                 <div id="torchCursor" class="torch-cursor" style="display: none;"></div>
             </div>
-            <div class="puzzle4-collected" id="collectedDisplay">Caught: _ _ _ _</div>
-            <button id="puzzle4ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Game</button>
+            <div class="puzzle4-collected" style="margin-top: 15px; font-size: 1.5rem; background: #2c241a; display: inline-block; padding: 5px 15px; border-radius: 40px;">
+                Caught: <span id="caughtDisplay">_ _ _</span>
+            </div>
+            <button id="puzzle4ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
             <div id="puzzle4Status" style="margin-top: 10px; font-style: italic;"></div>
         </div>
     `;
@@ -419,89 +422,91 @@ function renderPuzzle4(container, onSolve) {
     const canvas = document.getElementById('puzzle4Canvas');
     const ctx = canvas.getContext('2d');
     const torchCursor = document.getElementById('torchCursor');
-    const collectedDisplay = document.getElementById('collectedDisplay');
+    const caughtSpan = document.getElementById('caughtDisplay');
     const resetBtn = document.getElementById('puzzle4ResetBtn');
     const statusDiv = document.getElementById('puzzle4Status');
 
-    let animationId = null;
     let mouseX = -100, mouseY = -100;
     let mouseInside = false;
     let glowTarget = null;
+    let backgroundImage = new Image();
+    let imageLoaded = false;
 
-    function updateCollectedDisplay() {
-        let display = 'Caught: ';
+    // Load library image
+    backgroundImage.src = 'images/puzzle4/library.jpg';
+    backgroundImage.onload = () => {
+        imageLoaded = true;
+        draw();
+    };
+    backgroundImage.onerror = () => {
+        console.warn('Library image not found – using fallback colour');
+        imageLoaded = true; // proceed with fallback
+        draw();
+    };
+
+    function updateCaughtDisplay() {
+        let display = '';
         for (let t of TARGETS) {
             if (collected.includes(t)) display += t + ' ';
             else display += '_ ';
         }
-        collectedDisplay.innerText = display.trim();
+        caughtSpan.innerText = display.trim();
         if (collected.length === TARGETS.length) {
             statusDiv.innerHTML = '🎉 All numbers caught! Puzzle solved! 🎉';
             onSolve(EXPECTED_ANSWER);
-            cancelAnimationFrame(animationId);
-            animationId = null;
         }
     }
 
     function draw() {
         if (!ctx) return;
+        // Clear canvas
         ctx.clearRect(0, 0, W, H);
-        ctx.fillStyle = '#0a0c12';
-        ctx.fillRect(0, 0, W, H);
+        // Draw background (image or fallback)
+        if (imageLoaded && backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+            ctx.drawImage(backgroundImage, 0, 0, W, H);
+        } else {
+            ctx.fillStyle = '#4a5b6e';
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = '#ffecb3';
+            ctx.font = '14px monospace';
+            ctx.fillText('Library image missing – place images/puzzle4/library.jpg', 50, 200);
+        }
 
+        // Draw all numbers (faint, nearly invisible)
         for (let n of numbers) {
             if (n.caught) continue;
             ctx.font = 'bold 28px monospace';
             ctx.shadowBlur = 0;
-
             let isGlowing = false;
             if (mouseInside && !n.caught && n.isTarget) {
                 const dx = mouseX - n.x;
                 const dy = mouseY - n.y;
-                if (Math.hypot(dx, dy) < 45) {
+                if (Math.hypot(dx, dy) < 45) { // torch radius
                     isGlowing = true;
                     glowTarget = n;
                 }
             }
-
             if (isGlowing) {
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#ffff80';
-                ctx.fillStyle = '#ffffaa';
+                ctx.fillStyle = '#00C1D3';
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = '#ffaa00';
             } else {
-                // All numbers (targets and decoys) look identical when not glowing
-                ctx.fillStyle = '#6a7a8a';
+                // Nearly invisible (blends with image)
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
             }
-            ctx.fillText(n.symbol, n.x - 15, n.y + 10);
+            ctx.fillText(n.symbol, n.x - 12, n.y + 10);
         }
 
+        // Draw torch cursor circle
         if (mouseInside) {
             ctx.beginPath();
             ctx.arc(mouseX, mouseY, 40, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(255,255,200,0.15)';
+            ctx.fillStyle = 'rgba(255,255,200,0.2)';
             ctx.fill();
             ctx.strokeStyle = '#ffecb3';
             ctx.lineWidth = 2;
             ctx.stroke();
         }
-    }
-
-    function updatePositions() {
-        for (let n of numbers) {
-            if (n.caught) continue;
-            n.x += n.vx;
-            n.y += n.vy;
-            if (n.x < 20 || n.x > W - 20) n.vx *= -1;
-            if (n.y < 20 || n.y > H - 20) n.vy *= -1;
-            n.x = Math.min(Math.max(n.x, 20), W - 20);
-            n.y = Math.min(Math.max(n.y, 20), H - 20);
-        }
-    }
-
-    function animate() {
-        updatePositions();
-        draw();
-        animationId = requestAnimationFrame(animate);
     }
 
     function handleCatch(e) {
@@ -511,18 +516,21 @@ function renderPuzzle4(container, onSolve) {
             if (!collected.includes(symbol)) {
                 collected.push(symbol);
                 glowTarget.caught = true;
-                updateCollectedDisplay();
-                statusDiv.innerHTML = `✅ Caught ${symbol}! ${4 - collected.length} left.`;
+                updateCaughtDisplay();
+                statusDiv.innerHTML = `✅ Caught ${symbol}! ${3 - collected.length} left.`;
                 glowTarget = null;
+                draw(); // redraw to remove caught number
             }
         } else {
-            statusDiv.innerHTML = '❌ No target under torch. Keep hunting!';
+            statusDiv.innerHTML = '❌ No target under torch. Keep searching!';
             setTimeout(() => {
-                if (collected.length < TARGETS.length) statusDiv.innerHTML = 'Move torch over a glowing number and click.';
-            }, 800);
+                if (collected.length < TARGETS.length)
+                    statusDiv.innerHTML = 'Move torch over the image – hidden numbers will appear. Click to catch 2,4,7.';
+            }, 1500);
         }
     }
 
+    // Mouse/touch tracking
     function getCanvasCoords(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -552,30 +560,35 @@ function renderPuzzle4(container, onSolve) {
         const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
         torchCursor.style.left = clientX + 'px';
         torchCursor.style.top = clientY + 'px';
+        draw();
     }
 
     function onEnter() {
         mouseInside = true;
         torchCursor.style.display = 'block';
         canvas.style.cursor = 'none';
+        draw();
     }
     function onLeave() {
         mouseInside = false;
         torchCursor.style.display = 'none';
         canvas.style.cursor = 'default';
         glowTarget = null;
+        draw();
     }
 
     function resetGame() {
         collected = [];
-        initNumbers();
-        updateCollectedDisplay();
-        statusDiv.innerHTML = 'Game reset. Hunt for hidden numbers (2,4,7,∞) with your torch.';
+        for (let n of numbers) {
+            n.caught = false;
+        }
+        updateCaughtDisplay();
+        statusDiv.innerHTML = 'Puzzle reset. Find and catch 2, 4, and 7.';
         glowTarget = null;
-        if (animationId) cancelAnimationFrame(animationId);
-        animationId = requestAnimationFrame(animate);
+        draw();
     }
 
+    // Attach events
     canvas.addEventListener('mouseenter', onEnter);
     canvas.addEventListener('mousemove', onMove);
     canvas.addEventListener('mouseleave', onLeave);
@@ -586,8 +599,7 @@ function renderPuzzle4(container, onSolve) {
 
     resetBtn.addEventListener('click', resetGame);
 
-    initNumbers();
-    updateCollectedDisplay();
-    statusDiv.innerHTML = 'Move torch over the dark page – hidden numbers will glow. Click to catch 2,4,7,∞.';
-    animationId = requestAnimationFrame(animate);
+    // Initial draw
+    updateCaughtDisplay();
+    statusDiv.innerHTML = 'Move torch over the image – hidden numbers will glow. Click to catch 2,4,7.';
 }
