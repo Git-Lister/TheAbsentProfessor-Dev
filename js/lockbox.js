@@ -59,10 +59,16 @@ function renderLockboxUI(container, gridData, targetCode) {
             <table class="puzzle-grid" style="width:100%; margin-bottom: 20px;">
                 <thead><tr><th>Puzzle</th><th>Col 1</th><th>Col 2</th><th>Col 3</th><th>Col 4</th></tr></thead>
                 <tbody>
-                    ${gridData.map((row, idx) => `
+                    ${gridData.map((row, rowIdx) => `
                         <tr>
-                            <td style="border:1px solid #b5926a; padding:8px;">${['Number Grid', 'Library Layers', 'Email Chain', 'Blank Page'][idx]}</td>
-                            ${row.map(cell => `<td style="border:1px solid #b5926a; padding:8px; text-align:center;">${cell || '▯'}</td>`).join('')}
+                            <td style="border:1px solid #b5926a; padding:8px;">${['Number Grid', 'Library Layers', 'Email Chain', 'Blank Page'][rowIdx]}</td>
+                            ${row.map((cell, colIdx) => {
+                                // Show X for row 1 (index 0) col 4 (index 3) OR row 4 (index 3) col 4 (index 3)
+                                if ((rowIdx === 0 || rowIdx === 3) && colIdx === 3) {
+                                    return `<td style="border:1px solid #b5926a; padding:8px; text-align:center;">X</td>`;
+                                }
+                                return `<td style="border:1px solid #b5926a; padding:8px; text-align:center;">${cell || '▯'}</td>`;
+                            }).join('')}
                         </tr>
                     `).join('')}
                 </tbody>
