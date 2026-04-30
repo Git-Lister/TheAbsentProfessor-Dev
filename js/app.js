@@ -19,20 +19,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         initGame();
     }
 
-    // Start button logic
-    startBtn.addEventListener('click', () => {
-        const teamName = initialTeamInput.value.trim();
-        if (teamName === "") {
-            alert("Please enter a team name.");
-            return;
-        }
-        setTeamName(teamName);
-        displayTeamSpan.textContent = teamName;
-        teamEntryScreen.style.display = 'none';
-        mainGameUI.style.display = 'block';
-        initGame();
-        setStartTime(); // record when game starts
-    });
+startBtn.addEventListener('click', () => {
+    const teamName = initialTeamInput.value.trim();
+    if (teamName === "") {
+        alert("Please enter a team name.");
+        return;
+    }
+    setTeamName(teamName);
+    displayTeamSpan.textContent = teamName;
+    teamEntryScreen.style.display = 'none';
+    // Show story modal instead of mainGameUI yet
+    const storyModal = document.getElementById('storyModal');
+    storyModal.style.display = 'flex';
+});
+
+// Add listener for the begin button
+const beginBtn = document.getElementById('beginGameBtn');
+beginBtn.addEventListener('click', () => {
+    const storyModal = document.getElementById('storyModal');
+    storyModal.style.display = 'none';
+    mainGameUI.style.display = 'block';
+    initGame();
+    setStartTime(); // start timer now
+});
 
     // Reset button logic
     resetBtn.addEventListener('click', () => {

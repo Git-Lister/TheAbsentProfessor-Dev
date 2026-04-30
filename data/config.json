@@ -6,10 +6,10 @@
       "expectedAnswer": "158",
       "clues": {
         "wrongDigits": {},
-        "fallback": "The odd one out gives three digits. Check the grid pattern."
+        "fallback": "Don't feel Blue, just find what looks the same to you."
       },
       "hintTimer": 120,
-      "hintText": "Look at the shapes of the numbers – which one is different?"
+      "hintText": "Can't see what you're looking for? Return to the start, then Return twice more."
     },
     {
       "id": 2,
@@ -17,10 +17,10 @@
       "expectedAnswer": "1423",
       "clues": {
         "wrongDigits": {},
-        "fallback": "The poem mentions floor numbers. Read it again carefully."
+        "fallback": "Where silence dwells and voices blend, the pattern hides around the bend."
       },
       "hintTimer": 120,
-      "hintText": "Which floors are silent? Which are collaborative? The order matters."
+      "hintText": "Start where quiet begins, then find its twin; next where chatter starts, then its partner wins."
     },
     {
       "id": 3,
@@ -28,10 +28,10 @@
       "expectedAnswer": "2024",
       "clues": {
         "wrongDigits": {},
-        "fallback": "That's not the correct publication year. Search again for the 6th edition."
+        "fallback": "The Handbook’s most recent number – not the page, but the year it came to be."
       },
       "hintTimer": 120,
-      "hintText": "The 6th edition of 'The Study Skills Handbook' was published in 2024."
+      "hintText": "Study skills up to date? Look for the edition that matches today."
     },
     {
       "id": 4,
@@ -39,10 +39,10 @@
       "expectedAnswer": "247",
       "clues": {
         "wrongDigits": {},
-        "fallback": "The UV torch reveals three numbers. Keep moving the light."
+        "fallback": "A torch reveals what’s always open – three digits tell the tale."
       },
       "hintTimer": 120,
-      "hintText": "Shine the torch over the blank page – a number will appear."
+      "hintText": "Day and night, weeklong light. Catch the numbers hiding in plain sight."
     }
   ],
   "targetCode": "8227",

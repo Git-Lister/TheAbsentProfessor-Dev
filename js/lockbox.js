@@ -73,7 +73,7 @@ function renderLockboxUI(container, gridData, targetCode) {
                     `).join('')}
                 </tbody>
             </table>
-            <p><strong>Column 3 shows the safe code: ${targetCode}</strong></p>
+            <p><strong>Column 1, Column 2 or Column 3, in which of these will the safe-code be?: </strong></p>
         </div>
         <div class="safe-dials">
             <h4>🔐 Enter the combination</h4>
@@ -87,7 +87,7 @@ function renderLockboxUI(container, gridData, targetCode) {
                 `).join('')}
             </div>
             <button id="checkCombinationBtn" style="background: #3c6e47; color: white; border: none; padding: 10px 25px; border-radius: 30px; font-size: 1.2rem; cursor: pointer;">🔓 Check Combination</button>
-            <div id="lockboxMessage" class="message" style="margin-top: 15px;">Set the dials to ${targetCode} and click Check.</div>
+            <div id="lockboxMessage" class="message" style="margin-top: 15px;">Set the dials to and click to check.</div>
         </div>
     `;
 
