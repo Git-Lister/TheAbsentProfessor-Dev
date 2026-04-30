@@ -1,9 +1,8 @@
 // lockbox.js – Safe dial mechanism with progressive joke warnings
 
 let lockboxUnlockedFlag = false;
-let wrongAttemptCount = 0; // for progressive warnings
+let wrongAttemptCount = 0;
 
-// Joke warning messages (cycle through these, then loop)
 const WRONG_MESSAGES = [
     "Incorrect combination, try again.",
     "STILL incorrect combination.",
@@ -16,18 +15,14 @@ function initLockbox() {
     const container = document.getElementById('lockboxContainer');
     if (!container) return;
 
-    // If already unlocked globally, show unlocked state
     if (isLockboxUnlocked() || lockboxUnlockedFlag) {
         renderUnlockedState(container);
         return;
     }
 
-    // Get current puzzle answers and build grid
     const answers = loadState().puzzleAnswers;
     const gridData = buildGridFromAnswers(answers);
-    const targetCode = appConfig.targetCode; // "8227"
-
-    // Render grid + safe dials
+    const targetCode = appConfig.targetCode;
     renderLockboxUI(container, gridData, targetCode);
 }
 
@@ -47,12 +42,9 @@ function buildGridFromAnswers(answers) {
 }
 
 function renderLockboxUI(container, gridData, targetCode) {
-    // Target digits as array of characters
-    const targetDigits = targetCode.split(''); // ['8','2','2','7']
-    // Current dial values (initially 0,0,0,0)
+    const targetDigits = targetCode.split('');
     let currentDigits = ['0', '0', '0', '0'];
 
-    // Build HTML
     container.innerHTML = `
         <div class="lockbox-grid-section">
             <h4 style="margin-bottom: 10px;">Your answers (grid)</h4>
@@ -63,7 +55,6 @@ function renderLockboxUI(container, gridData, targetCode) {
                         <tr>
                             <td style="border:1px solid #b5926a; padding:8px;">${['Number Grid', 'Library Layers', 'Email Chain', 'Blank Page'][rowIdx]}</td>
                             ${row.map((cell, colIdx) => {
-                                // Show X for row 1 (index 0) col 4 (index 3) OR row 4 (index 3) col 4 (index 3)
                                 if ((rowIdx === 0 || rowIdx === 3) && colIdx === 3) {
                                     return `<td style="border:1px solid #b5926a; padding:8px; text-align:center;">X</td>`;
                                 }
@@ -73,7 +64,7 @@ function renderLockboxUI(container, gridData, targetCode) {
                     `).join('')}
                 </tbody>
             </table>
-            <p><strong>Column 1, Column 2 or Column 3, in which of these will the safe-code be?: </strong></p>
+            <p><strong>Column 3 contains the safe code: ${targetCode}</strong></p>
         </div>
         <div class="safe-dials">
             <h4>🔐 Enter the combination</h4>
@@ -87,11 +78,10 @@ function renderLockboxUI(container, gridData, targetCode) {
                 `).join('')}
             </div>
             <button id="checkCombinationBtn" style="background: #3c6e47; color: white; border: none; padding: 10px 25px; border-radius: 30px; font-size: 1.2rem; cursor: pointer;">🔓 Check Combination</button>
-            <div id="lockboxMessage" class="message" style="margin-top: 15px;">Set the dials to and click to check.</div>
+            <div id="lockboxMessage" class="message" style="margin-top: 15px;">Set the dials to ${targetCode} and click Check.</div>
         </div>
     `;
 
-    // Update display of dial values
     function updateDialUI() {
         for (let i = 0; i < targetDigits.length; i++) {
             const valueDiv = container.querySelector(`.dial[data-idx="${i}"] .dial-value`);
@@ -99,7 +89,6 @@ function renderLockboxUI(container, gridData, targetCode) {
         }
     }
 
-    // Increment/decrement handlers
     for (let i = 0; i < targetDigits.length; i++) {
         const upBtn = container.querySelector(`.dial-up[data-idx="${i}"]`);
         const downBtn = container.querySelector(`.dial-down[data-idx="${i}"]`);
@@ -121,7 +110,6 @@ function renderLockboxUI(container, gridData, targetCode) {
         }
     }
 
-    // Check combination button
     const checkBtn = container.querySelector('#checkCombinationBtn');
     const msgDiv = container.querySelector('#lockboxMessage');
 
@@ -130,16 +118,16 @@ function renderLockboxUI(container, gridData, targetCode) {
 
         const enteredCode = currentDigits.join('');
         if (enteredCode === targetCode) {
-            // Success!
             lockboxUnlockedFlag = true;
             setLockboxUnlocked(true);
             const team = getTeamName();
             const answers = loadState().puzzleAnswers;
-            const code = answers.join(''); // concatenated answers
-            reportSuccess(team, code);
+            const code = answers.join('');
+            const elapsed = getElapsedTime();
+            const timeString = elapsed ? `${elapsed.minutes}m ${elapsed.seconds}s` : "a fantastic effort";
+            reportSuccess(team, code, timeString);
             renderUnlockedState(container);
         } else {
-            // Wrong combination – progressive joke warnings
             const message = WRONG_MESSAGES[wrongAttemptCount % WRONG_MESSAGES.length];
             msgDiv.innerHTML = `❌ ${message}`;
             msgDiv.style.background = '#8b3a3a';
@@ -157,9 +145,9 @@ function renderLockboxUI(container, gridData, targetCode) {
 function renderUnlockedState(container) {
     const elapsed = getElapsedTime();
     const timeString = elapsed ? `${elapsed.minutes}m ${elapsed.seconds}s` : "a fantastic effort";
-    reportSuccess(team, code, timeString);
+    // Most of the stats display; reporting is already done inside the check button.
+    // We only need to show the visual celebration here.
 
-    // Trigger confetti
     if (typeof canvasConfetti === 'function') {
         canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.2 }, startVelocity: 15 });
@@ -186,16 +174,5 @@ function renderUnlockedState(container) {
         </div>
     `;
     container.classList.add('unlocked');
-    // Add a small animation keyframes if not already in CSS
-    if (!document.querySelector('#unlockedAnimationStyle')) {
-        const style = document.createElement('style');
-        style.id = 'unlockedAnimationStyle';
-        style.textContent = `
-            @keyframes fadeInScale {
-                from { opacity: 0; transform: scale(0.9); }
-                to { opacity: 1; transform: scale(1); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
+    // Optional animation style is already in CSS; no need to add twice.
 }
