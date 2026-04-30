@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 
 def create_file(path, content):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -56,7 +57,7 @@ config = {
                 "fallback": "Search for 'The Study Skills Handbook' in the library. The 6th edition's publication year gives the digit."
             },
             "hintTimer": 120,
-            "hintText": "Try searching the library for the 6th edition of the handbook. The year of publication holds the digit."
+            "hintText": "Year of publication."
         },
         {
             "id": 4,

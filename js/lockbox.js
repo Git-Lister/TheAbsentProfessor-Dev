@@ -22,7 +22,7 @@ function initLockbox() {
 
     const answers = loadState().puzzleAnswers;
     const gridData = buildGridFromAnswers(answers);
-    const targetCode = appConfig.targetCode;
+    const targetCode = appConfig.targetCode; // "8227"
     renderLockboxUI(container, gridData, targetCode);
 }
 
@@ -45,26 +45,40 @@ function renderLockboxUI(container, gridData, targetCode) {
     const targetDigits = targetCode.split('');
     let currentDigits = ['0', '0', '0', '0'];
 
+    // Riddle instead of direct instruction
+    const riddleHTML = `<p style="font-style: italic; margin: 5px 0 15px;">The Box is Locked, but here's the key – the puzzles are where your answers will be.</p>`;
+
+    // Build HTML with padlock icons as column headers
     container.innerHTML = `
         <div class="lockbox-grid-section">
-            <h4 style="margin-bottom: 10px;">Your answers (grid)</h4>
+            <h4 style="margin-bottom: 10px;">Prof's Lockbox</h4>
+            ${riddleHTML}
             <table class="puzzle-grid" style="width:100%; margin-bottom: 20px;">
-                <thead><tr><th>Puzzle</th><th>Col 1</th><th>Col 2</th><th>Col 3</th><th>Col 4</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Puzzle</th>
+                        <th>🔒</th>
+                        <th>🔒</th>
+                        <th>🔒</th>
+                        <th>🔒</th>
+                    </tr>
+                </thead>
                 <tbody>
                     ${gridData.map((row, rowIdx) => `
                         <tr>
                             <td style="border:1px solid #b5926a; padding:8px;">${['Number Grid', 'Library Layers', 'Email Chain', 'Blank Page'][rowIdx]}</td>
                             ${row.map((cell, colIdx) => {
+                                // Show X for row 1 col 4 and row 4 col 4 (answers with only 3 digits)
                                 if ((rowIdx === 0 || rowIdx === 3) && colIdx === 3) {
                                     return `<td style="border:1px solid #b5926a; padding:8px; text-align:center;">X</td>`;
                                 }
-                                return `<td style="border:1px solid #b5926a; padding:8px; text-align:center;">${cell || '▯'}</td>`;
+                                return `<td class="grid-cell" data-row="${rowIdx}" data-col="${colIdx}" style="border:1px solid #b5926a; padding:8px; text-align:center;">${cell || '▯'}</td>`;
                             }).join('')}
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-            <p><strong>Column 3 contains the safe code: ${targetCode}</strong></p>
+            <p class="column-hint" style="font-size:0.9rem; text-align:center;">Which column holds the key? Look for the pattern…</p>
         </div>
         <div class="safe-dials">
             <h4>🔐 Enter the combination</h4>
@@ -78,10 +92,27 @@ function renderLockboxUI(container, gridData, targetCode) {
                 `).join('')}
             </div>
             <button id="checkCombinationBtn" style="background: #3c6e47; color: white; border: none; padding: 10px 25px; border-radius: 30px; font-size: 1.2rem; cursor: pointer;">🔓 Check Combination</button>
-            <div id="lockboxMessage" class="message" style="margin-top: 15px;">Set the dials to ${targetCode} and click Check.</div>
+            <div id="lockboxMessage" class="message" style="margin-top: 15px;">Set the dials to the safe code and click Check.</div>
         </div>
     `;
 
+    // After rendering, highlight column 3 if all puzzles solved
+    if (allAnswersCollected()) {
+        const cells = container.querySelectorAll('.grid-cell');
+        cells.forEach(cell => {
+            const col = parseInt(cell.getAttribute('data-col'));
+            if (col === 2) { // column index 2 = third column
+                cell.style.backgroundColor = '#5f7a5c';
+                cell.style.border = '2px solid gold';
+                cell.style.boxShadow = '0 0 5px gold';
+            }
+        });
+        // Also highlight the column hint
+        const hintPara = container.querySelector('.column-hint');
+        if (hintPara) hintPara.innerHTML = '✨ The third column glows – that is your key! ✨';
+    }
+
+    // Update dial UI
     function updateDialUI() {
         for (let i = 0; i < targetDigits.length; i++) {
             const valueDiv = container.querySelector(`.dial[data-idx="${i}"] .dial-value`);
@@ -89,6 +120,7 @@ function renderLockboxUI(container, gridData, targetCode) {
         }
     }
 
+    // Attach dial increment/decrement
     for (let i = 0; i < targetDigits.length; i++) {
         const upBtn = container.querySelector(`.dial-up[data-idx="${i}"]`);
         const downBtn = container.querySelector(`.dial-down[data-idx="${i}"]`);
@@ -134,7 +166,7 @@ function renderLockboxUI(container, gridData, targetCode) {
             setTimeout(() => {
                 if (!lockboxUnlockedFlag) {
                     msgDiv.style.background = '#000000aa';
-                    msgDiv.innerHTML = `Set the dials to ${targetCode} and click Check.`;
+                    msgDiv.innerHTML = `Set the dials to the safe code and click Check.`;
                 }
             }, 2000);
             wrongAttemptCount++;
@@ -143,11 +175,7 @@ function renderLockboxUI(container, gridData, targetCode) {
 }
 
 function renderUnlockedState(container) {
-    const elapsed = getElapsedTime();
-    const timeString = elapsed ? `${elapsed.minutes}m ${elapsed.seconds}s` : "a fantastic effort";
-    // Most of the stats display; reporting is already done inside the check button.
-    // We only need to show the visual celebration here.
-
+    // Reporting already done inside check button; just show celebration
     if (typeof canvasConfetti === 'function') {
         canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.2 }, startVelocity: 15 });
@@ -162,7 +190,6 @@ function renderUnlockedState(container) {
             </div>
             <div style="background: #2c241a; border-radius: 30px; padding: 15px; margin: 20px 0;">
                 <h3 style="margin: 0 0 10px 0;">📊 Your Team's Stats</h3>
-                <p><strong>⏱️ Time taken:</strong> ${timeString}</p>
                 <p><strong>🔢 Code entered:</strong> ${appConfig.targetCode}</p>
                 <p><strong>📚 Puzzles solved:</strong> All 4 correctly!</p>
             </div>
@@ -174,5 +201,4 @@ function renderUnlockedState(container) {
         </div>
     `;
     container.classList.add('unlocked');
-    // Optional animation style is already in CSS; no need to add twice.
 }
