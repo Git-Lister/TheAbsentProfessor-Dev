@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Escape Room Reporting URL</title>
+    <style>
+        body { font-family: monospace; background: #2e3b3e; color: #f7e9c3; padding: 2rem; }
+        .container { max-width: 600px; margin: 0 auto; background: #4a3b2c; padding: 2rem; border-radius: 20px; }
+        input, button { padding: 10px; margin: 10px 0; border-radius: 30px; border: none; width: 100%; font-size: 1rem; }
+        button { background: #3c6e47; color: white; cursor: pointer; }
+        .status { margin-top: 1rem; font-style: italic; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>🔐 Admin: Reporting URL</h2>
+    <p>Paste your Google Apps Script Web App URL (ends with <code>/exec</code>).</p>
+    <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/.../exec">
+    <button id="saveBtn">Save to Browser</button>
+    <button id="clearBtn">Clear Custom URL (use config.json)</button>
+    <div id="status" class="status"></div>
+    <hr>
+    <p><strong>Current URL from localStorage:</strong> <span id="currentUrlDisplay">None</span></p>
+</div>
+<script>
+    function displayCurrent() {
+        const current = localStorage.getItem('customGoogleScriptUrl');
+        document.getElementById('currentUrlDisplay').textContent = current || 'None (using config.json)';
+        if (current) document.getElementById('urlInput').value = current;
+    }
+    document.getElementById('saveBtn').addEventListener('click', () => {
+        let url = document.getElementById('urlInput').value.trim();
+        if (url && url.startsWith('https://script.google.com/')) {
+            localStorage.setItem('customGoogleScriptUrl', url);
+            document.getElementById('status').innerHTML = '✅ Saved! The game will now use this URL.';
+            displayCurrent();
+        } else {
+            document.getElementById('status').innerHTML = '❌ Invalid URL. Must start with https://script.google.com/';
+        }
+    });
+    document.getElementById('clearBtn').addEventListener('click', () => {
+        localStorage.removeItem('customGoogleScriptUrl');
+        document.getElementById('status').innerHTML = '🔄 Cleared. Game will use URL from config.json.';
+        displayCurrent();
+        document.getElementById('urlInput').value = '';
+    });
+    displayCurrent();
+</script>
+</body>
+</html>

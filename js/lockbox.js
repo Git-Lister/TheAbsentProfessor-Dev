@@ -157,6 +157,7 @@ function renderLockboxUI(container, gridData, targetCode) {
 function renderUnlockedState(container) {
     const elapsed = getElapsedTime();
     const timeString = elapsed ? `${elapsed.minutes}m ${elapsed.seconds}s` : "a fantastic effort";
+    reportSuccess(team, code, timeString);
 
     // Trigger confetti
     if (typeof canvasConfetti === 'function') {
