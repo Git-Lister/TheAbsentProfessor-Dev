@@ -102,9 +102,7 @@ function renderLockboxUI(container, gridData, targetCode) {
         cells.forEach(cell => {
             const col = parseInt(cell.getAttribute('data-col'));
             if (col === 2) { // column index 2 = third column
-                cell.style.backgroundColor = '#5f7a5c';
-                cell.style.border = '2px solid gold';
-                cell.style.boxShadow = '0 0 5px gold';
+                cell.classList.add('col3-highlight');
             }
         });
         // Also highlight the column hint

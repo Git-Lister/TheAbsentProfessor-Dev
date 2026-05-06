@@ -32,8 +32,10 @@
 
 <!-- Story introduction modal (hidden initially) -->
 <div id="storyModal" class="story-overlay" style="display: none;">
-    <div class="story-card">
-        <h2>📜 The Case of the Absent Professor</h2>
+    <div class="story-card story-card-with-image">
+        <div class="professor-portrait"></div>
+        <div class="story-main">
+            <h2>📜 The Case of the Absent Professor</h2>
         <div class="story-content">
             <p><strong>Results day is here…</strong></p>
             <p>You’ve spent weeks working hard on your last assignment and now it’s time to learn whether all your hard work has paid off…</p>
@@ -46,6 +48,7 @@
             <p>Work together, explore every clue, and when you're ready – begin your investigation.</p>
         </div>
         <button id="beginGameBtn">🔍 Begin Investigation</button>
+        </div>
     </div>
 </div>
 
@@ -56,6 +59,7 @@
                 <h1>The Case of the Absent Professor</h1>
                 <div class="team-info">
                     Team: <span id="displayTeamName"></span>
+                    <button id="accessibilityToggle" class="accessibility-btn" title="Toggle high contrast mode">♿</button>
                     <button id="resetGameBtn" class="reset-btn">⟳ Reset Game</button>
                 </div>
             </header>

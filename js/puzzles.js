@@ -7,19 +7,20 @@ function renderPuzzle1(container, onSolve) {
     const hintText = puzzleConfig.hintText;
     const hintTimerSeconds = puzzleConfig.hintTimer;
     let hintTimeoutId = null;
+    let solved = false;
 
     const TARGETS = [1, 5, 8];
     const ANSWER = "158";
-    let selectedTargets = new Set();   // stores which target positions have been clicked
-    let lockedCells = new Set();        // same as selectedTargets, for UI
-    let wrongAttempts = 0;              // track wrong attempts for hint trigger
+    let selectedTargets = new Set();
+    let lockedCells = new Set();
 
     container.innerHTML = `
         <div style="text-align: center;">
-            <p style="margin-bottom: 15px; font-style: italic; font-size: 1.1rem;">Can't see what you're looking for? It's the same every time.</p>
+            <h3>📇 The Laptop‑Locker Onlooker</h3>
+            <p style="margin-bottom: 15px;">“Can't see what you're looking for? It's the same every time.”</p>
             <div id="puzzle1Grid" class="puzzle1-grid"></div>
             <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
-            <div id="puzzle1Status" class="puzzle1-status">Same-same, but different...</div>
+            <div id="puzzle1Status" class="puzzle1-status">Find the three matching images…</div>
             <div id="puzzle1HintContainer" style="margin-top: 10px;"></div>
         </div>
     `;
@@ -29,7 +30,7 @@ function renderPuzzle1(container, onSolve) {
     const statusDiv = container.querySelector('#puzzle1Status');
     const hintContainer = container.querySelector('#puzzle1HintContainer');
 
-    // Build 3x3 grid
+    // Build 3×3 grid of images 1..9
     for (let i = 1; i <= 9; i++) {
         const cell = document.createElement('div');
         cell.className = 'puzzle1-cell';
@@ -41,7 +42,7 @@ function renderPuzzle1(container, onSolve) {
         cell.appendChild(img);
         cell.addEventListener('click', (e) => {
             e.stopPropagation();
-            handleCellClick(i);
+            if (!solved) handleCellClick(i);
         });
         gridContainer.appendChild(cell);
     }
@@ -50,24 +51,25 @@ function renderPuzzle1(container, onSolve) {
         const cells = container.querySelectorAll('.puzzle1-cell');
         cells.forEach(cell => {
             const pos = parseInt(cell.dataset.pos);
-            if (lockedCells.has(pos)) {
-                cell.classList.add('correct');
-            } else {
-                cell.classList.remove('correct');
-            }
+            if (lockedCells.has(pos)) cell.classList.add('correct');
+            else cell.classList.remove('correct');
         });
-        if (selectedTargets.size === 3) {
-            statusDiv.innerHTML = '✓ Puzzle solved!';
-        } else {
+        if (selectedTargets.size === 3 && !solved) {
+            solved = true;
+            statusDiv.innerHTML = '✅ Well done! Puzzle solved. ✅';
+            if (hintTimeoutId) clearTimeout(hintTimeoutId);
+            setTimeout(() => onSolve(ANSWER), 1000);
+        } else if (!solved) {
             statusDiv.innerHTML = `Found ${selectedTargets.size} of 3 special images...`;
         }
     }
 
     function resetPuzzle() {
+        if (solved) return;
         selectedTargets.clear();
         lockedCells.clear();
         updateUI();
-        statusDiv.innerHTML = 'Puzzle reset. Try again.';
+        statusDiv.innerHTML = 'Puzzle reset. Find the three matching images.';
         const cells = container.querySelectorAll('.puzzle1-cell');
         cells.forEach(cell => cell.classList.remove('wrong-flash'));
         if (hintContainer) hintContainer.innerHTML = '';
@@ -77,9 +79,9 @@ function renderPuzzle1(container, onSolve) {
         }
     }
 
-    function showHintButton(forceShow = false) {
+    function showHintButton() {
         if (!document.body.contains(container)) return;
-        if (hintContainer && !hintContainer.innerHTML && selectedTargets.size !== 3) {
+        if (hintContainer && !hintContainer.innerHTML && !solved && selectedTargets.size !== 3) {
             hintContainer.innerHTML = `<button id="puzzle1HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
             const hintBtn = hintContainer.querySelector('#puzzle1HintBtn');
             hintBtn.addEventListener('click', () => {
@@ -91,41 +93,25 @@ function renderPuzzle1(container, onSolve) {
     }
 
     function handleCellClick(pos) {
-        if (selectedTargets.size === 3) return;
-
-        // If it's not a target cell
+        if (solved) return;
         if (!TARGETS.includes(pos)) {
-            wrongAttempts++;
             const clickedCell = container.querySelector(`.puzzle1-cell[data-pos='${pos}']`);
             if (clickedCell) {
                 clickedCell.classList.add('wrong-flash');
                 setTimeout(() => clickedCell.classList.remove('wrong-flash'), 400);
             }
-            statusDiv.innerHTML = `❌ Wrong image. That's not one of the hidden three. Resetting...`;
-            // Show hint early if 2+ wrong attempts
-            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
-                setTimeout(() => showHintButton(true), 500);
-            }
+            statusDiv.innerHTML = `❌ Wrong image. Resetting...`;
             resetPuzzle();
             return;
         }
-
-        // It is a target cell
         if (selectedTargets.has(pos)) {
             statusDiv.innerHTML = `❌ You already selected that one. Try another.`;
             return;
         }
-
-        // Correct selection
         selectedTargets.add(pos);
         lockedCells.add(pos);
         updateUI();
-
-        if (selectedTargets.size === 3) {
-            if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ Correct! Well done! 🎉';
-            setTimeout(() => onSolve(ANSWER), 1000);
-        } else {
+        if (selectedTargets.size !== 3) {
             statusDiv.innerHTML = `Good! Found ${selectedTargets.size}. Keep going.`;
         }
     }

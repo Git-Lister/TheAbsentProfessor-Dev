@@ -12,6 +12,16 @@ This project is a web‑based version of the in‑person escape room game create
 - **Google Sheets reporting** – logs team name, code, and timestamp for the facilitator.
 - **Wrong attempt logging** (optional) – helps identify common mistakes.
 
+## How Winner is Determined
+
+The **first team to unlock the lockbox** (by submitting the correct 4×4 grid with `8227` in column 3) is recorded as the winner. The winner is determined by **submission timestamp**, not by total time spent or duration. Each successful unlock is logged to the Google Sheet with:
+
+- Team name
+- Correct code (the 4×4 grid values)
+- Timestamp of unlock
+
+The facilitator can then announce the winning team based on who submitted first.
+
 ## How to Run Locally (for testing)
 
 Because the game uses `fetch()` to load `config.json`, you must serve the files via a web server, not open `index.html` directly from your file system.
