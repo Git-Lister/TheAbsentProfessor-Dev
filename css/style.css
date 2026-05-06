@@ -297,6 +297,82 @@ h1 {
     .puzzles-grid {
         grid-template-columns: 1fr;
     }
+    
+    /* MMU Logo – smaller on mobile */
+    .uni-logo {
+        height: 80px;
+        max-width: 80px;
+        padding: 2px;
+    }
+    
+    /* Dials container – reduce spacing on mobile */
+    .dials-container {
+        gap: 12px !important;
+    }
+    
+    .dial {
+        min-width: 60px;
+    }
+    
+    .dial button {
+        padding: 3px 8px !important;
+        font-size: 0.9rem;
+    }
+    
+    .dial-value {
+        font-size: 1.5rem !important;
+        padding: 0 10px !important;
+    }
+    
+    /* Puzzle grid table – reduce padding */
+    .puzzle-grid th, .puzzle-grid td {
+        padding: 6px 4px;
+        font-size: 0.85rem;
+    }
+    
+    .puzzle-grid th {
+        font-size: 0.75rem;
+    }
+    
+    /* Header adjustments */
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .team-info {
+        flex-direction: column;
+        gap: 10px;
+        padding: 8px 12px;
+    }
+    
+    .reset-btn {
+        padding: 4px 10px;
+        font-size: 0.9rem;
+    }
+    
+    /* Puzzle 1 grid – reduce gap */
+    .puzzle1-grid {
+        gap: 10px;
+    }
+    
+    /* Puzzle 4 canvas warning for portrait */
+    @media (orientation: portrait) {
+        .puzzle4-portrait-warning {
+            display: block;
+            background: #ffb347;
+            color: #2c241a;
+            padding: 15px;
+            border-radius: 30px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    }
 }
 
 /* ---------- PUZZLE 1 SPECIFIC ---------- */

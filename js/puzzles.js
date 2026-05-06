@@ -12,11 +12,11 @@ function renderPuzzle1(container, onSolve) {
     const ANSWER = "158";
     let selectedTargets = new Set();   // stores which target positions have been clicked
     let lockedCells = new Set();        // same as selectedTargets, for UI
+    let wrongAttempts = 0;              // track wrong attempts for hint trigger
 
     container.innerHTML = `
         <div style="text-align: center;">
-            <h3>📇 The Laptop‑Locker Onlooker</h3>
-            <p style="margin-bottom: 15px;">“The Laptop‑Locker onlooker must not check out, if they are to return the correct answer.”</p>
+            <p style="margin-bottom: 15px; font-style: italic; font-size: 1.1rem;">Can't see what you're looking for? It's the same every time.</p>
             <div id="puzzle1Grid" class="puzzle1-grid"></div>
             <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
             <div id="puzzle1Status" class="puzzle1-status">Same-same, but different...</div>
@@ -77,7 +77,7 @@ function renderPuzzle1(container, onSolve) {
         }
     }
 
-    function showHintButton() {
+    function showHintButton(forceShow = false) {
         if (!document.body.contains(container)) return;
         if (hintContainer && !hintContainer.innerHTML && selectedTargets.size !== 3) {
             hintContainer.innerHTML = `<button id="puzzle1HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
@@ -95,12 +95,17 @@ function renderPuzzle1(container, onSolve) {
 
         // If it's not a target cell
         if (!TARGETS.includes(pos)) {
+            wrongAttempts++;
             const clickedCell = container.querySelector(`.puzzle1-cell[data-pos='${pos}']`);
             if (clickedCell) {
                 clickedCell.classList.add('wrong-flash');
                 setTimeout(() => clickedCell.classList.remove('wrong-flash'), 400);
             }
             statusDiv.innerHTML = `❌ Wrong image. That's not one of the hidden three. Resetting...`;
+            // Show hint early if 2+ wrong attempts
+            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
+                setTimeout(() => showHintButton(true), 500);
+            }
             resetPuzzle();
             return;
         }
@@ -118,8 +123,8 @@ function renderPuzzle1(container, onSolve) {
 
         if (selectedTargets.size === 3) {
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ Puzzle solved!';
-            onSolve(ANSWER);
+            statusDiv.innerHTML = '✅ Correct! Well done! 🎉';
+            setTimeout(() => onSolve(ANSWER), 1000);
         } else {
             statusDiv.innerHTML = `Good! Found ${selectedTargets.size}. Keep going.`;
         }
@@ -149,6 +154,7 @@ function renderPuzzle2(container, onSolve) {
     ];
     let clickSequence = [];
     let puzzleSolved = false;
+    let wrongAttempts = 0;  // track wrong attempts for hint trigger
 
     const poemHTML = `
         <p>"A Library of Layers"</p>
@@ -166,11 +172,10 @@ function renderPuzzle2(container, onSolve) {
         <div class="puzzle2-container" style="text-align: center; max-width: 700px; margin: 0 auto;">
             <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 15px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.6; margin-bottom: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
                 ${poemHTML}
-                <p style="margin-top: 10px;"><strong>Are you floored?</strong> (It will Click eventually.)</p>
             </div>
             <div style="background: #4a3b2c; border-radius: 20px; padding: 20px; display: inline-block; width: 100%;">
-                <h3>📚 Library Floors (enter the code)</h3>
-                <div id="buildingSlots" style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 20px 0;"></div>
+                <h3>📚 Click Highlighted Words in Order</h3>
+                <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
             </div>
             <div style="margin-top: 20px; background: #2c241a; border-radius: 30px; padding: 10px;">
                 <strong>Your sequence:</strong> <span id="sequenceDisplay">_ _ _ _</span>
@@ -190,34 +195,27 @@ function renderPuzzle2(container, onSolve) {
 
     function renderBuilding() {
         buildingSlots.style.display = 'flex';
-        buildingSlots.style.flexDirection = 'column-reverse';
+        buildingSlots.style.flexDirection = 'row';
         buildingSlots.style.alignItems = 'center';
-        buildingSlots.style.gap = '10px';
+        buildingSlots.style.justifyContent = 'center';
+        buildingSlots.style.gap = '15px';
         buildingSlots.innerHTML = '';
         for (let floor of [1,2,3,4]) {
             const slotData = floorSlots.find(s => s.floor === floor);
             const slotDiv = document.createElement('div');
             slotDiv.style.background = slotData.filled ? '#6a9e7b' : '#3a3228';
-            slotDiv.style.width = '100px';
-            slotDiv.style.height = '70px';
+            slotDiv.style.width = '60px';
+            slotDiv.style.height = '60px';
             slotDiv.style.display = 'flex';
             slotDiv.style.alignItems = 'center';
             slotDiv.style.justifyContent = 'center';
             slotDiv.style.borderRadius = '12px';
             slotDiv.style.border = '2px solid #b5926a';
-            slotDiv.style.fontSize = '2rem';
+            slotDiv.style.fontSize = '1.8rem';
             slotDiv.style.fontWeight = 'bold';
             slotDiv.style.color = '#ffecb3';
-            slotDiv.textContent = slotData.filled ? slotData.value : '?';
-            const label = document.createElement('div');
-            label.style.fontSize = '0.7rem';
-            label.style.marginTop = '4px';
-            label.textContent = `Floor ${floor}`;
-            const wrapper = document.createElement('div');
-            wrapper.style.textAlign = 'center';
-            wrapper.appendChild(slotDiv);
-            wrapper.appendChild(label);
-            buildingSlots.appendChild(wrapper);
+            slotDiv.textContent = slotData.filled ? slotData.value : '□';
+            buildingSlots.appendChild(slotDiv);
         }
     }
 
@@ -230,8 +228,8 @@ function renderPuzzle2(container, onSolve) {
         if (clickSequence.length === 4 && clickSequence.join('') === EXPECTED_WORD_ORDER.join('') && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ Perfect! Puzzle solved. ✅';
-            onSolve(ANSWER);
+            statusDiv.innerHTML = '✅ Correct! Well done! 🎉';
+            setTimeout(() => onSolve(ANSWER), 1000);
         }
     }
 
@@ -263,7 +261,7 @@ function renderPuzzle2(container, onSolve) {
         hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
     }
 
-    function showHintButton() {
+    function showHintButton(forceShow = false) {
         if (!document.body.contains(container)) return;
         if (hintContainer && !hintContainer.innerHTML && !puzzleSolved) {
             hintContainer.innerHTML = `<button id="puzzle2HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
@@ -282,11 +280,19 @@ function renderPuzzle2(container, onSolve) {
         const word = span.getAttribute('data-word');
         if (clickSequence.includes(word)) {
             statusDiv.innerHTML = `❌ Already used "${word}". Reset and try again.`;
+            wrongAttempts++;
+            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
+                showHintButton(true);
+            }
             return;
         }
         const nextExpected = EXPECTED_WORD_ORDER[clickSequence.length];
         if (word !== nextExpected) {
             statusDiv.innerHTML = `❌ Wrong order! Expected "${nextExpected}". Resetting.`;
+            wrongAttempts++;
+            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
+                setTimeout(() => showHintButton(true), 500);
+            }
             resetPuzzle();
             return;
         }
@@ -409,8 +415,8 @@ const emailsHTML = `
         if (entered === expectedYear) {
             solved = true;
             cleanup();
-            feedback.innerHTML = '✅ Correct! Puzzle solved.';
-            onSolve(expectedYear);
+            feedback.innerHTML = '✅ Correct! Well done! 🎉';
+            setTimeout(() => onSolve(expectedYear), 1000);
         } else {
             feedback.innerHTML = `❌ Wrong year. Try searching again.`;
             reportWrongAttempt(3, entered, "Wrong year");
@@ -450,8 +456,9 @@ function renderPuzzle4(container, onSolve) {
     container.innerHTML = `
         <div style="text-align: center;">
             <h3>🏛️ Library Entrance</h3>
-            <p>“Here you see the Library, but can you find its opening times?”</p>
-            <div style="position: relative; display: inline-block;">
+            <p>“Here you see the Library, but can you find its opening times?”</p>            <div class="puzzle4-portrait-warning" style="display: none; background: #ffb347; color: #2c241a; padding: 15px; border-radius: 30px; margin: 15px 0; text-align: center; font-weight: bold;">
+                📱 For best experience, please rotate your device to landscape mode.
+            </div>            <div style="position: relative; display: inline-block;">
                 <canvas id="puzzle4Canvas" width="${W}" height="${H}" style="border: 2px solid #b5926a; border-radius: 16px; background: #2c241a; cursor: none;"></canvas>
                 <div id="torchCursor" class="torch-cursor" style="display: none;"></div>
             </div>
@@ -471,6 +478,19 @@ function renderPuzzle4(container, onSolve) {
     const resetBtn = document.getElementById('puzzle4ResetBtn');
     const statusDiv = document.getElementById('puzzle4Status');
     const hintContainer = document.getElementById('puzzle4HintContainer');
+    const portraitWarning = container.querySelector('.puzzle4-portrait-warning');
+    
+    // Show portrait warning if needed
+    function checkOrientation() {
+        if (window.innerHeight > window.innerWidth && portraitWarning) {
+            portraitWarning.style.display = 'block';
+        } else if (portraitWarning) {
+            portraitWarning.style.display = 'none';
+        }
+    }
+    checkOrientation();
+    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('resize', checkOrientation);
 
     let mouseX = -100, mouseY = -100;
     let mouseInside = false;
@@ -490,8 +510,8 @@ function renderPuzzle4(container, onSolve) {
         if (collected.length === TARGETS.length && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '🎉 All numbers caught! Puzzle solved! 🎉';
-            onSolve(EXPECTED_ANSWER);
+            statusDiv.innerHTML = '✅ Correct! Well done! 🎉';
+            setTimeout(() => onSolve(EXPECTED_ANSWER), 1000);
         }
     }
 

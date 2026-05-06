@@ -189,12 +189,11 @@ function renderUnlockedState(container) {
                 🔓 SAFE UNLOCKED! 🔓
             </div>
             <div style="background: #2c241a; border-radius: 30px; padding: 15px; margin: 20px 0;">
-                <h3 style="margin: 0 0 10px 0;">📊 Your Team's Stats</h3>
-                <p><strong>🔢 Code entered:</strong> ${appConfig.targetCode}</p>
-                <p><strong>📚 Puzzles solved:</strong> All 4 correctly!</p>
+                <h3 style="margin: 0 0 10px 0;">✨ Case Solved! ✨</h3>
+                <p>Your completion has been recorded.</p>
+                <p style="font-weight: bold; margin: 15px 0;">The facilitator will announce the winning team!</p>
             </div>
             <div style="background: #4a3b2c; border-radius: 30px; padding: 15px;">
-                <p>✨ Professor Al Beback's grades have been revealed! ✨</p>
                 <p>🎁 Your prize (edible) is waiting with the facilitator.</p>
                 <p style="font-size: 0.8rem; margin-top: 10px;">Great teamwork, detectives!</p>
             </div>
