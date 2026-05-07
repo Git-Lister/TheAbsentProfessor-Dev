@@ -35,9 +35,8 @@ function renderPuzzle1(container, onSolve) {
         cell.className = 'puzzle1-cell';
         cell.dataset.pos = i;
         const img = document.createElement('img');
-        img.src = `images/puzzle1/${i}.png`;
+        img.src = `images/puzzle1/${i}.jpg`;
         img.alt = `Grid cell ${i}`;
-        img.onerror = () => { img.src = `images/puzzle1/${i}.jpg`; };
         cell.appendChild(img);
         cell.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -165,7 +164,7 @@ function renderPuzzle2(container, onSolve) {
                 ${poemHTML}
             </div>
             <div class="puzzle2-slots-container" style="background: var(--card-bg); border-radius: 20px; padding: 20px; display: inline-block; width: 100%;">
-                <h3>📚 Click Highlighted Words in Order</h3>
+                <h3>📚 Floored?! It'll click eventually. 📚</h3>
                 <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
             </div>
             <div style="margin-top: 20px; background: var(--card-bg); border-radius: 30px; padding: 10px;">
@@ -462,10 +461,10 @@ function renderPuzzle4(container, onSolve) {
                 📱 For best experience, please rotate your device to landscape mode.
             </div>
             <div style="position: relative; display: inline-block;">
-                <canvas id="puzzle4Canvas" width="${W}" height="${H}" style="border: 2px solid #b5926a; border-radius: 16px; background: #2c241a; cursor: none;"></canvas>
+                <canvas id="puzzle4Canvas" width="${W}" height="${H}" style="border: 2px solid var(--card-border); border-radius: 16px; background: #1a1f2c; cursor: none;"></canvas>
                 <div id="torchCursor" class="torch-cursor" style="display: none;"></div>
             </div>
-            <div class="puzzle4-collected" style="margin-top: 15px; font-size: 1.5rem; background: #2c241a; display: inline-block; padding: 5px 15px; border-radius: 40px;">
+            <div class="puzzle4-collected" style="margin-top: 15px; font-size: 1.5rem; background: var(--card-bg); display: inline-block; padding: 5px 15px; border-radius: 40px;">
                 Caught: <span id="caughtDisplay">_ _ _</span>
             </div>
             <button id="puzzle4ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
@@ -514,7 +513,7 @@ function renderPuzzle4(container, onSolve) {
             statusDiv.innerHTML = '✅ Well done! You caught all numbers.';
             const claimBtn = document.createElement('button');
             claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.style.cssText = 'background:var(--button-primary); color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
             claimBtn.onclick = () => onSolve(EXPECTED_ANSWER);
             container.appendChild(claimBtn);
         }
@@ -534,7 +533,7 @@ function renderPuzzle4(container, onSolve) {
         }
         for (let n of numbers) {
             if (n.caught) continue;
-            ctx.font = 'bold 28px monospace';
+            ctx.font = 'bold 42px monospace';   // increased from 28px to 42px (+50%)
             ctx.shadowBlur = 0;
             let isGlowing = false;
             if (mouseInside && !n.caught && n.isTarget) {
@@ -551,7 +550,8 @@ function renderPuzzle4(container, onSolve) {
             } else {
                 ctx.shadowBlur = 0;
             }
-            ctx.fillText(n.symbol, n.x - 12, n.y + 10);
+            // Adjust position offsets for larger font (was -12, +10; now -20, +15)
+            ctx.fillText(n.symbol, n.x - 20, n.y + 15);
         }
         if (mouseInside) {
             ctx.beginPath();
