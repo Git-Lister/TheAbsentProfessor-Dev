@@ -434,95 +434,65 @@ h1 {
     animation: fadeInOffice 0.8s ease-in;
 }
 
-/* ---------- HIGH CONTRAST MODE ---------- */
+/* ---------- HIGH CONTRAST MODE (Refined) ---------- */
 body.high-contrast {
-    background: white !important;
-    color: black !important;
+    background: #f8f9fa !important;
+    color: #1e2a3a !important;
 }
-
 body.high-contrast h1,
 body.high-contrast h2,
 body.high-contrast h3,
 body.high-contrast p,
 body.high-contrast span,
-body.high-contrast div {
-    color: black !important;
-    text-shadow: none !important;
+body.high-contrast div,
+body.high-contrast label {
+    color: #1e2a3a !important;
 }
-
-body.high-contrast header {
-    background: white !important;
-    border: 2px solid black;
-    padding: 20px;
+body.high-contrast .puzzle-card,
+body.high-contrast .modal-content,
+body.high-contrast .story-card,
+body.high-contrast .team-entry-card,
+body.high-contrast .lootbox-container,
+body.high-contrast .lockbox-container,
+body.high-contrast .safe-dials {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+    box-shadow: none !important;
 }
-
-body.high-contrast .team-info {
-    background: white !important;
-    border: 2px solid black;
-    color: black !important;
+body.high-contrast .puzzle-grid,
+body.high-contrast .puzzle-grid th,
+body.high-contrast .puzzle-grid td,
+body.high-contrast .grid-cell {
+    border: 1px solid #1e2a3a !important;
+    background: #ffffff !important;
+    color: #1e2a3a !important;
 }
-
-body.high-contrast .puzzle-card {
-    background: white !important;
-    border: 3px solid black !important;
-    color: black !important;
+body.high-contrast .dial-value {
+    background: #ffffff !important;
+    border: 1px solid #1e2a3a !important;
+    color: #1e2a3a !important;
 }
-
-body.high-contrast .modal-content {
-    background: white !important;
-    border: 3px solid black !important;
-    color: black !important;
+body.high-contrast .dial-up,
+body.high-contrast .dial-down,
+body.high-contrast button,
+body.high-contrast #checkCombinationBtn,
+body.high-contrast .reset-btn {
+    background: #e9ecef !important;
+    border: 2px solid #1e2a3a !important;
+    color: #1e2a3a !important;
 }
-
-body.high-contrast .story-card {
-    background: white !important;
-    border: 3px solid black !important;
-    color: black !important;
+body.high-contrast button:hover {
+    background: #ced4da !important;
 }
-
-body.high-contrast button {
-    border: 2px solid black !important;
-    background: white !important;
-    color: black !important;
+body.high-contrast .message {
+    background: #e9ecef !important;
+    border: 1px solid #1e2a3a !important;
+    color: #1e2a3a !important;
 }
-
-body.high-contrast input {
-    border: 2px solid black !important;
-    background: white !important;
-    color: black !important;
-}
-
-body.high-contrast .puzzle1-grid,
-body.high-contrast .puzzle-grid {
-    background: white !important;
-    border: 2px solid black !important;
-}
-
-body.high-contrast table {
-    border-collapse: collapse;
-    border: 2px solid black !important;
-}
-
-body.high-contrast th,
-body.high-contrast td {
-    border: 2px solid black !important;
-    background: white !important;
-    color: black !important;
-}
-
-body.high-contrast .team-entry-card {
-    background: white !important;
-    border: 3px solid black !important;
-    color: black !important;
-}
-
-body.high-contrast .game-container {
-    background: white !important;
-}
-
-body.high-contrast .dark-overlay {
-    display: none !important;
-}
+body.high-contrast .message.success {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border-color: #155724 !important;
 }
 
 /* ---------- PUZZLE 1 SPECIFIC ---------- */

@@ -30,7 +30,6 @@ function renderPuzzle1(container, onSolve) {
     const statusDiv = container.querySelector('#puzzle1Status');
     const hintContainer = container.querySelector('#puzzle1HintContainer');
 
-    // Build 3×3 grid of images 1..9
     for (let i = 1; i <= 9; i++) {
         const cell = document.createElement('div');
         cell.className = 'puzzle1-cell';
@@ -56,9 +55,15 @@ function renderPuzzle1(container, onSolve) {
         });
         if (selectedTargets.size === 3 && !solved) {
             solved = true;
-            statusDiv.innerHTML = '✅ Well done! Puzzle solved. ✅';
+            statusDiv.innerHTML = '✅ Well done! You found the three matching images.';
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            setTimeout(() => onSolve(ANSWER), 1000);
+            // Claim button instead of auto‑close
+            const claimBtn = document.createElement('button');
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(ANSWER);
+            container.appendChild(claimBtn);
+            if (hintContainer) hintContainer.innerHTML = '';
         } else if (!solved) {
             statusDiv.innerHTML = `Found ${selectedTargets.size} of 3 special images...`;
         }
@@ -140,7 +145,7 @@ function renderPuzzle2(container, onSolve) {
     ];
     let clickSequence = [];
     let puzzleSolved = false;
-    let wrongAttempts = 0;  // track wrong attempts for hint trigger
+    let wrongAttempts = 0;
 
     const poemHTML = `
         <p>"A Library of Layers"</p>
@@ -214,8 +219,12 @@ function renderPuzzle2(container, onSolve) {
         if (clickSequence.length === 4 && clickSequence.join('') === EXPECTED_WORD_ORDER.join('') && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ Correct! Well done! 🎉';
-            setTimeout(() => onSolve(ANSWER), 1000);
+            statusDiv.innerHTML = '✅ Well done! Correct order.';
+            const claimBtn = document.createElement('button');
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(ANSWER);
+            container.appendChild(claimBtn);
         }
     }
 
@@ -314,45 +323,46 @@ function renderPuzzle3(container, onSolve) {
     const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
     const hintText = puzzleConfig.hintText;
     const hintTimerSeconds = puzzleConfig.hintTimer;
-    let hintTimeoutId = null;
+    let hintTimeoutIdLocal = null;
+    let solved = false;
+    let wrongAttempts = 0;
 
     const expectedYear = puzzleConfig.expectedAnswer; // "2024"
-    let solved = false;
 
-const emailsHTML = `
-    <div style="font-family: 'Segoe UI', 'Helvetica', sans-serif; max-width: 600px; margin: 0 auto;">
-        <!-- Email 1: Mark to Professor -->
-        <div style="border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px; background: #fff;">
-            <div class="puzzle3-email-header" style="padding: 12px 16px; border-bottom: 1px solid #ccc; background: #e8e8e8; border-radius: 8px 8px 0 0; color: #111;">
-                <span style="font-weight: bold; color: #004c6e;">From:</span> Mark Burgess &lt;library@mmu.ac.uk&gt;<br>
-                <span style="font-weight: bold; color: #004c6e;">To:</span> Professor Al Beback &lt;a.beback@mmu.ac.uk&gt;<br>
-                <span style="font-weight: bold; color: #004c6e;">Subject:</span> Recommended Resource for Student Study Skills
+    const emailsHTML = `
+        <div style="font-family: 'Segoe UI', 'Helvetica', sans-serif; max-width: 600px; margin: 0 auto;">
+            <!-- Email 1: Mark to Professor -->
+            <div style="border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px; background: #fff;">
+                <div class="puzzle3-email-header" style="padding: 12px 16px; border-bottom: 1px solid #ccc; background: #e8e8e8; border-radius: 8px 8px 0 0; color: #111;">
+                    <span style="font-weight: bold; color: #004c6e;">From:</span> Mark Burgess &lt;library@mmu.ac.uk&gt;<br>
+                    <span style="font-weight: bold; color: #004c6e;">To:</span> Professor Al Beback &lt;a.beback@mmu.ac.uk&gt;<br>
+                    <span style="font-weight: bold; color: #004c6e;">Subject:</span> Recommended Resource for Student Study Skills
+                </div>
+                <div style="padding: 16px; color: #222; line-height: 1.5;">
+                    <p>Dear Professor Beback,</p>
+                    <p>I hope your research into botanical adaptations and human night vision is progressing well – sounds like a fascinating intersection of biology and perception!</p>
+                    <p>I wanted to signpost a resource that could be particularly useful for your students: <strong><em>The Study Skills Handbook</em> (6th edition)</strong> by Stella Cottrell. It's a well-regarded guide that covers a wide range of academic skills, from managing time effectively to developing critical thinking.</p>
+                    <p>It's available through the MMU Library. You might want to take a look in the usual way by visiting the Library Website and looking on Library Search.</p>
+                    <p>Talk soon,<br><strong>Mark Burgess</strong><br>Academic Liaison Librarian | Manchester Metropolitan University Library</p>
+                </div>
             </div>
-            <div style="padding: 16px; color: #222; line-height: 1.5;">
-                <p>Dear Professor Beback,</p>
-                <p>I hope your research into botanical adaptations and human night vision is progressing well – sounds like a fascinating intersection of biology and perception!</p>
-                <p>I wanted to signpost a resource that could be particularly useful for your students: <strong><em>The Study Skills Handbook</em> (6th edition)</strong> by Stella Cottrell. It's a well-regarded guide that covers a wide range of academic skills, from managing time effectively to developing critical thinking.</p>
-                <p>It's available through the MMU Library. You might want to take a look in the usual way by visiting the Library Website and looking on Library Search.</p>
-                <p>Talk soon,<br><strong>Mark Burgess</strong><br>Academic Liaison Librarian | Manchester Metropolitan University Library</p>
+            <!-- Email 2: Professor to Mark -->
+            <div style="border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px; background: #fff;">
+                <div class="puzzle3-email-header" style="padding: 12px 16px; border-bottom: 1px solid #ccc; background: #e8e8e8; border-radius: 8px 8px 0 0; color: #111;">
+                    <span style="font-weight: bold; color: #004c6e;">From:</span> Professor Al Beback &lt;a.beback@mmu.ac.uk&gt;<br>
+                    <span style="font-weight: bold; color: #004c6e;">To:</span> Mark Burgess &lt;library@mmu.ac.uk&gt;<br>
+                    <span style="font-weight: bold; color: #004c6e;">Subject:</span> RE: Recommended Resource for Student Study Skills
+                </div>
+                <div style="padding: 16px; color: #222; line-height: 1.5;">
+                    <p>Dear Mark,</p>
+                    <p>Thanks for the recommendation – <em>The Study Skills Handbook</em> is an excellent choice. I've seen how it helps students sharpen their academic focus, even if it doesn't quite help them see in the dark!</p>
+                    <p>However, I noticed you didn't include <u>the year of publication</u>. I do like to keep things up‑to‑date – especially when it comes to student resources.</p>
+                    <p>I'll encourage my students to head over to Library Search and track down the most recent edition.</p>
+                    <p>All the best,<br><strong>Professor Al Beback</strong><br>Faculty of Health and Education | Manchester Metropolitan University</p>
+                </div>
             </div>
         </div>
-        <!-- Email 2: Professor to Mark -->
-        <div style="border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px; background: #fff;">
-            <div class="puzzle3-email-header" style="padding: 12px 16px; border-bottom: 1px solid #ccc; background: #e8e8e8; border-radius: 8px 8px 0 0; color: #111;">
-                <span style="font-weight: bold; color: #004c6e;">From:</span> Professor Al Beback &lt;a.beback@mmu.ac.uk&gt;<br>
-                <span style="font-weight: bold; color: #004c6e;">To:</span> Mark Burgess &lt;library@mmu.ac.uk&gt;<br>
-                <span style="font-weight: bold; color: #004c6e;">Subject:</span> RE: Recommended Resource for Student Study Skills
-            </div>
-            <div style="padding: 16px; color: #222; line-height: 1.5;">
-                <p>Dear Mark,</p>
-                <p>Thanks for the recommendation – <em>The Study Skills Handbook</em> is an excellent choice. I've seen how it helps students sharpen their academic focus, even if it doesn't quite help them see in the dark!</p>
-                <p>However, I noticed you didn't include <u>the year of publication</u>. I do like to keep things up‑to‑date – especially when it comes to student resources.</p>
-                <p>I'll encourage my students to head over to Library Search and track down the most recent edition.</p>
-                <p>All the best,<br><strong>Professor Al Beback</strong><br>Faculty of Health and Education | Manchester Metropolitan University</p>
-            </div>
-        </div>
-    </div>
-`;
+    `;
 
     container.innerHTML = `
         <div style="max-height: 70vh; overflow-y: auto; padding: 10px;">
@@ -376,7 +386,6 @@ const emailsHTML = `
     const yearInput = container.querySelector('#yearInput');
     const feedback = container.querySelector('#puzzle3Feedback');
     const hintContainer = container.querySelector('#puzzle3HintContainer');
-    let hintTimeoutIdLocal = null;
 
     function showHintButton() {
         if (!document.body.contains(container)) return;
@@ -401,16 +410,23 @@ const emailsHTML = `
         if (entered === expectedYear) {
             solved = true;
             cleanup();
-            feedback.innerHTML = '✅ Correct! Well done! 🎉';
-            setTimeout(() => onSolve(expectedYear), 1000);
+            feedback.innerHTML = '✅ Well done! Correct year.';
+            const claimBtn = document.createElement('button');
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'display:block; margin:15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(expectedYear);
+            container.querySelector('#puzzle3AnswerArea').appendChild(claimBtn);
         } else {
+            wrongAttempts++;
             feedback.innerHTML = `❌ Wrong year. Try searching again.`;
             reportWrongAttempt(3, entered, "Wrong year");
+            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
+                showHintButton();
+            }
         }
     });
 
     hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
-    // Cleanup if modal closes – the container will be removed, but we keep the timeout; the showHintButton checks document.body.contains
 }
 
 // ------------------- Puzzle 4: UV Torch (Library Entrance) -------------------
@@ -424,6 +440,8 @@ function renderPuzzle4(container, onSolve) {
     const EXPECTED_ANSWER = "247";
     const TARGETS = ['2', '4', '7'];
     let collected = [];
+    let puzzleSolved = false;
+    let wrongAttempts = 0;
     const W = 600, H = 400;
 
     const numbers = [
@@ -442,9 +460,11 @@ function renderPuzzle4(container, onSolve) {
     container.innerHTML = `
         <div style="text-align: center;">
             <h3>🏛️ Library Entrance</h3>
-            <p>“Here you see the Library, but can you find its opening times?”</p>            <div class="puzzle4-portrait-warning" style="display: none; background: #ffb347; color: #2c241a; padding: 15px; border-radius: 30px; margin: 15px 0; text-align: center; font-weight: bold;">
+            <p>“Here you see the Library, but can you find its opening times?”</p>
+            <div class="puzzle4-portrait-warning" style="display: none; background: #ffb347; color: #2c241a; padding: 15px; border-radius: 30px; margin: 15px 0; text-align: center; font-weight: bold;">
                 📱 For best experience, please rotate your device to landscape mode.
-            </div>            <div style="position: relative; display: inline-block;">
+            </div>
+            <div style="position: relative; display: inline-block;">
                 <canvas id="puzzle4Canvas" width="${W}" height="${H}" style="border: 2px solid #b5926a; border-radius: 16px; background: #2c241a; cursor: none;"></canvas>
                 <div id="torchCursor" class="torch-cursor" style="display: none;"></div>
             </div>
@@ -465,8 +485,7 @@ function renderPuzzle4(container, onSolve) {
     const statusDiv = document.getElementById('puzzle4Status');
     const hintContainer = document.getElementById('puzzle4HintContainer');
     const portraitWarning = container.querySelector('.puzzle4-portrait-warning');
-    
-    // Show portrait warning if needed
+
     function checkOrientation() {
         if (window.innerHeight > window.innerWidth && portraitWarning) {
             portraitWarning.style.display = 'block';
@@ -483,7 +502,6 @@ function renderPuzzle4(container, onSolve) {
     let glowTarget = null;
     let backgroundImage = new Image();
     let imageLoaded = false;
-    let puzzleSolved = false;
 
     backgroundImage.src = 'images/puzzle4/library.jpg';
     backgroundImage.onload = () => { imageLoaded = true; draw(); };
@@ -496,8 +514,12 @@ function renderPuzzle4(container, onSolve) {
         if (collected.length === TARGETS.length && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ Correct! Well done! 🎉';
-            setTimeout(() => onSolve(EXPECTED_ANSWER), 1000);
+            statusDiv.innerHTML = '✅ Well done! You caught all numbers.';
+            const claimBtn = document.createElement('button');
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(EXPECTED_ANSWER);
+            container.appendChild(claimBtn);
         }
     }
 
@@ -559,7 +581,11 @@ function renderPuzzle4(container, onSolve) {
                 draw();
             }
         } else {
+            wrongAttempts++;
             statusDiv.innerHTML = '❌ No target under torch. Keep searching!';
+            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
+                showHintButton();
+            }
             setTimeout(() => {
                 if (collected.length < TARGETS.length && !puzzleSolved)
                     statusDiv.innerHTML = 'Move torch over the image – hidden numbers will glow. Click to catch.';
