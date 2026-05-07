@@ -145,7 +145,7 @@ function renderPuzzle2(container, onSolve) {
     ];
     let clickSequence = [];
     let puzzleSolved = false;
-    let wrongAttempts = 0;
+    let wrongAttempts = 0;  // kept for user feedback, no hint trigger
 
     const poemHTML = `
         <p>"A Library of Layers"</p>
@@ -164,11 +164,11 @@ function renderPuzzle2(container, onSolve) {
             <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 15px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.6; margin-bottom: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
                 ${poemHTML}
             </div>
-            <div style="background: #4a3b2c; border-radius: 20px; padding: 20px; display: inline-block; width: 100%;">
+            <div class="puzzle2-slots-container" style="background: var(--card-bg); border-radius: 20px; padding: 20px; display: inline-block; width: 100%;">
                 <h3>📚 Click Highlighted Words in Order</h3>
                 <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
             </div>
-            <div style="margin-top: 20px; background: #2c241a; border-radius: 30px; padding: 10px;">
+            <div style="margin-top: 20px; background: var(--card-bg); border-radius: 30px; padding: 10px;">
                 <strong>Your sequence:</strong> <span id="sequenceDisplay">_ _ _ _</span>
             </div>
             <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px;">Reset Puzzle</button>
@@ -194,17 +194,17 @@ function renderPuzzle2(container, onSolve) {
         for (let floor of [1,2,3,4]) {
             const slotData = floorSlots.find(s => s.floor === floor);
             const slotDiv = document.createElement('div');
-            slotDiv.style.background = slotData.filled ? '#6a9e7b' : '#3a3228';
+            slotDiv.style.background = slotData.filled ? 'var(--accent-green)' : 'var(--input-bg)';
             slotDiv.style.width = '60px';
             slotDiv.style.height = '60px';
             slotDiv.style.display = 'flex';
             slotDiv.style.alignItems = 'center';
             slotDiv.style.justifyContent = 'center';
             slotDiv.style.borderRadius = '12px';
-            slotDiv.style.border = '2px solid #b5926a';
+            slotDiv.style.border = '2px solid var(--card-border)';
             slotDiv.style.fontSize = '1.8rem';
             slotDiv.style.fontWeight = 'bold';
-            slotDiv.style.color = '#ffecb3';
+            slotDiv.style.color = 'var(--text-primary)';
             slotDiv.textContent = slotData.filled ? slotData.value : '□';
             buildingSlots.appendChild(slotDiv);
         }
@@ -222,7 +222,7 @@ function renderPuzzle2(container, onSolve) {
             statusDiv.innerHTML = '✅ Well done! Correct order.';
             const claimBtn = document.createElement('button');
             claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.style.cssText = 'background:var(--button-primary); color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
             claimBtn.onclick = () => onSolve(ANSWER);
             container.appendChild(claimBtn);
         }
@@ -250,9 +250,10 @@ function renderPuzzle2(container, onSolve) {
             span.style.backgroundColor = '';
             span.style.pointerEvents = 'auto';
         });
-        statusDiv.innerHTML = 'Puzzle reset.';
+        statusDiv.innerHTML = 'Studying Hard, or Hardly Studying?';
         if (hintContainer) hintContainer.innerHTML = '';
         if (hintTimeoutId) clearTimeout(hintTimeoutId);
+        // Set timed hint only
         hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
     }
 
@@ -276,18 +277,14 @@ function renderPuzzle2(container, onSolve) {
         if (clickSequence.includes(word)) {
             statusDiv.innerHTML = `❌ Already used "${word}". Reset and try again.`;
             wrongAttempts++;
-            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
-                showHintButton(true);
-            }
+            // No hint trigger – purely timed now
             return;
         }
         const nextExpected = EXPECTED_WORD_ORDER[clickSequence.length];
         if (word !== nextExpected) {
             statusDiv.innerHTML = `❌ Wrong order! Expected "${nextExpected}". Resetting.`;
             wrongAttempts++;
-            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
-                setTimeout(() => showHintButton(true), 500);
-            }
+            // No hint trigger
             resetPuzzle();
             return;
         }
@@ -297,7 +294,7 @@ function renderPuzzle2(container, onSolve) {
         statusDiv.innerHTML = `✓ Correct! "${word}" added.`;
         span.style.opacity = '0.5';
         span.style.cursor = 'default';
-        span.style.backgroundColor = '#6a9e7b';
+        span.style.backgroundColor = 'var(--accent-green)';
         span.style.pointerEvents = 'none';
     }
 
@@ -313,7 +310,7 @@ function renderPuzzle2(container, onSolve) {
     resetBtn.addEventListener('click', resetPuzzle);
     renderBuilding();
     updateSequenceDisplay();
-    statusDiv.innerHTML = 'Click the highlighted words in the correct order.';
+    statusDiv.innerHTML = 'Studying Hard, or Hardly Studying?';
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }
 

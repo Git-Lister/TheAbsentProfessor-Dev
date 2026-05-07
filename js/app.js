@@ -123,16 +123,16 @@ beginBtn.addEventListener('click', () => {
         modalOverlay.style.display = 'flex';
     }
 
-    // Accessibility button toggle
-    const accessibilityBtn = document.getElementById('accessibilityToggle');
-    if (accessibilityBtn) {
-        // Load high contrast preference from localStorage
-        const isHighContrast = localStorage.getItem('highContrast') === 'true';
-        if (isHighContrast) {
-            document.body.classList.add('high-contrast');
-        }
+    // ---------- HIGH CONTRAST MODE (global, works from entry screen) ----------
+    // Load saved preference
+    if (localStorage.getItem('highContrast') === 'true') {
+        document.body.classList.add('high-contrast');
+    }
 
-        accessibilityBtn.addEventListener('click', () => {
+    // Global toggle button (always present)
+    const globalA11yBtn = document.getElementById('globalAccessibilityToggle');
+    if (globalA11yBtn) {
+        globalA11yBtn.addEventListener('click', () => {
             const isNowHighContrast = !document.body.classList.contains('high-contrast');
             if (isNowHighContrast) {
                 document.body.classList.add('high-contrast');
