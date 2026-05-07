@@ -243,14 +243,12 @@ h1 {
     flex-shrink: 0;
     width: 120px;
     height: 200px;
-    background: linear-gradient(135deg, var(--col3-highlight-bg) 0%, #1a2a22 100%);
+    background-image: url('../images/professor-portrait.jpg');
+    background-size: cover;
+    background-position: top center;
+    background-repeat: no-repeat;
     border-radius: 15px;
     border: 3px solid var(--card-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 60px;
-    color: var(--text-primary);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 

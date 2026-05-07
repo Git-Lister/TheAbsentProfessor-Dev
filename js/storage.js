@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'absent_professor';
+const STORAGE_KEY = 'absent_';
 
 function loadState() {
     const saved = localStorage.getItem(STORAGE_KEY);
