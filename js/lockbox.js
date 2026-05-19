@@ -191,8 +191,7 @@ function renderUnlockedState(container) {
                 <p>Your completion has been recorded.</p>
                 <p style="font-weight: bold; margin: 15px 0;">The facilitator will announce the winning team!</p>
             </div>
-            <div style="background: #4a3b2c; border-radius: 30px; padding: 15px;">
-                <p>🎁 Your prize (edible) is waiting with the facilitator.</p>
+            <div style="background: #4a3b2c; border-radius: 30px; padding: 15px;">sp>
                 <p style="font-size: 0.8rem; margin-top: 10px;">Great teamwork, detectives!</p>
             </div>
         </div>

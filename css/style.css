@@ -559,7 +559,7 @@ h1 {
     animation: fadeInOffice 0.8s ease-in;
 }
 
-/* ---------- HIGH CONTRAST MODE (completely untouched) ---------- */
+/* ---------- HIGH CONTRAST MODE ---------- */
 body.high-contrast {
     background: #f8f9fa !important;
     color: #1e2a3a !important;
@@ -571,7 +571,26 @@ body.high-contrast h3,
 body.high-contrast p,
 body.high-contrast span,
 body.high-contrast div,
-body.high-contrast label {
+body.high-contrast label,
+body.high-contrast .game-container h1,
+body.high-contrast .game-title-hero,
+body.high-contrast .game-subtitle,
+body.high-contrast .story-content,
+body.high-contrast .story-card h2,
+body.high-contrast .story-card p,
+body.high-contrast .team-info,
+body.high-contrast #displayTeamName,
+body.high-contrast .team-info span,
+body.high-contrast .team-info div,
+body.high-contrast .puzzle1-status,
+body.high-contrast .puzzle2-status,
+body.high-contrast .puzzle4-status,
+body.high-contrast #sequenceDisplay,
+body.high-contrast .puzzle2-slots-container,
+body.high-contrast .puzzle2-slots-container h3,
+body.high-contrast .lockbox-section h2,
+body.high-contrast header h1,
+body.high-contrast .team-info #displayTeamName {
     color: #1e2a3a !important;
 }
 
@@ -581,7 +600,9 @@ body.high-contrast .story-card,
 body.high-contrast .team-entry-card,
 body.high-contrast .lootbox-container,
 body.high-contrast .lockbox-container,
-body.high-contrast .safe-dials {
+body.high-contrast .safe-dials,
+body.high-contrast .puzzle2-slots-container,
+body.high-contrast .puzzle4-collected {
     background: #ffffff !important;
     border: 2px solid #1e2a3a !important;
     box-shadow: none !important;
@@ -606,7 +627,9 @@ body.high-contrast .dial-up,
 body.high-contrast .dial-down,
 body.high-contrast button,
 body.high-contrast #checkCombinationBtn,
-body.high-contrast .reset-btn {
+body.high-contrast .reset-btn,
+body.high-contrast .team-entry-card input,
+body.high-contrast .team-entry-card button {
     background: #e9ecef !important;
     border: 2px solid #1e2a3a !important;
     color: #1e2a3a !important;
@@ -626,6 +649,20 @@ body.high-contrast .message.success {
     background: #d4edda !important;
     color: #155724 !important;
     border-color: #155724 !important;
+}
+
+/* Puzzle 2 poem background */
+body.high-contrast .puzzle2-poem {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .puzzle2-poem .highlight {
+    background: #e9ecef !important;
+    border: 1px solid #1e2a3a !important;
+    box-shadow: none !important;
+    color: #1e2a3a !important;
 }
 
 /* ---------- PUZZLE 1 SPECIFIC ---------- */

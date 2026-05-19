@@ -20,7 +20,7 @@ function renderPuzzle1(container, onSolve) {
             <p style="margin-bottom: 15px;">“Can't see what you're looking for? It's the same every time.”</p>
             <div id="puzzle1Grid" class="puzzle1-grid"></div>
             <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
-            <div id="puzzle1Status" class="puzzle1-status">Find the three matching images…</div>
+            <div id="puzzle1Status" class="puzzle1-status">What’s the pattern? Look closely…</div>
             <div id="puzzle1HintContainer" style="margin-top: 10px;"></div>
         </div>
     `;
@@ -56,12 +56,12 @@ function renderPuzzle1(container, onSolve) {
             solved = true;
             statusDiv.innerHTML = '✅ Well done! You found the three matching images.';
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            // Claim button instead of auto‑close
             const claimBtn = document.createElement('button');
             claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
             claimBtn.onclick = () => onSolve(ANSWER);
             container.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             if (hintContainer) hintContainer.innerHTML = '';
         } else if (!solved) {
             statusDiv.innerHTML = `Found ${selectedTargets.size} of 3 special images...`;
@@ -73,7 +73,7 @@ function renderPuzzle1(container, onSolve) {
         selectedTargets.clear();
         lockedCells.clear();
         updateUI();
-        statusDiv.innerHTML = 'Puzzle reset. Find the three matching images.';
+        statusDiv.innerHTML = 'What’s the pattern? Look closely…';
         const cells = container.querySelectorAll('.puzzle1-cell');
         cells.forEach(cell => cell.classList.remove('wrong-flash'));
         if (hintContainer) hintContainer.innerHTML = '';
@@ -124,6 +124,7 @@ function renderPuzzle1(container, onSolve) {
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }
 
+
 // ------------------- Puzzle 2: Library Layers -------------------
 function renderPuzzle2(container, onSolve) {
     const puzzleId = 2;
@@ -132,7 +133,7 @@ function renderPuzzle2(container, onSolve) {
     const hintTimerSeconds = puzzleConfig.hintTimer;
     let hintTimeoutId = null;
 
-    const EXPECTED_WORD_ORDER = ['first', 'fourth', 'second', 'third'];
+    const EXPECTED_WORDS = ['first', 'fourth', 'second', 'third']; // no order requirement
     const ANSWER = "1423";
     const wordToFloor = { first: '1', fourth: '4', second: '2', third: '3' };
 
@@ -142,9 +143,9 @@ function renderPuzzle2(container, onSolve) {
         { floor: 3, word: 'third', filled: false, value: '' },
         { floor: 4, word: 'fourth', filled: false, value: '' }
     ];
-    let clickSequence = [];
+    let clickSequence = []; // stores words in the order clicked
     let puzzleSolved = false;
-    let wrongAttempts = 0;  // kept for user feedback, no hint trigger
+    let wrongAttempts = 0;
 
     const poemHTML = `
         <p>"A Library of Layers"</p>
@@ -183,6 +184,18 @@ function renderPuzzle2(container, onSolve) {
     const hintContainer = document.getElementById('puzzle2HintContainer');
     const highlights = container.querySelectorAll('.highlight');
 
+    // Add styling to make highlighted words pop
+    highlights.forEach(span => {
+        span.style.fontWeight = 'bold';
+        span.style.textDecoration = 'underline';
+        span.style.textTransform = 'capitalize';
+        span.style.cursor = 'pointer';
+        span.style.display = 'inline-block';
+        span.style.padding = '0 4px';
+        span.style.borderRadius = '12px';
+        span.style.transition = '0.1s';
+    });
+
     function renderBuilding() {
         buildingSlots.style.display = 'flex';
         buildingSlots.style.flexDirection = 'row';
@@ -215,15 +228,18 @@ function renderPuzzle2(container, onSolve) {
             display += (clickSequence[i] ? wordToFloor[clickSequence[i]] : '_') + ' ';
         }
         sequenceSpan.innerText = display.trim();
-        if (clickSequence.length === 4 && clickSequence.join('') === EXPECTED_WORD_ORDER.join('') && !puzzleSolved) {
+        // Check if all four words have been clicked (any order)
+        if (clickSequence.length === 4 && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
             statusDiv.innerHTML = '✅ Well done! Correct order.';
             const claimBtn = document.createElement('button');
             claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'background:var(--button-primary); color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
             claimBtn.onclick = () => onSolve(ANSWER);
             container.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            if (hintContainer) hintContainer.innerHTML = '';
         }
     }
 
@@ -243,30 +259,35 @@ function renderPuzzle2(container, onSolve) {
         floorSlots.forEach(slot => { slot.filled = false; slot.value = ''; });
         renderBuilding();
         updateSequenceDisplay();
+        // Re-enable and reset styling of highlighted words
         highlights.forEach(span => {
             span.style.opacity = '1';
-            span.style.cursor = 'pointer';
-            span.style.backgroundColor = '';
             span.style.pointerEvents = 'auto';
+            span.style.backgroundColor = '';
+            span.style.boxShadow = '';
         });
         statusDiv.innerHTML = 'Studying Hard, or Hardly Studying?';
         if (hintContainer) hintContainer.innerHTML = '';
         if (hintTimeoutId) clearTimeout(hintTimeoutId);
-        // Set timed hint only
-        hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
+        // Start timed hint (highlight words after delay)
+        hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
+    }
+
+    function highlightWords() {
+        if (!document.body.contains(container)) return;
+        if (puzzleSolved) return;
+        // Add a glowing effect to all .highlight spans
+        highlights.forEach(span => {
+            span.style.boxShadow = '0 0 8px 2px gold';
+            span.style.backgroundColor = '#fff3c9';
+            span.style.transition = '0.2s';
+        });
+        statusDiv.innerHTML = '💡 The four highlighted words are the key – click them in any order.';
+        // Remove highlight after 5 seconds? Keep it until clicked? We'll keep until clicked.
     }
 
     function showHintButton(forceShow = false) {
-        if (!document.body.contains(container)) return;
-        if (hintContainer && !hintContainer.innerHTML && !puzzleSolved) {
-            hintContainer.innerHTML = `<button id="puzzle2HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
-            const hintBtn = hintContainer.querySelector('#puzzle2HintBtn');
-            hintBtn.addEventListener('click', () => {
-                statusDiv.innerHTML = `💡 Hint: ${hintText}`;
-                hintBtn.disabled = true;
-                hintBtn.style.opacity = '0.5';
-            });
-        }
+        // Not used anymore; we use highlightWords instead. Keep empty to avoid errors.
     }
 
     function handleWordClick(e) {
@@ -276,17 +297,9 @@ function renderPuzzle2(container, onSolve) {
         if (clickSequence.includes(word)) {
             statusDiv.innerHTML = `❌ Already used "${word}". Reset and try again.`;
             wrongAttempts++;
-            // No hint trigger – purely timed now
             return;
         }
-        const nextExpected = EXPECTED_WORD_ORDER[clickSequence.length];
-        if (word !== nextExpected) {
-            statusDiv.innerHTML = `❌ Wrong order! Expected "${nextExpected}". Resetting.`;
-            wrongAttempts++;
-            // No hint trigger
-            resetPuzzle();
-            return;
-        }
+        // No order validation – just add the word
         clickSequence.push(word);
         fillSlot(word);
         updateSequenceDisplay();
@@ -294,15 +307,11 @@ function renderPuzzle2(container, onSolve) {
         span.style.opacity = '0.5';
         span.style.cursor = 'default';
         span.style.backgroundColor = 'var(--accent-green)';
+        span.style.boxShadow = 'none';
         span.style.pointerEvents = 'none';
     }
 
     highlights.forEach(span => {
-        span.style.cursor = 'pointer';
-        span.style.display = 'inline-block';
-        span.style.padding = '0 4px';
-        span.style.borderRadius = '12px';
-        span.style.transition = '0.1s';
         span.addEventListener('click', handleWordClick);
     });
 
@@ -310,8 +319,9 @@ function renderPuzzle2(container, onSolve) {
     renderBuilding();
     updateSequenceDisplay();
     statusDiv.innerHTML = 'Studying Hard, or Hardly Studying?';
-    hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
+    hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
 }
+
 
 // ------------------- Puzzle 3: Email Exchange -------------------
 function renderPuzzle3(container, onSolve) {
@@ -411,7 +421,9 @@ function renderPuzzle3(container, onSolve) {
             claimBtn.textContent = '🔓 Claim Your Code →';
             claimBtn.style.cssText = 'display:block; margin:15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
             claimBtn.onclick = () => onSolve(expectedYear);
-            container.querySelector('#puzzle3AnswerArea').appendChild(claimBtn);
+            const answerArea = container.querySelector('#puzzle3AnswerArea');
+            answerArea.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
         } else {
             wrongAttempts++;
             feedback.innerHTML = `❌ Wrong year. Try searching again.`;
@@ -503,6 +515,7 @@ function renderPuzzle4(container, onSolve) {
     backgroundImage.onload = () => { imageLoaded = true; draw(); };
     backgroundImage.onerror = () => { console.warn('Library image missing – using fallback'); imageLoaded = true; draw(); };
 
+
     function updateCaughtDisplay() {
         let display = '';
         for (let t of TARGETS) display += (collected.includes(t) ? t : '_') + ' ';
@@ -513,9 +526,11 @@ function renderPuzzle4(container, onSolve) {
             statusDiv.innerHTML = '✅ Well done! You caught all numbers.';
             const claimBtn = document.createElement('button');
             claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'background:var(--button-primary); color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
-            claimBtn.onclick = () => onSolve(EXPECTED_ANSWER);
+            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(ANSWER);
             container.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            if (hintContainer) hintContainer.innerHTML = '';
         }
     }
 
@@ -533,29 +548,35 @@ function renderPuzzle4(container, onSolve) {
         }
         for (let n of numbers) {
             if (n.caught) continue;
-            ctx.font = 'bold 42px monospace';   // increased from 28px to 42px (+50%)
+            ctx.font = 'bold 42px monospace';
             ctx.shadowBlur = 0;
             let isGlowing = false;
             if (mouseInside && !n.caught && n.isTarget) {
                 const dx = mouseX - n.x, dy = mouseY - n.y;
-                if (Math.hypot(dx, dy) < 45) {
+                if (Math.hypot(dx, dy) < 60) { // increased torch radius
                     isGlowing = true;
                     glowTarget = n;
                 }
             }
-            ctx.fillStyle = isGlowing ? '#00C1D3' : 'rgba(0,0,0,0.15)';
             if (isGlowing) {
+                ctx.fillStyle = '#00C1D3';
                 ctx.shadowBlur = 12;
                 ctx.shadowColor = '#ffaa00';
             } else {
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
                 ctx.shadowBlur = 0;
             }
-            // Adjust position offsets for larger font (was -12, +10; now -20, +15)
+            // Draw text with outline for target numbers (to make them pop)
+            if (n.isTarget) {
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.strokeText(n.symbol, n.x - 20, n.y + 15);
+            }
             ctx.fillText(n.symbol, n.x - 20, n.y + 15);
         }
         if (mouseInside) {
             ctx.beginPath();
-            ctx.arc(mouseX, mouseY, 40, 0, 2 * Math.PI);
+            ctx.arc(mouseX, mouseY, 60, 0, 2 * Math.PI); // larger visual circle
             ctx.fillStyle = 'rgba(255,255,200,0.2)';
             ctx.fill();
             ctx.strokeStyle = '#ffecb3';
