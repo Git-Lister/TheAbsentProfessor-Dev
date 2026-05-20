@@ -143,4 +143,20 @@ beginBtn.addEventListener('click', () => {
             }
         });
     }
+    // Help button toggle
+    const helpBtn = document.getElementById('globalHelpToggle');
+    const helpModal = document.getElementById('helpModal');
+    const closeHelpBtn = document.getElementById('closeHelpBtn');
+    if (helpBtn && helpModal && closeHelpBtn) {
+        helpBtn.addEventListener('click', () => {
+            helpModal.style.display = 'flex';
+        });
+        closeHelpBtn.addEventListener('click', () => {
+            helpModal.style.display = 'none';
+        });
+        // Close modal if clicking outside the card (on the overlay)
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) helpModal.style.display = 'none';
+        });
+    }
 });

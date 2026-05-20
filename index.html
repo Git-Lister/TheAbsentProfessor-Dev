@@ -8,6 +8,34 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
 </head>
 <body>
+    <!-- Help button (top left) -->
+    <button id="globalHelpToggle" class="help-btn global-help" title="Help">❓</button>
+
+    <!-- Help modal (hidden initially) -->
+    <div id="helpModal" class="help-overlay" style="display: none;">
+        <div class="help-card">
+            <button id="closeHelpBtn" class="close-help">✖</button>
+            <div class="help-header">
+                <div class="help-portrait"></div>
+                <div class="help-title">
+                    <h2>Professor Al Beback's Notebook</h2>
+                    <p>“A little nudge never hurt anybody.”</p>
+                </div>
+            </div>
+            <div class="help-content">
+                <p><strong>Your mission:</strong> Four puzzles hide the numbers you need to unlock the lockbox. Work together, explore everything.</p>
+                <ul class="puzzle-list">
+                    <li><strong>📇 Laptop‑Locker Onlooker:</strong> Spot the difference/find the same.</li>
+                    <li><strong>📚 Library Layers:</strong> Find and click/tap.</li>
+                    <li><strong>✉️ Email Chain:</strong> Navigate to Library-Search and find the approrpiate information.</li>
+                    <li><strong>🏛️ Library Entrance:</strong> Use the torch to catch the hidden numbers.</li>
+                </ul>
+                <div class="tip-box">
+                    💡 <strong>Stuck?</strong> Make a few incorrect guesses and a hint will appear (or wait a minute). Each puzzle has a timed hint button.
+                </div>
+            </div>
+        </div>
+    </div>
     <button id="globalAccessibilityToggle" class="accessibility-btn global-a11y" title="Toggle high contrast mode">♿</button>
 <!-- New & improved Team Entry Screen -->
 <div id="teamEntryScreen" class="team-entry-overlay">
