@@ -565,18 +565,15 @@ body.high-contrast {
     color: #1e2a3a !important;
 }
 
-body.high-contrast h1,
-body.high-contrast h2,
+/* Do NOT change h1, h2, .game-title-hero, .game-subtitle, .lockbox-section h2, etc.
+   They remain white/gold because they are on the dark jungle background. */
+
 body.high-contrast h3,
 body.high-contrast p,
 body.high-contrast span,
 body.high-contrast div,
 body.high-contrast label,
-body.high-contrast .game-container h1,
-body.high-contrast .game-title-hero,
-body.high-contrast .game-subtitle,
 body.high-contrast .story-content,
-body.high-contrast .story-card h2,
 body.high-contrast .story-card p,
 body.high-contrast .team-info,
 body.high-contrast #displayTeamName,
@@ -587,11 +584,10 @@ body.high-contrast .puzzle2-status,
 body.high-contrast .puzzle4-status,
 body.high-contrast #sequenceDisplay,
 body.high-contrast .puzzle2-slots-container,
-body.high-contrast .puzzle2-slots-container h3,
-body.high-contrast .lockbox-section h2,
-body.high-contrast header h1,
-body.high-contrast .team-info #displayTeamName {
+body.high-contrast .puzzle2-slots-container h3 {
     color: #1e2a3a !important;
+    text-shadow: none !important;
+    background-color: transparent !important;
 }
 
 body.high-contrast .puzzle-card,
