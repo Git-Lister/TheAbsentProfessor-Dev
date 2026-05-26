@@ -466,6 +466,7 @@ function renderPuzzle4(container, onSolve) {
     let puzzleSolved = false;
     let wrongAttempts = 0;
     const W = 600, H = 400;
+    const TORCH_RADIUS = 80;
 
     const numbers = [
         { x: 120, y: 150, symbol: '2', isTarget: true, caught: false },
@@ -484,15 +485,14 @@ function renderPuzzle4(container, onSolve) {
         <div style="text-align: center;">
             <h3>🏛️ Library Entrance</h3>
             <p>“Here you see the Library, but can you find its opening times?”</p>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">💡 <strong>Move your finger or cursor</strong> around the image to reveal hidden numbers. Tap/click to catch them.</p>
             <div style="position: relative; display: inline-block;">
                 <canvas id="puzzle4Canvas" width="${W}" height="${H}" style="border: 2px solid var(--card-border); border-radius: 16px; background: #1a1f2c; cursor: none; touch-action: none;"></canvas>
                 <div id="torchCursor" class="torch-cursor" style="display: none;"></div>
             </div>
-            <!-- NEW: Found Numbers Rail -->
+            <!-- Found Numbers Rail (sorted, only appears once) -->
             <div id="found-numbers-rail" class="found-rail"></div>
-            <div class="puzzle4-collected" style="margin-top: 5px; font-size: 1.5rem; background: var(--card-bg); display: inline-block; padding: 5px 15px; border-radius: 40px;">
-                Caught: <span id="caughtDisplay">_ _ _</span>
-            </div>
+            <!-- Removed the extra "Caught" display – numbers now only appear in the rail -->
             <button id="puzzle4ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
             <div id="puzzle4Status" style="margin-top: 10px; font-style: italic;"></div>
             <div id="puzzle4HintContainer" style="margin-top: 10px;"></div>
@@ -502,22 +502,9 @@ function renderPuzzle4(container, onSolve) {
     const canvas = document.getElementById('puzzle4Canvas');
     const ctx = canvas.getContext('2d');
     const torchCursor = document.getElementById('torchCursor');
-    const caughtSpan = document.getElementById('caughtDisplay');
     const resetBtn = document.getElementById('puzzle4ResetBtn');
     const statusDiv = document.getElementById('puzzle4Status');
     const hintContainer = document.getElementById('puzzle4HintContainer');
-    const portraitWarning = container.querySelector('.puzzle4-portrait-warning');
-
-    function checkOrientation() {
-        if (window.innerHeight > window.innerWidth && portraitWarning) {
-            portraitWarning.style.display = 'block';
-        } else if (portraitWarning) {
-            portraitWarning.style.display = 'none';
-        }
-    }
-    checkOrientation();
-    window.addEventListener('orientationchange', checkOrientation);
-    window.addEventListener('resize', checkOrientation);
 
     let mouseX = -100, mouseY = -100;
     let mouseInside = false;
@@ -529,36 +516,21 @@ function renderPuzzle4(container, onSolve) {
     backgroundImage.onload = () => { imageLoaded = true; draw(); };
     backgroundImage.onerror = () => { console.warn('Library image missing – using fallback'); imageLoaded = true; draw(); };
 
-    function updateCaughtDisplay() {
-        // Update the main caught display
-        if (collected.length === TARGETS.length) {
-            caughtSpan.innerText = "The Library is Open: (24/7)";
-            // Optionally hide the rail if you want, but you said numbers should stay.
-            // I'll keep the rail visible with numbers, just hide the "Caught" prefix.
-            const rail = document.getElementById('found-numbers-rail');
-            if (rail) rail.style.display = 'flex'; // Ensure it's visible
-        } else {
-            let display = '';
-            for (let t of TARGETS) display += (collected.includes(t) ? t : '_') + ' ';
-            caughtSpan.innerText = display.trim();
+    function updateRail() {
+        const rail = document.getElementById('found-numbers-rail');
+        if (!rail) return;
+        rail.innerHTML = '';
+        // Sort the collected numbers (so they appear as 2,4,7 not catch order)
+        const sorted = [...collected].sort((a,b) => parseInt(a) - parseInt(b));
+        for (let sym of sorted) {
+            const span = document.createElement('span');
+            span.textContent = sym;
+            span.className = 'caught-number';
+            rail.appendChild(span);
         }
-        
-        // Trigger the solved state if all three are caught
-        if (collected.length === TARGETS.length && !puzzleSolved) {
-            puzzleSolved = true;
-            if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ The Library is Open: 24/7!';
-            
-            // NEW: Prevent duplicate button
-            if (container.querySelector('.claim-code-btn')) return;
-            
-            const claimBtn = document.createElement('button');
-            claimBtn.className = 'claim-code-btn';
-            claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'background:var(--button-primary); color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
-            claimBtn.onclick = () => onSolve(EXPECTED_ANSWER);
-            container.appendChild(claimBtn);
-            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        // If solved, change rail appearance
+        if (collected.length === TARGETS.length) {
+            rail.style.borderColor = 'var(--accent-gold)';
         }
     }
 
@@ -574,14 +546,27 @@ function renderPuzzle4(container, onSolve) {
             ctx.font = '14px monospace';
             ctx.fillText('Library image missing – place images/puzzle4/library.jpg', 50, 200);
         }
+
+        // 1. Draw all numbers (including caught ones – they stay on the image)
         for (let n of numbers) {
-            if (n.caught) continue;
             ctx.font = 'bold 42px monospace';
             ctx.shadowBlur = 0;
+
+            if (n.caught) {
+                // Caught numbers: permanent gold with glow
+                ctx.fillStyle = '#d4af37';
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#d4af37';
+                ctx.fillText(n.symbol, n.x - 20, n.y + 15);
+                ctx.shadowBlur = 0; // reset for next
+                continue;
+            }
+
+            // Uncaught numbers
             let isGlowing = false;
             if (mouseInside && !n.caught && n.isTarget) {
                 const dx = mouseX - n.x, dy = mouseY - n.y;
-                if (Math.hypot(dx, dy) < 60) {
+                if (Math.hypot(dx, dy) < TORCH_RADIUS) {
                     isGlowing = true;
                     glowTarget = n;
                 }
@@ -590,19 +575,20 @@ function renderPuzzle4(container, onSolve) {
                 ctx.fillStyle = '#00C1D3';
                 ctx.shadowBlur = 12;
                 ctx.shadowColor = '#ffaa00';
-                // Black outline for glowing numbers
                 ctx.strokeStyle = '#000000';
                 ctx.lineWidth = 2;
                 ctx.strokeText(n.symbol, n.x - 20, n.y + 15);
+                ctx.fillText(n.symbol, n.x - 20, n.y + 15);
             } else {
                 ctx.fillStyle = 'rgba(0,0,0,0.15)';
                 ctx.shadowBlur = 0;
+                ctx.fillText(n.symbol, n.x - 20, n.y + 15);
             }
-            ctx.fillText(n.symbol, n.x - 20, n.y + 15);
         }
+
         if (mouseInside) {
             ctx.beginPath();
-            ctx.arc(mouseX, mouseY, 60, 0, 2 * Math.PI);
+            ctx.arc(mouseX, mouseY, TORCH_RADIUS, 0, 2 * Math.PI);
             ctx.fillStyle = 'rgba(255,255,200,0.2)';
             ctx.fill();
             ctx.strokeStyle = '#ffecb3';
@@ -620,33 +606,50 @@ function renderPuzzle4(container, onSolve) {
                 collected.push(symbol);
                 glowTarget.caught = true;
                 
-                // NEW: Add to Rail
-                const rail = document.getElementById('found-numbers-rail');
-                if (rail) {
-                    const numSpan = document.createElement('span');
-                    numSpan.textContent = symbol;
-                    numSpan.className = 'caught-number';
-                    rail.appendChild(numSpan);
-                }
+                // Update rail (sorted, no duplicates)
+                updateRail();
                 
-                // NEW: Haptic Feedback (mobile vibration)
+                // Haptic feedback
                 if (navigator.vibrate) navigator.vibrate(10);
                 
-                updateCaughtDisplay();
-                statusDiv.innerHTML = `✅ Caught ${symbol}! ${3 - collected.length} left.`;
+                // Non-revealing status message
+                const left = TARGETS.length - collected.length;
+                if (left === 0) {
+                    statusDiv.innerHTML = '✨ All opening-time numbers found! ✨';
+                } else {
+                    statusDiv.innerHTML = `✅ Found one! (${left} left)`;
+                }
                 glowTarget = null;
                 draw();
             }
         } else {
             wrongAttempts++;
-            statusDiv.innerHTML = '❌ No target under torch. Keep searching!';
+            statusDiv.innerHTML = '❌ Nothing there. Keep searching...';
             if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
                 showHintButton();
             }
             setTimeout(() => {
                 if (collected.length < TARGETS.length && !puzzleSolved)
-                    statusDiv.innerHTML = 'Move torch over the image – hidden numbers will glow. Click to catch.';
+                    statusDiv.innerHTML = 'Move your torch over the image to reveal hidden numbers.';
             }, 1500);
+        }
+    }
+
+    function checkSolved() {
+        if (collected.length === TARGETS.length && !puzzleSolved) {
+            puzzleSolved = true;
+            if (hintTimeoutId) clearTimeout(hintTimeoutId);
+            statusDiv.innerHTML = '✅ The Library is Open: 24/7!';
+            // Claim button
+            if (container.querySelector('.claim-code-btn')) return;
+            const claimBtn = document.createElement('button');
+            claimBtn.className = 'claim-code-btn';
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'background:var(--button-primary); color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(EXPECTED_ANSWER);
+            container.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            if (hintContainer) hintContainer.innerHTML = '';
         }
     }
 
@@ -683,8 +686,12 @@ function renderPuzzle4(container, onSolve) {
         collected = [];
         puzzleSolved = false;
         numbers.forEach(n => n.caught = false);
-        updateCaughtDisplay();
-        statusDiv.innerHTML = 'Puzzle reset. Find and catch 2,4,7.';
+        const rail = document.getElementById('found-numbers-rail');
+        if (rail) {
+            rail.innerHTML = '';
+            rail.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        }
+        statusDiv.innerHTML = 'Find the hidden numbers on the library entrance.';
         glowTarget = null;
         draw();
         hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
@@ -712,6 +719,7 @@ function renderPuzzle4(container, onSolve) {
     canvas.addEventListener('touchend', onLeave);
     resetBtn.addEventListener('click', resetGame);
 
-    updateCaughtDisplay();
+    // Initial state
+    statusDiv.innerHTML = 'Find the hidden numbers on the library entrance.';
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }
