@@ -13,6 +13,8 @@
     --button-primary: #3c6e47;
     --input-bg: #2c3e35;
     --col3-highlight-bg: #2d5a3a;
+        --lockbox-outer-bg: url('../images/lockbox-outer.jpg'); /* replace with your texture */
+    --lockbox-inner-bg: url('../images/lockbox-inner.jpg'); /* optional */
 }
 
 /* ---------- RESET & BASE ---------- */
@@ -311,6 +313,14 @@ h1 {
     box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
 
+.puzzle-card {
+    background: rgba(22, 36, 32, 0.8);
+    backdrop-filter: blur(2px);
+}
+.puzzle-card:hover {
+    background: rgba(22, 36, 32, 0.95);
+}
+
 .puzzle-card h3 {
     margin-top: 0;
     color: var(--text-primary);
@@ -330,7 +340,11 @@ h1 {
 
 /* ---------- LOCKBOX & GRID ---------- */
 .lockbox-section {
-    background: var(--card-bg);
+    background: var(--card-bg);  /* fallback colour */
+    background-image: var(--lockbox-outer-bg, none);
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
     border-radius: 40px;
     padding: 20px;
     text-align: center;
@@ -338,7 +352,11 @@ h1 {
 }
 
 .lootbox-container {
-    background: var(--card-bg);
+    background: var(--card-bg);  /* fallback colour */
+    background-image: var(--lockbox-inner-bg, none);
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
     border-radius: 30px;
     padding: 20px;
     max-width: 400px;
@@ -347,7 +365,6 @@ h1 {
     box-shadow: 0 0 15px rgba(0,0,0,0.5);
     border: 2px solid var(--card-border);
 }
-
 .lootbox-container.unlocked {
     background: var(--button-primary);
     border-color: var(--accent-gold);
@@ -391,6 +408,103 @@ h1 {
     color: white;
 }
 
+/* Metallic / steel texture for the lockbox outer area */
+.lockbox-section {
+    background: var(--card-bg);  /* fallback */
+    position: relative;
+    overflow: hidden;            /* keeps any pseudo-element inside */
+}
+
+/* Add a subtle steel gradient or pattern */
+.lockbox-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: repeating-linear-gradient(45deg, rgba(180,180,200,0.1) 0px, rgba(180,180,200,0.1) 2px, transparent 2px, transparent 8px);
+    pointer-events: none;        /* IMPORTANT: allows clicks to pass through */
+    z-index: 0;
+}
+
+/* Ensure the inner container stays above the pattern */
+.lockbox-section .lootbox-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* High-contrast mode: remove the decorative pattern */
+body.high-contrast .lockbox-section::before {
+    background-image: none !important;
+}
+
+
+/* -------------------- Lockbox Inner "Pad" Styling -------------------- */
+/* Recessed inset shadow for the whole lockbox container */
+.lootbox-container {
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,0,0,0.3);
+    background: radial-gradient(circle at 30% 20%, var(--card-bg), #1a2a22);
+}
+
+/* Puzzle grid – make it look like a digital keypad */
+.puzzle-grid {
+    background: #0a1a15;
+    border: 1px solid var(--accent-gold);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.puzzle-grid th, .puzzle-grid td {
+    background: rgba(0,0,0,0.4);
+    border-color: var(--accent-gold);
+    color: var(--text-primary);
+    font-weight: bold;
+}
+.puzzle-grid th {
+    background: #1e3a2a;
+}
+
+/* Safe dials – metallic / vault style */
+.dials-container {
+    background: rgba(0,0,0,0.3);
+    border-radius: 40px;
+    padding: 15px 10px;
+    margin: 10px 0 !important;
+}
+.dial {
+    background: #2c2a24;
+    border-radius: 20px;
+    padding: 5px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.6), 0 2px 4px rgba(255,255,200,0.2);
+}
+.dial-value {
+    background: #000000aa;
+    border-radius: 15px;
+    font-family: monospace;
+    letter-spacing: 2px;
+}
+.dial-up, .dial-down {
+    background: #4a3b2c;
+    color: var(--accent-gold);
+    border: 1px solid var(--accent-gold);
+    transition: 0.05s linear;
+}
+.dial-up:active, .dial-down:active {
+    transform: scale(0.95);
+}
+
+/* Check combination button – metallic finish */
+#checkCombinationBtn {
+    background: linear-gradient(145deg, #5a6b5a, #2a3a2a);
+    border: 1px solid var(--accent-gold);
+    box-shadow: 0 3px 0 #1a2a1a;
+    transition: 0.05s linear;
+}
+#checkCombinationBtn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #1a2a1a;
+}
 /* ---------- MODALS ---------- */
 .modal-overlay {
     position: fixed;
@@ -587,7 +701,11 @@ body.high-contrast .lockbox-section h2 {
     text-shadow: none !important;
 }
 
-
+body.high-contrast .lockbox-section,
+body.high-contrast .lootbox-container {
+    background-image: none !important;
+    background: #ffffff !important;
+}
 
 /* All other text elements become dark */
 body.high-contrast h3,
@@ -707,6 +825,18 @@ body.high-contrast .tip-box {
     background: #e9ecef !important;
 }
 
+body.high-contrast .puzzle-grid,
+body.high-contrast .dials-container,
+body.high-contrast .dial,
+body.high-contrast .dial-value,
+body.high-contrast .dial-up,
+body.high-contrast .dial-down,
+body.high-contrast #checkCombinationBtn {
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border-color: #1e2a3a !important;
+    color: #1e2a3a !important;
+}
 /* ---------- PUZZLE 1 SPECIFIC ---------- */
 .puzzle1-grid {
     display: grid;

@@ -173,11 +173,16 @@ function renderLockboxUI(container, gridData, targetCode) {
 }
 
 function renderUnlockedState(container) {
-    // Reporting already done inside check button; just show celebration
+    // Original confetti (keep as is, it works)
     if (typeof canvasConfetti === 'function') {
         canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.2 }, startVelocity: 15 });
         canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.8 }, startVelocity: 15 });
+        
+        // ADD a gentle delayed burst (no conflict)
+        setTimeout(() => {
+            canvasConfetti({ particleCount: 200, spread: 80, origin: { y: 0.5 }, colors: ['#d4af37', '#6aab6a'] });
+        }, 300);
     }
 
     container.innerHTML = `
