@@ -13,7 +13,7 @@
     --button-primary: #3c6e47;
     --input-bg: #2c3e35;
     --col3-highlight-bg: #2d5a3a;
-        --lockbox-outer-bg: url('../images/lockbox-outer.jpg'); /* replace with your texture */
+    --lockbox-outer-bg: url('../images/lockbox-outer.jpg'); /* replace with your texture */
     --lockbox-inner-bg: url('../images/lockbox-inner.jpg'); /* optional */
 }
 
@@ -641,23 +641,26 @@ body.high-contrast .lockbox-section::before {
     }
 }
 
-    /* Puzzle 4 portrait warning – now uses theme gold */
-    @media (orientation: portrait) {
-        .puzzle4-portrait-warning {
-            display: block;
-            background: var(--accent-gold);
-            color: #0a1f1a;
-            padding: 15px;
-            border-radius: 30px;
-            margin: 15px 0;
-            text-align: center;
-            font-weight: bold;
-        }
+/* ============================================================
+   NEW: CANVAS RESPONSIVENESS
+   ============================================================ */
+#puzzle4Canvas {
+    max-width: 100%;
+    height: auto;
+    touch-action: none; /* Prevents scrolling while dragging torch */
+    display: block;
+    margin: 0 auto;
+}
 
-        canvas {
-            max-width: 100%;
-            height: auto;
-        }
+/* High-contrast mode override for the new rail */
+body.high-contrast .found-rail {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+}
+body.high-contrast .caught-number {
+    color: #1e2a3a !important;
+    border-color: #1e2a3a !important;
+    background: #e9ecef !important;
     }
 }
 
@@ -1110,4 +1113,40 @@ body.high-contrast #checkCombinationBtn {
     border-radius: 20px;
     margin-top: 15px;
     text-align: center;
+}
+
+/* ============================================================
+   NEW: PUZZLE 4 - FOUND NUMBERS RAIL
+   ============================================================ */
+.found-rail {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px;
+    margin: 12px auto 0;
+    min-height: 50px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
+    max-width: 300px;
+    transition: all 0.3s;
+}
+
+.caught-number {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--accent-gold);
+    text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0 10px;
+    border-radius: 12px;
+    border: 1px solid var(--accent-gold);
+    animation: popIn 0.2s ease-out;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
 }
