@@ -515,7 +515,6 @@ function renderPuzzle4(container, onSolve) {
     backgroundImage.onload = () => { imageLoaded = true; draw(); };
     backgroundImage.onerror = () => { console.warn('Library image missing – using fallback'); imageLoaded = true; draw(); };
 
-
     function updateCaughtDisplay() {
         let display = '';
         for (let t of TARGETS) display += (collected.includes(t) ? t : '_') + ' ';
@@ -526,11 +525,10 @@ function renderPuzzle4(container, onSolve) {
             statusDiv.innerHTML = '✅ Well done! You caught all numbers.';
             const claimBtn = document.createElement('button');
             claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
-            claimBtn.onclick = () => onSolve(ANSWER);
+            claimBtn.style.cssText = 'background:var(--button-primary); color:white; border:none; padding:10px 20px; border-radius:30px; margin-top:15px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(EXPECTED_ANSWER);
             container.appendChild(claimBtn);
             setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-            if (hintContainer) hintContainer.innerHTML = '';
         }
     }
 
@@ -553,7 +551,7 @@ function renderPuzzle4(container, onSolve) {
             let isGlowing = false;
             if (mouseInside && !n.caught && n.isTarget) {
                 const dx = mouseX - n.x, dy = mouseY - n.y;
-                if (Math.hypot(dx, dy) < 60) { // increased torch radius
+                if (Math.hypot(dx, dy) < 60) {
                     isGlowing = true;
                     glowTarget = n;
                 }
@@ -562,21 +560,19 @@ function renderPuzzle4(container, onSolve) {
                 ctx.fillStyle = '#00C1D3';
                 ctx.shadowBlur = 12;
                 ctx.shadowColor = '#ffaa00';
+                // Black outline for glowing numbers
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.strokeText(n.symbol, n.x - 20, n.y + 15);
             } else {
                 ctx.fillStyle = 'rgba(0,0,0,0.15)';
                 ctx.shadowBlur = 0;
-            }
-            // Draw text with outline for target numbers (to make them pop)
-            if (n.isTarget) {
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
-                ctx.strokeText(n.symbol, n.x - 20, n.y + 15);
             }
             ctx.fillText(n.symbol, n.x - 20, n.y + 15);
         }
         if (mouseInside) {
             ctx.beginPath();
-            ctx.arc(mouseX, mouseY, 60, 0, 2 * Math.PI); // larger visual circle
+            ctx.arc(mouseX, mouseY, 60, 0, 2 * Math.PI);
             ctx.fillStyle = 'rgba(255,255,200,0.2)';
             ctx.fill();
             ctx.strokeStyle = '#ffecb3';

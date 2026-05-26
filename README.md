@@ -1,18 +1,5 @@
 
 
-## README.md
-
-Below is the **complete revised README**. It incorporates:
-- The new jungle theme and colour palette (CSS variables)
-- High‑contrast accessibility mode (♿ button)
-- Improved Google Sheets reporting (order, split answers, readable timestamp)
-- Admin area for changing the reporting URL
-- Winner determination by submission timestamp (not duration)
-- Mobile responsiveness notes
-- Updated puzzle descriptions (Puzzle 2 simplified, Puzzle 4 larger numbers, etc.)
-
-**Copy and paste this into your `README.md` file.**
-
 ```markdown
 # The Case of the Absent Professor – Digital Escape Room
 
