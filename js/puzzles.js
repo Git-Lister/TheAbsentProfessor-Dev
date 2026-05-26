@@ -1,6 +1,6 @@
 // Puzzle implementations (each receives a container and an onSolve callback)
 
-// ------------------- Puzzle 1: Number Grid -------------------
+// ------------------- Puzzle 1: Check it, Return it, Laptop Locker it! -------------------
 function renderPuzzle1(container, onSolve) {
     const puzzleId = 1;
     const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);

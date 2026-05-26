@@ -66,7 +66,7 @@ function renderLockboxUI(container, gridData, targetCode) {
                 <tbody>
                     ${gridData.map((row, rowIdx) => `
                         <tr>
-                            <td style="border:1px solid #b5926a; padding:8px;">${['Number Grid', 'Library Layers', 'Email Chain', 'Blank Page'][rowIdx]}</td>
+                            <td style="border:1px solid #b5926a; padding:8px;">${['Check it, Return it, Laptop Locker it!', 'Library Layers', 'Email Chain', 'Open All Hours'][rowIdx]}</td>
                             ${row.map((cell, colIdx) => {
                                 // Show X for row 1 col 4 and row 4 col 4 (answers with only 3 digits)
                                 if ((rowIdx === 0 || rowIdx === 3) && colIdx === 3) {
