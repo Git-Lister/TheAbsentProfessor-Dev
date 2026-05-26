@@ -314,7 +314,7 @@ h1 {
 }
 
 .puzzle-card {
-    background: rgba(22, 36, 32, 0.8);
+    background: rgba(22, 36, 32, 0.6);
     backdrop-filter: blur(2px);
 }
 .puzzle-card:hover {
@@ -1225,4 +1225,41 @@ body.high-contrast .unlocked-celebration .message.success {
 .lockbox-grid-section, .safe-dials, #lockboxContainer > * {
     background: transparent !important;
     backdrop-filter: blur(2px); /* keeps text readable over image */
+}
+
+/* --- Force high‑contrast on lockbox inner container and text --- */
+body.high-contrast #lockboxContainer,
+body.high-contrast .lootbox-container {
+    background: #ffffff !important;
+    background-image: none !important;
+    border: 2px solid #1e2a3a !important;
+}
+
+/* --- Force all text inside lockbox to be dark --- */
+body.high-contrast #lockboxContainer h2,
+body.high-contrast #lockboxContainer h4,
+body.high-contrast #lockboxContainer p,
+body.high-contrast #lockboxContainer .message,
+body.high-contrast #lockboxContainer .column-hint,
+body.high-contrast #lockboxContainer .dial-value,
+body.high-contrast #lockboxContainer .grid-cell,
+body.high-contrast #lockboxContainer .puzzle-grid th,
+body.high-contrast #lockboxContainer .puzzle-grid td {
+    color: #1e2a3a !important;
+}
+
+/* --- Force high‑contrast on the unlocked / congrats screen too --- */
+body.high-contrast #lockboxContainer .unlocked-celebration {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+}
+body.high-contrast #lockboxContainer .unlocked-celebration h3,
+body.high-contrast #lockboxContainer .unlocked-celebration p,
+body.high-contrast #lockboxContainer .unlocked-celebration div {
+    color: #1e2a3a !important;
+}
+body.high-contrast #lockboxContainer .unlocked-celebration .message.success {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border: 2px solid #155724 !important;
 }
