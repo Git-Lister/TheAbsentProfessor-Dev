@@ -1185,6 +1185,63 @@ body.high-contrast .unlocked-celebration .message.success {
     text-align: center;
 }
 
+/* Global action buttons – help & accessibility */
+.global-help,
+.global-a11y {
+    position: fixed;
+    top: 15px;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.5);   /* semi‑transparent dark background */
+    backdrop-filter: blur(4px);        /* soft blur to blend with background */
+    border: 1px solid rgba(255, 255, 200, 0.4);
+    border-radius: 30px;
+    padding: 5px 12px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+    box-shadow: none;
+}
+
+.global-help:hover,
+.global-a11y:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 200, 0.8);
+}
+
+.global-help {
+    left: 15px;
+}
+
+.global-a11y {
+    right: 15px;
+}
+
+/* On mobile, move buttons further from top to avoid overlapping the main title */
+@media (max-width: 600px) {
+    .global-help,
+    .global-a11y {
+        top: 70px;          /* push below the MMU logo / title area */
+        padding: 3px 10px;
+        font-size: 1rem;
+    }
+    .global-help {
+        left: 10px;
+    }
+    .global-a11y {
+        right: 10px;
+    }
+}
+
+/* High‑contrast mode override – make buttons solid white with black text */
+body.high-contrast .global-help,
+body.high-contrast .global-a11y {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+    color: #1e2a3a !important;
+    backdrop-filter: none !important;
+}
+
 /* ============================================================
    NEW: PUZZLE 4 - FOUND NUMBERS RAIL
    ============================================================ */

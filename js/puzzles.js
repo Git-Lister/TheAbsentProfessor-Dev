@@ -606,13 +606,11 @@ function renderPuzzle4(container, onSolve) {
                 collected.push(symbol);
                 glowTarget.caught = true;
                 
-                // Update rail (sorted, no duplicates)
-                updateRail();
+                updateRail();                   // update the found numbers display
                 
-                // Haptic feedback
+                // Haptic feedback (optional)
                 if (navigator.vibrate) navigator.vibrate(10);
                 
-                // Non-revealing status message
                 const left = TARGETS.length - collected.length;
                 if (left === 0) {
                     statusDiv.innerHTML = '✨ All opening-time numbers found! ✨';
@@ -621,6 +619,9 @@ function renderPuzzle4(container, onSolve) {
                 }
                 glowTarget = null;
                 draw();
+                
+                // *** IMPORTANT: Check if puzzle is now solved ***
+                checkSolved();
             }
         } else {
             wrongAttempts++;
