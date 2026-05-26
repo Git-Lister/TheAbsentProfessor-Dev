@@ -1233,6 +1233,8 @@ body.high-contrast .unlocked-celebration .message.success {
     }
 }
 
+
+
 /* High‑contrast mode override – make buttons solid white with black text */
 body.high-contrast .global-help,
 body.high-contrast .global-a11y {
