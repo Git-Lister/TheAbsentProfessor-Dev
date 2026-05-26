@@ -338,6 +338,7 @@ h1 {
     color: var(--text-secondary);
 }
 
+
 /* ---------- LOCKBOX & GRID ---------- */
 .lockbox-section {
     background: var(--card-bg);  /* fallback colour */
@@ -349,20 +350,22 @@ h1 {
     padding: 20px;
     text-align: center;
     border: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
 }
 
 .lootbox-container {
-    background: var(--card-bg);  /* fallback colour */
+    background: radial-gradient(circle at 30% 20%, var(--card-bg), #1a2a22);
     background-image: var(--lockbox-inner-bg, none);
+    background-blend-mode: overlay;
     background-size: cover;
     background-position: center;
-    background-blend-mode: overlay;
     border-radius: 30px;
     padding: 20px;
     max-width: 400px;
     margin: 0 auto;
     transition: all 0.3s;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,0,0,0.3);
     border: 2px solid var(--card-border);
 }
 .lootbox-container.unlocked {
@@ -415,18 +418,7 @@ h1 {
     overflow: hidden;            /* keeps any pseudo-element inside */
 }
 
-/* Add a subtle steel gradient or pattern */
-.lockbox-section::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: repeating-linear-gradient(45deg, rgba(180,180,200,0.1) 0px, rgba(180,180,200,0.1) 2px, transparent 2px, transparent 8px);
-    pointer-events: none;        /* IMPORTANT: allows clicks to pass through */
-    z-index: 0;
-}
+
 
 /* Ensure the inner container stays above the pattern */
 .lockbox-section .lootbox-container {
@@ -625,6 +617,7 @@ body.high-contrast .lockbox-section::before {
     .puzzle1-grid {
         gap: 10px;
     }
+    
 
     /* Prevent MMU logo from overlapping team entry card on small screens */
 @media (max-width: 600px) {
@@ -641,6 +634,33 @@ body.high-contrast .lockbox-section::before {
     }
 }
 
+
+        /* --- Mobile Lockbox Dials Fix --- */
+    @media (max-width: 600px) {
+        .dials-container {
+            gap: 6px !important;
+            flex-wrap: nowrap !important;
+            justify-content: center;
+            padding: 10px 5px !important;
+        }
+        .dial {
+            min-width: 35px !important;
+            padding: 3px !important;
+        }
+        .dial-value {
+            font-size: 1.2rem !important;
+            padding: 0 6px !important;
+        }
+        .dial-up, .dial-down {
+            padding: 2px 6px !important;
+            font-size: 0.7rem !important;
+            min-width: 24px !important;
+        }
+        #checkCombinationBtn {
+            padding: 8px 16px !important;
+            font-size: 0.9rem !important;
+        }
+    }
 /* ============================================================
    NEW: CANVAS RESPONSIVENESS
    ============================================================ */
@@ -840,6 +860,35 @@ body.high-contrast #checkCombinationBtn {
     border-color: #1e2a3a !important;
     color: #1e2a3a !important;
 }
+/* --- Lockbox & Case Solved High Contrast Fix --- */
+body.high-contrast .lockbox-section h2,
+body.high-contrast .lockbox-section h4,
+body.high-contrast .lockbox-section p,
+body.high-contrast .lockbox-section .message,
+body.high-contrast .lockbox-section .column-hint,
+body.high-contrast .lockbox-section .dial-value,
+body.high-contrast .lockbox-section .grid-cell,
+body.high-contrast .lockbox-section .puzzle-grid th,
+body.high-contrast .lockbox-section .puzzle-grid td {
+    color: #1e2a3a !important;
+}
+
+/* --- Unlocked / Case Solved Screen --- */
+body.high-contrast .unlocked-celebration {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+}
+body.high-contrast .unlocked-celebration h3,
+body.high-contrast .unlocked-celebration p,
+body.high-contrast .unlocked-celebration div {
+    color: #1e2a3a !important;
+}
+body.high-contrast .unlocked-celebration .message.success {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border: 2px solid #155724 !important;
+}
+
 /* ---------- PUZZLE 1 SPECIFIC ---------- */
 .puzzle1-grid {
     display: grid;
@@ -1149,4 +1198,31 @@ body.high-contrast #checkCombinationBtn {
     0% { transform: scale(0.5); opacity: 0; }
     80% { transform: scale(1.1); }
     100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================================
+   LOCKBOX IMAGE DEBUG & FORCE SHOW
+   ============================================================ */
+
+/* 1. Outer Box - ensure image shows */
+.lockbox-section {
+    background-image: var(--lockbox-outer-bg, none) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-color: var(--card-bg) !important; /* fallback */
+}
+
+/* 2. Inner Pad - ensure image shows and content is transparent */
+.lootbox-container, #lockboxContainer {
+    background-image: var(--lockbox-inner-bg, none) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-blend-mode: overlay !important;
+    background-color: transparent !important; /* so outer texture is visible */
+}
+
+/* 3. Make the inner HTML elements transparent so the pad shows through */
+.lockbox-grid-section, .safe-dials, #lockboxContainer > * {
+    background: transparent !important;
+    backdrop-filter: blur(2px); /* keeps text readable over image */
 }

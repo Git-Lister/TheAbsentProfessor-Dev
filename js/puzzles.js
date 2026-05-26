@@ -530,13 +530,24 @@ function renderPuzzle4(container, onSolve) {
     backgroundImage.onerror = () => { console.warn('Library image missing – using fallback'); imageLoaded = true; draw(); };
 
     function updateCaughtDisplay() {
-        let display = '';
-        for (let t of TARGETS) display += (collected.includes(t) ? t : '_') + ' ';
-        caughtSpan.innerText = display.trim();
+        // Update the main caught display
+        if (collected.length === TARGETS.length) {
+            caughtSpan.innerText = "The Library is Open: (24/7)";
+            // Optionally hide the rail if you want, but you said numbers should stay.
+            // I'll keep the rail visible with numbers, just hide the "Caught" prefix.
+            const rail = document.getElementById('found-numbers-rail');
+            if (rail) rail.style.display = 'flex'; // Ensure it's visible
+        } else {
+            let display = '';
+            for (let t of TARGETS) display += (collected.includes(t) ? t : '_') + ' ';
+            caughtSpan.innerText = display.trim();
+        }
+        
+        // Trigger the solved state if all three are caught
         if (collected.length === TARGETS.length && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ Well done! You caught all numbers.';
+            statusDiv.innerHTML = '✅ The Library is Open: 24/7!';
             
             // NEW: Prevent duplicate button
             if (container.querySelector('.claim-code-btn')) return;

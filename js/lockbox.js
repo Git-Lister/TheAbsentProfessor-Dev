@@ -174,16 +174,16 @@ function renderLockboxUI(container, gridData, targetCode) {
 
 function renderUnlockedState(container) {
     // Original confetti (keep as is, it works)
-    if (typeof canvasConfetti === 'function') {
-        canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.2 }, startVelocity: 15 });
-        canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.8 }, startVelocity: 15 });
-        
-        // ADD a gentle delayed burst (no conflict)
-        setTimeout(() => {
-            canvasConfetti({ particleCount: 200, spread: 80, origin: { y: 0.5 }, colors: ['#d4af37', '#6aab6a'] });
-        }, 300);
-    }
+const confettiFn = typeof confetti === 'function' ? confetti : (typeof canvasConfetti === 'function' ? canvasConfetti : null);
+if (confettiFn) {
+    confettiFn({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    confettiFn({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.2 }, startVelocity: 15 });
+    confettiFn({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.8 }, startVelocity: 15 });
+    
+    setTimeout(() => {
+        confettiFn({ particleCount: 200, spread: 80, origin: { y: 0.5 }, colors: ['#d4af37', '#6aab6a'] });
+    }, 300);
+}
 
     container.innerHTML = `
         <div class="unlocked-celebration" style="text-align: center; animation: fadeInScale 0.5s ease;">
@@ -197,7 +197,7 @@ function renderUnlockedState(container) {
                 <p style="font-weight: bold; margin: 15px 0;">The facilitator will announce the winning team!</p>
             </div>
             <div style="background: #4a3b2c; border-radius: 30px; padding: 15px;">
-                <p style="font-size: 0.8rem; margin-top: 10px;">Great teamwork, detectives!</p>
+                <p style="font-size: 1.4rem; font-weight: bold; text-align: center; margin-top: 15px;">Great teamwork, detectives!</p>
             </div>
         </div>
     `;
