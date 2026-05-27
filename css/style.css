@@ -926,23 +926,7 @@ body.high-contrast .unlocked-celebration .message.success {
     box-shadow: 0 0 0 3px #4caf50, 0 0 0 6px #81c784;
 }
 
-.puzzle1-cell.correct::after {
-    content: "✓";
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #2e7d32;
-    background: rgba(255,255,255,0.8);
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-}
+
 
 .puzzle1-cell.wrong-flash {
     animation: shakeFlash 0.3s ease;

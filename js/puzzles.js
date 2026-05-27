@@ -8,6 +8,7 @@ function renderPuzzle1(container, onSolve) {
     const hintTimerSeconds = puzzleConfig.hintTimer;
     let hintTimeoutId = null;
     let solved = false;
+    let wrongAttempts = 0; // <-- NEW counter
 
     const TARGETS = [1, 5, 8];
     const ANSWER = "158";
@@ -16,8 +17,8 @@ function renderPuzzle1(container, onSolve) {
 
     container.innerHTML = `
         <div style="text-align: center;">
-            <h3>📇 The Laptop‑Locker Onlooker</h3>
-            <p style="margin-bottom: 15px;">“Can't see what you're looking for? It's the same every time.”</p>
+            <h3>📇 Check it, Return it, Laptop Locker it!</h3>
+            <p style="margin-bottom: 15px;">“Don't feel Blue, just find what looks the same to you.”</p>
             <div id="puzzle1Grid" class="puzzle1-grid"></div>
             <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
             <div id="puzzle1Status" class="puzzle1-status">What’s the pattern? Look closely…</div>
@@ -57,11 +58,10 @@ function renderPuzzle1(container, onSolve) {
             statusDiv.innerHTML = '✅ Well done! You found the three matching images.';
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
             
-            // NEW: Prevent duplicate button
             if (container.querySelector('.claim-code-btn')) return;
             
             const claimBtn = document.createElement('button');
-            claimBtn.className = 'claim-code-btn'; // Assign class
+            claimBtn.className = 'claim-code-btn';
             claimBtn.textContent = '🔓 Claim Your Code →';
             claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
             claimBtn.onclick = () => onSolve(ANSWER);
@@ -77,6 +77,7 @@ function renderPuzzle1(container, onSolve) {
         if (solved) return;
         selectedTargets.clear();
         lockedCells.clear();
+        wrongAttempts = 0; // <-- Reset counter
         updateUI();
         statusDiv.innerHTML = 'What’s the pattern? Look closely…';
         const cells = container.querySelectorAll('.puzzle1-cell');
@@ -109,8 +110,14 @@ function renderPuzzle1(container, onSolve) {
                 clickedCell.classList.add('wrong-flash');
                 setTimeout(() => clickedCell.classList.remove('wrong-flash'), 400);
             }
-            statusDiv.innerHTML = `❌ Wrong image. Resetting...`;
-            resetPuzzle();
+            
+            wrongAttempts++;
+            if (wrongAttempts >= 3) {
+                statusDiv.innerHTML = '❌ Too many wrong attempts. Resetting puzzle...';
+                resetPuzzle();
+            } else {
+                statusDiv.innerHTML = `❌ Wrong image. ${3 - wrongAttempts} attempts remaining.`;
+            }
             return;
         }
         if (selectedTargets.has(pos)) {
@@ -128,7 +135,6 @@ function renderPuzzle1(container, onSolve) {
     resetBtn.addEventListener('click', resetPuzzle);
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }
-
 
 // ------------------- Puzzle 2: Library Layers -------------------
 function renderPuzzle2(container, onSolve) {
@@ -450,6 +456,25 @@ function renderPuzzle3(container, onSolve) {
     });
 
     hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
+
+        // --- Add Reset Button to Puzzle 3 ---
+    const resetBtn = document.createElement('button');
+    resetBtn.id = 'puzzle3ResetBtn';
+    resetBtn.textContent = 'Reset Puzzle';
+    resetBtn.style.cssText = 'background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px; cursor: pointer;';
+    resetBtn.addEventListener('click', function() {
+        if (solved) return;
+        yearInput.value = '';
+        feedback.innerHTML = '';
+        wrongAttempts = 0;
+        if (hintContainer) hintContainer.innerHTML = '';
+        if (hintTimeoutIdLocal) clearTimeout(hintTimeoutIdLocal);
+        hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
+        feedback.innerHTML = '⏳ Ready. Type the year.';
+    });
+    // Insert it below the hint container
+    const answerArea = container.querySelector('#puzzle3AnswerArea');
+    answerArea.appendChild(resetBtn);
 }
 
 // ------------------- Puzzle 4: UV Torch (Library Entrance) -------------------
