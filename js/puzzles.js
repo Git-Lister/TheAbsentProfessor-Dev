@@ -18,9 +18,11 @@ function renderPuzzle1(container, onSolve) {
     container.innerHTML = `
         <div style="text-align: center;">
             <h3>📇 Check it, Return it, Laptop Locker it!</h3>
-            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">🔍 What's the pattern? Look closely...</p>
+            <p style="margin-bottom: 15px; font-weight: bold; color: var(--text-secondary);">🔍 What's the pattern? Look closely...</p>
+            <p style="margin-bottom: 20px; font-style: italic; color: var(--text-secondary);">“Don't feel Blue, just find what looks the same to you.”</p>
             <div id="puzzle1Grid" class="puzzle1-grid"></div>
             <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
+            <div id="puzzle1Status" class="puzzle1-status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
             <div id="puzzle1HintContainer" style="margin-top: 10px;"></div>
         </div>
     `;
@@ -78,7 +80,7 @@ function renderPuzzle1(container, onSolve) {
         lockedCells.clear();
         wrongAttempts = 0;
         updateUI();
-        statusDiv.innerHTML = 'What’s the pattern? Look closely…';
+        statusDiv.innerHTML = '';
         const cells = container.querySelectorAll('.puzzle1-cell');
         cells.forEach(cell => cell.classList.remove('wrong-flash'));
         if (hintContainer) hintContainer.innerHTML = '';
@@ -171,13 +173,13 @@ function renderPuzzle2(container, onSolve) {
 
     container.innerHTML = `
         <div class="puzzle2-container" style="text-align: center; max-width: 700px; margin: 0 auto;">
-            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📖 Click the highlighted words in the poem to reveal the floor order.</p>
+            <p style="margin-bottom: 20px; font-weight: bold; color: var(--text-secondary);">📖 Click the highlighted words in the poem to reveal the floor order.</p>
             <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 20px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.8; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
                 ${poemHTML}
             </div>
             <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
             <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
-            <div id="puzzle2Status" style="margin-top: 15px; font-style: italic;"></div>
+            <div id="puzzle2Status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
             <div id="puzzle2HintContainer" style="margin-top: 10px;"></div>
         </div>
     `;
@@ -226,7 +228,6 @@ function renderPuzzle2(container, onSolve) {
     }
 
     function updateSequenceDisplay() {
-        // No longer needed, but we must check for completion when clickSequence reaches 4
         if (clickSequence.length === 4 && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
@@ -260,13 +261,13 @@ function renderPuzzle2(container, onSolve) {
         puzzleSolved = false;
         floorSlots.forEach(slot => { slot.filled = false; slot.value = ''; });
         renderBuilding();
+        statusDiv.innerHTML = '';
         highlights.forEach(span => {
             span.style.opacity = '1';
             span.style.pointerEvents = 'auto';
             span.style.backgroundColor = '';
             span.style.boxShadow = '';
         });
-        statusDiv.innerHTML = 'Studying Hard, or Hardly Studying?';
         if (hintContainer) hintContainer.innerHTML = '';
         if (hintTimeoutId) clearTimeout(hintTimeoutId);
         hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
@@ -294,7 +295,7 @@ function renderPuzzle2(container, onSolve) {
         }
         clickSequence.push(word);
         fillSlot(word);
-        updateSequenceDisplay(); // Checks for completion
+        updateSequenceDisplay();
         statusDiv.innerHTML = `✓ Correct! "${word}" added.`;
         span.style.opacity = '0.5';
         span.style.cursor = 'default';
@@ -309,7 +310,6 @@ function renderPuzzle2(container, onSolve) {
 
     resetBtn.addEventListener('click', resetPuzzle);
     renderBuilding();
-    statusDiv.innerHTML = 'Studying Hard, or Hardly Studying?';
     hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
 }
 
@@ -362,7 +362,7 @@ function renderPuzzle3(container, onSolve) {
 
     container.innerHTML = `
         <div style="max-height: 70vh; overflow-y: auto; padding: 10px;">
-            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📅 Find the year of publication mentioned in the emails.</p>
+            <p style="margin-bottom: 20px; font-weight: bold; color: var(--text-secondary);">📅 Find the year of publication mentioned in the emails.</p>
             ${emailsHTML}
             <div style="text-align: center; margin: 20px 0;">
                 <p>🔍 <strong>Are your study skills up to date?</strong></p>
@@ -373,7 +373,7 @@ function renderPuzzle3(container, onSolve) {
                     <input type="text" id="yearInput" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 8px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc;">
                     <button id="submitYearBtn" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin-left: 10px;">Submit</button>
                 </div>
-                <div id="puzzle3Feedback" style="margin-top: 15px; font-style: italic;"></div>
+                <div id="puzzle3Feedback" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
             </div>
             <div id="puzzle3HintContainer" style="margin-top: 15px; text-align: center;"></div>
         </div>
@@ -482,7 +482,7 @@ function renderPuzzle4(container, onSolve) {
     container.innerHTML = `
         <div style="text-align: center;">
             <h3>🏛️ Open All Hours</h3>
-            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">🔦 Move your torch to catch the three hidden numbers.</p>
+            <p style="margin-bottom: 20px; font-weight: bold; color: var(--text-secondary);">🔦 Move your torch to catch the three hidden numbers.</p>
             <p>“Here you see the Library, but can you find its opening times?”</p>
             <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">💡 <strong>Move your finger or cursor</strong> around the image to reveal hidden numbers. Tap/click to catch them.</p>
             <div style="position: relative; display: inline-block;">
@@ -491,7 +491,7 @@ function renderPuzzle4(container, onSolve) {
             </div>
             <div id="found-numbers-rail" class="found-rail"></div>
             <button id="puzzle4ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
-            <div id="puzzle4Status" style="margin-top: 10px; font-style: italic;"></div>
+            <div id="puzzle4Status" style="margin-top: 10px; font-style: italic; min-height: 30px;"></div>
             <div id="puzzle4HintContainer" style="margin-top: 10px;"></div>
         </div>
     `;
@@ -665,7 +665,7 @@ function renderPuzzle4(container, onSolve) {
             rail.innerHTML = '';
             rail.style.borderColor = 'rgba(255, 255, 255, 0.2)';
         }
-        statusDiv.innerHTML = 'Find the hidden numbers on the library entrance.';
+        statusDiv.innerHTML = '';
         glowTarget = null;
         draw();
         hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
@@ -694,6 +694,5 @@ function renderPuzzle4(container, onSolve) {
     resetBtn.addEventListener('click', resetGame);
 
     updateRailAndCheckCompletion();
-    statusDiv.innerHTML = 'Find the hidden numbers on the library entrance.';
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }
