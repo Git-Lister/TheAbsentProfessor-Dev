@@ -8,7 +8,7 @@ function renderPuzzle1(container, onSolve) {
     const hintTimerSeconds = puzzleConfig.hintTimer;
     let hintTimeoutId = null;
     let solved = false;
-    let wrongAttempts = 0; // <-- NEW counter
+    let wrongAttempts = 0;
 
     const TARGETS = [1, 5, 8];
     const ANSWER = "158";
@@ -18,10 +18,9 @@ function renderPuzzle1(container, onSolve) {
     container.innerHTML = `
         <div style="text-align: center;">
             <h3>📇 Check it, Return it, Laptop Locker it!</h3>
-            <p style="margin-bottom: 15px;">“Don't feel Blue, just find what looks the same to you.”</p>
+            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">🔍 What's the pattern? Look closely...</p>
             <div id="puzzle1Grid" class="puzzle1-grid"></div>
             <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
-            <div id="puzzle1Status" class="puzzle1-status">What’s the pattern? Look closely…</div>
             <div id="puzzle1HintContainer" style="margin-top: 10px;"></div>
         </div>
     `;
@@ -77,7 +76,7 @@ function renderPuzzle1(container, onSolve) {
         if (solved) return;
         selectedTargets.clear();
         lockedCells.clear();
-        wrongAttempts = 0; // <-- Reset counter
+        wrongAttempts = 0;
         updateUI();
         statusDiv.innerHTML = 'What’s the pattern? Look closely…';
         const cells = container.querySelectorAll('.puzzle1-cell');
@@ -144,7 +143,7 @@ function renderPuzzle2(container, onSolve) {
     const hintTimerSeconds = puzzleConfig.hintTimer;
     let hintTimeoutId = null;
 
-    const EXPECTED_WORDS = ['first', 'fourth', 'second', 'third']; // no order requirement
+    const EXPECTED_WORDS = ['first', 'fourth', 'second', 'third'];
     const ANSWER = "1423";
     const wordToFloor = { first: '1', fourth: '4', second: '2', third: '3' };
 
@@ -154,7 +153,7 @@ function renderPuzzle2(container, onSolve) {
         { floor: 3, word: 'third', filled: false, value: '' },
         { floor: 4, word: 'fourth', filled: false, value: '' }
     ];
-    let clickSequence = []; // stores words in the order clicked
+    let clickSequence = [];
     let puzzleSolved = false;
     let wrongAttempts = 0;
 
@@ -172,30 +171,23 @@ function renderPuzzle2(container, onSolve) {
 
     container.innerHTML = `
         <div class="puzzle2-container" style="text-align: center; max-width: 700px; margin: 0 auto;">
-            <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 15px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.6; margin-bottom: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
+            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📖 Click the highlighted words in the poem to reveal the floor order.</p>
+            <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 20px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.8; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
                 ${poemHTML}
             </div>
-            <div class="puzzle2-slots-container" style="background: var(--card-bg); border-radius: 20px; padding: 20px; display: inline-block; width: 100%;">
-                <h3>📚 Floored?! It'll click eventually. 📚</h3>
-                <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
-            </div>
-            <div style="margin-top: 20px; background: var(--card-bg); border-radius: 30px; padding: 10px;">
-                <strong>Your sequence:</strong> <span id="sequenceDisplay">_ _ _ _</span>
-            </div>
-            <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px;">Reset Puzzle</button>
+            <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
+            <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
             <div id="puzzle2Status" style="margin-top: 15px; font-style: italic;"></div>
             <div id="puzzle2HintContainer" style="margin-top: 10px;"></div>
         </div>
     `;
 
     const buildingSlots = document.getElementById('buildingSlots');
-    const sequenceSpan = document.getElementById('sequenceDisplay');
     const resetBtn = document.getElementById('puzzle2ResetBtn');
     const statusDiv = document.getElementById('puzzle2Status');
     const hintContainer = document.getElementById('puzzle2HintContainer');
     const highlights = container.querySelectorAll('.highlight');
 
-    // Add styling to make highlighted words pop
     highlights.forEach(span => {
         span.style.fontWeight = 'bold';
         span.style.textDecoration = 'underline';
@@ -234,18 +226,12 @@ function renderPuzzle2(container, onSolve) {
     }
 
     function updateSequenceDisplay() {
-        let display = '';
-        for (let i = 0; i < 4; i++) {
-            display += (clickSequence[i] ? wordToFloor[clickSequence[i]] : '_') + ' ';
-        }
-        sequenceSpan.innerText = display.trim();
-        // Check if all four words have been clicked (any order)
+        // No longer needed, but we must check for completion when clickSequence reaches 4
         if (clickSequence.length === 4 && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
             statusDiv.innerHTML = '✅ Well done! Correct order.';
             
-            // NEW: Prevent duplicate button
             if (container.querySelector('.claim-code-btn')) return;
             
             const claimBtn = document.createElement('button');
@@ -274,8 +260,6 @@ function renderPuzzle2(container, onSolve) {
         puzzleSolved = false;
         floorSlots.forEach(slot => { slot.filled = false; slot.value = ''; });
         renderBuilding();
-        updateSequenceDisplay();
-        // Re-enable and reset styling of highlighted words
         highlights.forEach(span => {
             span.style.opacity = '1';
             span.style.pointerEvents = 'auto';
@@ -285,25 +269,18 @@ function renderPuzzle2(container, onSolve) {
         statusDiv.innerHTML = 'Studying Hard, or Hardly Studying?';
         if (hintContainer) hintContainer.innerHTML = '';
         if (hintTimeoutId) clearTimeout(hintTimeoutId);
-        // Start timed hint (highlight words after delay)
         hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
     }
 
     function highlightWords() {
         if (!document.body.contains(container)) return;
         if (puzzleSolved) return;
-        // Add a glowing effect to all .highlight spans
         highlights.forEach(span => {
             span.style.boxShadow = '0 0 8px 2px gold';
             span.style.backgroundColor = '#fff3c9';
             span.style.transition = '0.2s';
         });
         statusDiv.innerHTML = '💡 The four highlighted words are the key – click them in any order.';
-        // Remove highlight after 5 seconds? Keep it until clicked? We'll keep until clicked.
-    }
-
-    function showHintButton(forceShow = false) {
-        // Not used anymore; we use highlightWords instead. Keep empty to avoid errors.
     }
 
     function handleWordClick(e) {
@@ -315,10 +292,9 @@ function renderPuzzle2(container, onSolve) {
             wrongAttempts++;
             return;
         }
-        // No order validation – just add the word
         clickSequence.push(word);
         fillSlot(word);
-        updateSequenceDisplay();
+        updateSequenceDisplay(); // Checks for completion
         statusDiv.innerHTML = `✓ Correct! "${word}" added.`;
         span.style.opacity = '0.5';
         span.style.cursor = 'default';
@@ -333,11 +309,9 @@ function renderPuzzle2(container, onSolve) {
 
     resetBtn.addEventListener('click', resetPuzzle);
     renderBuilding();
-    updateSequenceDisplay();
     statusDiv.innerHTML = 'Studying Hard, or Hardly Studying?';
     hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
 }
-
 
 // ------------------- Puzzle 3: Email Exchange -------------------
 function renderPuzzle3(container, onSolve) {
@@ -388,6 +362,7 @@ function renderPuzzle3(container, onSolve) {
 
     container.innerHTML = `
         <div style="max-height: 70vh; overflow-y: auto; padding: 10px;">
+            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📅 Find the year of publication mentioned in the emails.</p>
             ${emailsHTML}
             <div style="text-align: center; margin: 20px 0;">
                 <p>🔍 <strong>Are your study skills up to date?</strong></p>
@@ -434,7 +409,6 @@ function renderPuzzle3(container, onSolve) {
             cleanup();
             feedback.innerHTML = '✅ Well done! Correct year.';
             
-            // NEW: Prevent duplicate button
             if (container.querySelector('.claim-code-btn')) return;
             
             const claimBtn = document.createElement('button');
@@ -457,7 +431,7 @@ function renderPuzzle3(container, onSolve) {
 
     hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
 
-        // --- Add Reset Button to Puzzle 3 ---
+    // Reset Button
     const resetBtn = document.createElement('button');
     resetBtn.id = 'puzzle3ResetBtn';
     resetBtn.textContent = 'Reset Puzzle';
@@ -472,12 +446,11 @@ function renderPuzzle3(container, onSolve) {
         hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
         feedback.innerHTML = '⏳ Ready. Type the year.';
     });
-    // Insert it below the hint container
     const answerArea = container.querySelector('#puzzle3AnswerArea');
     answerArea.appendChild(resetBtn);
 }
 
-// ------------------- Puzzle 4: UV Torch (Library Entrance) -------------------
+// ------------------- Puzzle 4: Open All Hours -------------------
 function renderPuzzle4(container, onSolve) {
     const puzzleId = 4;
     const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
@@ -508,7 +481,8 @@ function renderPuzzle4(container, onSolve) {
 
     container.innerHTML = `
         <div style="text-align: center;">
-            <h3>🏛️ Library Entrance</h3>
+            <h3>🏛️ Open All Hours</h3>
+            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">🔦 Move your torch to catch the three hidden numbers.</p>
             <p>“Here you see the Library, but can you find its opening times?”</p>
             <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">💡 <strong>Move your finger or cursor</strong> around the image to reveal hidden numbers. Tap/click to catch them.</p>
             <div style="position: relative; display: inline-block;">
@@ -552,7 +526,6 @@ function renderPuzzle4(container, onSolve) {
         }
         if (collected.length === TARGETS.length) {
             rail.style.borderColor = 'var(--accent-gold)';
-            // CLAIM BUTTON HERE (reliable)
             if (!puzzleSolved && !container.querySelector('.claim-code-btn')) {
                 puzzleSolved = true;
                 if (hintTimeoutId) clearTimeout(hintTimeoutId);
@@ -639,7 +612,7 @@ function renderPuzzle4(container, onSolve) {
                 statusDiv.innerHTML = left === 0 ? '✨ All opening-time numbers found! ✨' : `✅ Found one! (${left} left)`;
                 glowTarget = null;
                 draw();
-                updateRailAndCheckCompletion();   // Critical: this now creates the claim button
+                updateRailAndCheckCompletion();
             }
         } else {
             wrongAttempts++;
@@ -720,8 +693,7 @@ function renderPuzzle4(container, onSolve) {
     canvas.addEventListener('touchend', onLeave);
     resetBtn.addEventListener('click', resetGame);
 
-    // Initial state
-    updateRailAndCheckCompletion(); // just in case (initially empty)
+    updateRailAndCheckCompletion();
     statusDiv.innerHTML = 'Find the hidden numbers on the library entrance.';
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }
