@@ -4,8 +4,9 @@ import os
 
 def create_file(path, content):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(content)
+
 
 # Project root
 ROOT = "escape-room"
@@ -15,19 +16,19 @@ config = {
     "puzzles": [
         {
             "id": 1,
-            "title": "Number Grid",
+            "title": "Check it, Return it, Laptop Locker it!",
             "expectedDigit": "2",
             "clues": {
                 "wrongDigits": {
                     "1": "That number has no closed loops. Look at 8 and 0 instead.",
                     "3": "3 has no closed loops. Think about the shapes of the numbers.",
                     "5": "5 has no closed loops. The correct digit has two loops.",
-                    "8": "8 has two loops, but that's not the odd one out. Compare the numbers."
+                    "8": "8 has two loops, but that's not the odd one out. Compare the numbers.",
                 },
-                "fallback": "The odd one out is the only number with two closed loops."
+                "fallback": "The odd one out is the only number with two closed loops.",
             },
             "hintTimer": 120,
-            "hintText": "Count the closed loops in each digit. Which one is different?"
+            "hintText": "Count the closed loops in each digit. Which one is different?",
         },
         {
             "id": 2,
@@ -37,12 +38,12 @@ config = {
                 "wrongDigits": {
                     "1": "The silent floors are 1 and 4. How many are there?",
                     "2": "Collaborative floors are 2 and 3. The puzzle asks for something else.",
-                    "3": "Think about the number of floors that are silent."
+                    "3": "Think about the number of floors that are silent.",
                 },
-                "fallback": "Read the poem again – which floors are described as 'calm and still'? How many are there?"
+                "fallback": "Read the poem again – which floors are described as 'calm and still'? How many are there?",
             },
             "hintTimer": 120,
-            "hintText": "The first and fourth floors are silent. That's two floors, but the digit might be something else..."
+            "hintText": "The first and fourth floors are silent. That's two floors, but the digit might be something else...",
         },
         {
             "id": 3,
@@ -52,35 +53,35 @@ config = {
                 "wrongDigits": {
                     "1": "The year is in the 2020s.",
                     "2": "The 6th edition was published recently.",
-                    "3": "Check the email – the professor wants the most recent edition."
+                    "3": "Check the email – the professor wants the most recent edition.",
                 },
-                "fallback": "Search for 'The Study Skills Handbook' in the library. The 6th edition's publication year gives the digit."
+                "fallback": "Search for 'The Study Skills Handbook' in the library. The 6th edition's publication year gives the digit.",
             },
             "hintTimer": 120,
-            "hintText": "Year of publication."
+            "hintText": "Year of publication.",
         },
         {
             "id": 4,
-            "title": "Blank Page",
+            "title": "Open All Hours",
             "expectedDigit": "5",
             "clues": {
                 "wrongDigits": {
                     "1": "The hidden number is one of the digits in the professor's name.",
                     "2": "Use the torch to reveal the number.",
-                    "3": "It's not 3. Keep looking with your light."
+                    "3": "It's not 3. Keep looking with your light.",
                 },
-                "fallback": "Move your mouse (or finger) over the blank page – it acts like a UV torch."
+                "fallback": "Move your mouse (or finger) over the Open All Hours – it acts like a UV torch.",
             },
             "hintTimer": 120,
-            "hintText": "The page isn't really blank. Try 'shining a light' on it by moving your cursor."
-        }
+            "hintText": "The page isn't really blank. Try 'shining a light' on it by moving your cursor.",
+        },
     ],
     "lockboxCode": ["2", "0", "2", "5"],
-    "googleScriptUrl": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+    "googleScriptUrl": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
 }
 
 # ---------- index.html ----------
-index_html = '''<!DOCTYPE html>
+index_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -120,10 +121,10 @@ index_html = '''<!DOCTYPE html>
     <script src="js/app.js"></script>
 </body>
 </html>
-'''
+"""
 
 # ---------- CSS ----------
-css_content = '''* {
+css_content = """* {
     box-sizing: border-box;
     user-select: none;
 }
@@ -317,11 +318,11 @@ h1 {
         font-size: 1.2rem;
     }
 }
-'''
+"""
 
 # ---------- JS files ----------
 # config.js (loads config.json)
-config_js = '''// This file will be replaced by the actual config loaded via fetch
+config_js = """// This file will be replaced by the actual config loaded via fetch
 let appConfig = null;
 
 function loadConfig() {
@@ -332,10 +333,10 @@ function loadConfig() {
             return data;
         });
 }
-'''
+"""
 
 # storage.js
-storage_js = '''const STORAGE_KEY = 'absent_professor';
+storage_js = """const STORAGE_KEY = 'absent_professor';
 
 function loadState() {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -379,10 +380,10 @@ function setTeamName(name) {
 function getTeamName() {
     return loadState().teamName;
 }
-'''
+"""
 
 # reporting.js
-reporting_js = '''function reportSuccess(team, code) {
+reporting_js = """function reportSuccess(team, code) {
     if (!appConfig || !appConfig.googleScriptUrl) {
         console.warn('No Google Script URL configured');
         return;
@@ -400,17 +401,17 @@ reporting_js = '''function reportSuccess(team, code) {
         })
     }).catch(err => console.error('Reporting error:', err));
 }
-'''
+"""
 
 # puzzles.js (placeholder, actual implementations will be added)
-puzzles_js = '''// This will contain the puzzle implementations.
+puzzles_js = """// This will contain the puzzle implementations.
 // For brevity in the generator, we'll leave stubs and embed in index.html later.
 // In a real project, each puzzle would have its own code.
 console.log('Puzzles module loaded');
-'''
+"""
 
 # lockbox.js
-lockbox_js = '''let lockboxCurrentPosition = 0;
+lockbox_js = """let lockboxCurrentPosition = 0;
 let lockboxEnteredDigits = ['', '', '', ''];
 let lockboxLocked = false;
 
@@ -553,10 +554,10 @@ function attemptLockboxUnlock() {
         clearLockboxEntry();
     }
 }
-'''
+"""
 
 # app.js
-app_js = '''document.addEventListener('DOMContentLoaded', async () => {
+app_js = """document.addEventListener('DOMContentLoaded', async () => {
     await loadConfig();
     // Initialize team name input
     const teamInput = document.getElementById('teamName');
@@ -629,19 +630,19 @@ function updateLockboxVisibility() {
         lockboxSection.style.display = allCollected ? 'block' : 'none';
     }
 }
-'''
+"""
 
 # backend/apps-script.js (Google Apps Script code)
-apps_script = '''function doPost(e) {
+apps_script = """function doPost(e) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = JSON.parse(e.postData.contents);
   sheet.appendRow([data.team, data.code, data.timestamp]);
   return ContentService.createTextOutput("OK");
 }
-'''
+"""
 
 # README.md
-readme = '''# The Case of the Absent Professor – Digital Escape Room
+readme = """# The Case of the Absent Professor – Digital Escape Room
 
 This project is a web-based version of the in-person escape room game created by Mark Burgess (MMU Library). It allows student groups to solve four puzzles, collect a 4-digit code, and “unlock” a digital lockbox, with real-time reporting to a Google Sheet for the facilitator.
 
@@ -683,7 +684,8 @@ This project is a web-based version of the in-person escape room game created by
 - `backend/` – Google Apps Script reference  
 
 Enjoy the game!
-'''
+"""
+
 
 # ---------- Create files ----------
 def create_project():
@@ -691,29 +693,30 @@ def create_project():
     os.makedirs(ROOT, exist_ok=True)
 
     # Write config.json
-    create_file(os.path.join(ROOT, 'data', 'config.json'), json.dumps(config, indent=2))
+    create_file(os.path.join(ROOT, "data", "config.json"), json.dumps(config, indent=2))
 
     # Write index.html
-    create_file(os.path.join(ROOT, 'index.html'), index_html)
+    create_file(os.path.join(ROOT, "index.html"), index_html)
 
     # Write CSS
-    create_file(os.path.join(ROOT, 'css', 'style.css'), css_content)
+    create_file(os.path.join(ROOT, "css", "style.css"), css_content)
 
     # Write JS files
-    create_file(os.path.join(ROOT, 'js', 'config.js'), config_js)
-    create_file(os.path.join(ROOT, 'js', 'storage.js'), storage_js)
-    create_file(os.path.join(ROOT, 'js', 'reporting.js'), reporting_js)
-    create_file(os.path.join(ROOT, 'js', 'puzzles.js'), puzzles_js)
-    create_file(os.path.join(ROOT, 'js', 'lockbox.js'), lockbox_js)
-    create_file(os.path.join(ROOT, 'js', 'app.js'), app_js)
+    create_file(os.path.join(ROOT, "js", "config.js"), config_js)
+    create_file(os.path.join(ROOT, "js", "storage.js"), storage_js)
+    create_file(os.path.join(ROOT, "js", "reporting.js"), reporting_js)
+    create_file(os.path.join(ROOT, "js", "puzzles.js"), puzzles_js)
+    create_file(os.path.join(ROOT, "js", "lockbox.js"), lockbox_js)
+    create_file(os.path.join(ROOT, "js", "app.js"), app_js)
 
     # Write backend script
-    create_file(os.path.join(ROOT, 'backend', 'apps-script.js'), apps_script)
+    create_file(os.path.join(ROOT, "backend", "apps-script.js"), apps_script)
 
     # Write README
-    create_file(os.path.join(ROOT, 'README.md'), readme)
+    create_file(os.path.join(ROOT, "README.md"), readme)
 
     print(f"Project created in '{ROOT}' directory.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     create_project()

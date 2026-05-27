@@ -2,7 +2,7 @@
   "puzzles": [
     {
       "id": 1,
-      "title": "Number Grid",
+      "title": "Check it, Return it, Laptop Locker it!",
       "expectedAnswer": "158",
       "clues": {
         "wrongDigits": {},
@@ -35,7 +35,7 @@
     },
     {
       "id": 4,
-      "title": "Blank Page",
+      "title": "Open All Hours",
       "expectedAnswer": "247",
       "clues": {
         "wrongDigits": {},

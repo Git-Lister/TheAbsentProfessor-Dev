@@ -13,6 +13,8 @@
     --button-primary: #3c6e47;
     --input-bg: #2c3e35;
     --col3-highlight-bg: #2d5a3a;
+    --lockbox-outer-bg: url('../images/lockbox-outer.jpg'); /* replace with your texture */
+    --lockbox-inner-bg: url('../images/lockbox-inner.jpg'); /* optional */
 }
 
 /* ---------- RESET & BASE ---------- */
@@ -311,6 +313,14 @@ h1 {
     box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
 
+.puzzle-card {
+    background: rgba(22, 36, 32, 0.6);
+    backdrop-filter: blur(2px);
+}
+.puzzle-card:hover {
+    background: rgba(22, 36, 32, 0.95);
+}
+
 .puzzle-card h3 {
     margin-top: 0;
     color: var(--text-primary);
@@ -328,26 +338,36 @@ h1 {
     color: var(--text-secondary);
 }
 
+
 /* ---------- LOCKBOX & GRID ---------- */
 .lockbox-section {
-    background: var(--card-bg);
+    background: var(--card-bg);  /* fallback colour */
+    background-image: var(--lockbox-outer-bg, none);
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
     border-radius: 40px;
     padding: 20px;
     text-align: center;
     border: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
 }
 
 .lootbox-container {
-    background: var(--card-bg);
+    background: radial-gradient(circle at 30% 20%, var(--card-bg), #1a2a22);
+    background-image: var(--lockbox-inner-bg, none);
+    background-blend-mode: overlay;
+    background-size: cover;
+    background-position: center;
     border-radius: 30px;
     padding: 20px;
     max-width: 400px;
     margin: 0 auto;
     transition: all 0.3s;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,0,0,0.3);
     border: 2px solid var(--card-border);
 }
-
 .lootbox-container.unlocked {
     background: var(--button-primary);
     border-color: var(--accent-gold);
@@ -391,6 +411,92 @@ h1 {
     color: white;
 }
 
+/* Metallic / steel texture for the lockbox outer area */
+.lockbox-section {
+    background: var(--card-bg);  /* fallback */
+    position: relative;
+    overflow: hidden;            /* keeps any pseudo-element inside */
+}
+
+
+
+/* Ensure the inner container stays above the pattern */
+.lockbox-section .lootbox-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* High-contrast mode: remove the decorative pattern */
+body.high-contrast .lockbox-section::before {
+    background-image: none !important;
+}
+
+
+/* -------------------- Lockbox Inner "Pad" Styling -------------------- */
+/* Recessed inset shadow for the whole lockbox container */
+.lootbox-container {
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,0,0,0.3);
+    background: radial-gradient(circle at 30% 20%, var(--card-bg), #1a2a22);
+}
+
+/* Puzzle grid – make it look like a digital keypad */
+.puzzle-grid {
+    background: #0a1a15;
+    border: 1px solid var(--accent-gold);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.puzzle-grid th, .puzzle-grid td {
+    background: rgba(0,0,0,0.4);
+    border-color: var(--accent-gold);
+    color: var(--text-primary);
+    font-weight: bold;
+}
+.puzzle-grid th {
+    background: #1e3a2a;
+}
+
+/* Safe dials – metallic / vault style */
+.dials-container {
+    background: rgba(0,0,0,0.3);
+    border-radius: 40px;
+    padding: 15px 10px;
+    margin: 10px 0 !important;
+}
+.dial {
+    background: #2c2a24;
+    border-radius: 20px;
+    padding: 5px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.6), 0 2px 4px rgba(255,255,200,0.2);
+}
+.dial-value {
+    background: #000000aa;
+    border-radius: 15px;
+    font-family: monospace;
+    letter-spacing: 2px;
+}
+.dial-up, .dial-down {
+    background: #4a3b2c;
+    color: var(--accent-gold);
+    border: 1px solid var(--accent-gold);
+    transition: 0.05s linear;
+}
+.dial-up:active, .dial-down:active {
+    transform: scale(0.95);
+}
+
+/* Check combination button – metallic finish */
+#checkCombinationBtn {
+    background: linear-gradient(145deg, #5a6b5a, #2a3a2a);
+    border: 1px solid var(--accent-gold);
+    box-shadow: 0 3px 0 #1a2a1a;
+    transition: 0.05s linear;
+}
+#checkCombinationBtn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #1a2a1a;
+}
 /* ---------- MODALS ---------- */
 .modal-overlay {
     position: fixed;
@@ -511,6 +617,7 @@ h1 {
     .puzzle1-grid {
         gap: 10px;
     }
+    
 
     /* Prevent MMU logo from overlapping team entry card on small screens */
 @media (max-width: 600px) {
@@ -527,23 +634,53 @@ h1 {
     }
 }
 
-    /* Puzzle 4 portrait warning – now uses theme gold */
-    @media (orientation: portrait) {
-        .puzzle4-portrait-warning {
-            display: block;
-            background: var(--accent-gold);
-            color: #0a1f1a;
-            padding: 15px;
-            border-radius: 30px;
-            margin: 15px 0;
-            text-align: center;
-            font-weight: bold;
-        }
 
-        canvas {
-            max-width: 100%;
-            height: auto;
+        /* --- Mobile Lockbox Dials Fix --- */
+    @media (max-width: 600px) {
+        .dials-container {
+            gap: 6px !important;
+            flex-wrap: nowrap !important;
+            justify-content: center;
+            padding: 10px 5px !important;
         }
+        .dial {
+            min-width: 35px !important;
+            padding: 3px !important;
+        }
+        .dial-value {
+            font-size: 1.2rem !important;
+            padding: 0 6px !important;
+        }
+        .dial-up, .dial-down {
+            padding: 2px 6px !important;
+            font-size: 0.7rem !important;
+            min-width: 24px !important;
+        }
+        #checkCombinationBtn {
+            padding: 8px 16px !important;
+            font-size: 0.9rem !important;
+        }
+    }
+/* ============================================================
+   NEW: CANVAS RESPONSIVENESS
+   ============================================================ */
+#puzzle4Canvas {
+    max-width: 100%;
+    height: auto;
+    touch-action: none; /* Prevents scrolling while dragging torch */
+    display: block;
+    margin: 0 auto;
+}
+
+/* High-contrast mode override for the new rail */
+body.high-contrast .found-rail {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+}
+body.high-contrast .caught-number {
+    color: #1e2a3a !important;
+    border-color: #1e2a3a !important;
+    background: #e9ecef !important;
     }
 }
 
@@ -587,7 +724,11 @@ body.high-contrast .lockbox-section h2 {
     text-shadow: none !important;
 }
 
-
+body.high-contrast .lockbox-section,
+body.high-contrast .lootbox-container {
+    background-image: none !important;
+    background: #ffffff !important;
+}
 
 /* All other text elements become dark */
 body.high-contrast h3,
@@ -705,6 +846,47 @@ body.high-contrast .close-help {
 }
 body.high-contrast .tip-box {
     background: #e9ecef !important;
+}
+
+body.high-contrast .puzzle-grid,
+body.high-contrast .dials-container,
+body.high-contrast .dial,
+body.high-contrast .dial-value,
+body.high-contrast .dial-up,
+body.high-contrast .dial-down,
+body.high-contrast #checkCombinationBtn {
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border-color: #1e2a3a !important;
+    color: #1e2a3a !important;
+}
+/* --- Lockbox & Case Solved High Contrast Fix --- */
+body.high-contrast .lockbox-section h2,
+body.high-contrast .lockbox-section h4,
+body.high-contrast .lockbox-section p,
+body.high-contrast .lockbox-section .message,
+body.high-contrast .lockbox-section .column-hint,
+body.high-contrast .lockbox-section .dial-value,
+body.high-contrast .lockbox-section .grid-cell,
+body.high-contrast .lockbox-section .puzzle-grid th,
+body.high-contrast .lockbox-section .puzzle-grid td {
+    color: #1e2a3a !important;
+}
+
+/* --- Unlocked / Case Solved Screen --- */
+body.high-contrast .unlocked-celebration {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+}
+body.high-contrast .unlocked-celebration h3,
+body.high-contrast .unlocked-celebration p,
+body.high-contrast .unlocked-celebration div {
+    color: #1e2a3a !important;
+}
+body.high-contrast .unlocked-celebration .message.success {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border: 2px solid #155724 !important;
 }
 
 /* ---------- PUZZLE 1 SPECIFIC ---------- */
@@ -884,6 +1066,27 @@ body.high-contrast .tip-box {
     background: #7b68ee;
 }
 
+/* --- Puzzle 4 Mobile Overrides --- */
+@media (max-width: 600px) {
+    #puzzle4Canvas {
+        max-width: 95vw;
+        height: auto;
+    }
+    .found-rail {
+        gap: 8px;
+        padding: 6px;
+        margin-top: 8px;
+        min-height: 40px;
+    }
+    .caught-number {
+        font-size: 1.8rem;
+        padding: 0 6px;
+    }
+    #caughtDisplay {
+        font-size: 1.2rem;
+    }
+}
+
 /* Help button – top left, opposite accessibility */
 .global-help {
     position: fixed;
@@ -980,6 +1183,165 @@ body.high-contrast .tip-box {
     border-radius: 20px;
     margin-top: 15px;
     text-align: center;
+}
+
+/* Global action buttons – help & accessibility */
+.global-help,
+.global-a11y {
+    position: fixed;
+    top: 15px;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.5);   /* semi‑transparent dark background */
+    backdrop-filter: blur(4px);        /* soft blur to blend with background */
+    border: 1px solid rgba(255, 255, 200, 0.4);
+    border-radius: 30px;
+    padding: 5px 12px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+    box-shadow: none;
+}
+
+.global-help:hover,
+.global-a11y:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 200, 0.8);
+}
+
+.global-help {
+    left: 15px;
+}
+
+.global-a11y {
+    right: 15px;
+}
+
+/* On mobile, move buttons further from top to avoid overlapping the main title */
+@media (max-width: 600px) {
+    .global-help,
+    .global-a11y {
+        top: 70px;          /* push below the MMU logo / title area */
+        padding: 3px 10px;
+        font-size: 1rem;
+    }
+    .global-help {
+        left: 10px;
+    }
+    .global-a11y {
+        right: 10px;
+    }
+}
+
+
+
+/* High‑contrast mode override – make buttons solid white with black text */
+body.high-contrast .global-help,
+body.high-contrast .global-a11y {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+    color: #1e2a3a !important;
+    backdrop-filter: none !important;
+}
+
+/* ============================================================
+   NEW: PUZZLE 4 - FOUND NUMBERS RAIL
+   ============================================================ */
+.found-rail {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px;
+    margin: 12px auto 0;
+    min-height: 50px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
+    max-width: 300px;
+    transition: all 0.3s;
+}
+
+.caught-number {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--accent-gold);
+    text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0 10px;
+    border-radius: 12px;
+    border: 1px solid var(--accent-gold);
+    animation: popIn 0.2s ease-out;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================================
+   LOCKBOX IMAGE DEBUG & FORCE SHOW
+   ============================================================ */
+
+/* 1. Outer Box - ensure image shows */
+.lockbox-section {
+    background-image: var(--lockbox-outer-bg, none) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-color: var(--card-bg) !important; /* fallback */
+}
+
+/* 2. Inner Pad - ensure image shows and content is transparent */
+.lootbox-container, #lockboxContainer {
+    background-image: var(--lockbox-inner-bg, none) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-blend-mode: overlay !important;
+    background-color: transparent !important; /* so outer texture is visible */
+}
+
+/* 3. Make the inner HTML elements transparent so the pad shows through */
+.lockbox-grid-section, .safe-dials, #lockboxContainer > * {
+    background: transparent !important;
+    backdrop-filter: blur(2px); /* keeps text readable over image */
+}
+
+/* --- Force high‑contrast on lockbox inner container and text --- */
+body.high-contrast #lockboxContainer,
+body.high-contrast .lootbox-container {
+    background: #ffffff !important;
+    background-image: none !important;
+    border: 2px solid #1e2a3a !important;
+}
+
+/* --- Force all text inside lockbox to be dark --- */
+body.high-contrast #lockboxContainer h2,
+body.high-contrast #lockboxContainer h4,
+body.high-contrast #lockboxContainer p,
+body.high-contrast #lockboxContainer .message,
+body.high-contrast #lockboxContainer .column-hint,
+body.high-contrast #lockboxContainer .dial-value,
+body.high-contrast #lockboxContainer .grid-cell,
+body.high-contrast #lockboxContainer .puzzle-grid th,
+body.high-contrast #lockboxContainer .puzzle-grid td {
+    color: #1e2a3a !important;
+}
+
+/* --- Force high‑contrast on the unlocked / congrats screen too --- */
+body.high-contrast #lockboxContainer .unlocked-celebration {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+}
+body.high-contrast #lockboxContainer .unlocked-celebration h3,
+body.high-contrast #lockboxContainer .unlocked-celebration p,
+body.high-contrast #lockboxContainer .unlocked-celebration div {
+    color: #1e2a3a !important;
+}
+body.high-contrast #lockboxContainer .unlocked-celebration .message.success {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border: 2px solid #155724 !important;
 }
 
 /* --- Force fixed toggles to stay in place --- */

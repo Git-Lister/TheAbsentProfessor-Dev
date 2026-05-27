@@ -66,7 +66,7 @@ function renderLockboxUI(container, gridData, targetCode) {
                 <tbody>
                     ${gridData.map((row, rowIdx) => `
                         <tr>
-                            <td style="border:1px solid #b5926a; padding:8px;">${['Number Grid', 'Library Layers', 'Email Chain', 'Blank Page'][rowIdx]}</td>
+                            <td style="border:1px solid #b5926a; padding:8px;">${['Check it, Return it, Laptop Locker it!', 'Library Layers', 'Email Chain', 'Open All Hours'][rowIdx]}</td>
                             ${row.map((cell, colIdx) => {
                                 // Show X for row 1 col 4 and row 4 col 4 (answers with only 3 digits)
                                 if ((rowIdx === 0 || rowIdx === 3) && colIdx === 3) {
@@ -173,12 +173,17 @@ function renderLockboxUI(container, gridData, targetCode) {
 }
 
 function renderUnlockedState(container) {
-    // Reporting already done inside check button; just show celebration
-    if (typeof canvasConfetti === 'function') {
-        canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.2 }, startVelocity: 15 });
-        canvasConfetti({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.8 }, startVelocity: 15 });
-    }
+    // Original confetti (keep as is, it works)
+const confettiFn = typeof confetti === 'function' ? confetti : (typeof canvasConfetti === 'function' ? canvasConfetti : null);
+if (confettiFn) {
+    confettiFn({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    confettiFn({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.2 }, startVelocity: 15 });
+    confettiFn({ particleCount: 100, spread: 100, origin: { y: 0.6, x: 0.8 }, startVelocity: 15 });
+    
+    setTimeout(() => {
+        confettiFn({ particleCount: 200, spread: 80, origin: { y: 0.5 }, colors: ['#d4af37', '#6aab6a'] });
+    }, 300);
+}
 
     container.innerHTML = `
         <div class="unlocked-celebration" style="text-align: center; animation: fadeInScale 0.5s ease;">
@@ -192,7 +197,7 @@ function renderUnlockedState(container) {
                 <p style="font-weight: bold; margin: 15px 0;">The facilitator will announce the winning team!</p>
             </div>
             <div style="background: #4a3b2c; border-radius: 30px; padding: 15px;">
-                <p style="font-size: 0.8rem; margin-top: 10px;">Great teamwork, detectives!</p>
+                <p style="font-size: 1.4rem; font-weight: bold; text-align: center; margin-top: 15px;">Great teamwork, detectives!</p>
             </div>
         </div>
     `;
