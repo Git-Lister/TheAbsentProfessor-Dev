@@ -981,3 +981,24 @@ body.high-contrast .tip-box {
     margin-top: 15px;
     text-align: center;
 }
+
+/* --- Force fixed toggles to stay in place --- */
+.global-help, .global-a11y {
+    position: fixed !important;
+    z-index: 99999 !important;   /* Far above everything else */
+    top: 15px !important;
+    transform: translateZ(0);     /* forces GPU layer, stops scrolling drift */
+}
+.global-help {
+    left: 15px !important;
+    right: auto !important;
+}
+.global-a11y {
+    right: 15px !important;
+    left: auto !important;
+}
+
+/* Ensure their parent containers don't interfere */
+body, body * {
+    isolation: isolate;  /* creates stacking context, but we override with z-index */
+}
