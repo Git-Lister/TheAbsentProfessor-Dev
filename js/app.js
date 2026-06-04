@@ -113,13 +113,13 @@ beginBtn.addEventListener('click', () => {
         };
 
         switch (puzzleId) {
-            case 1: renderPuzzle1(dynamicDiv, onSolve); break;
-            case 2: renderPuzzle2(dynamicDiv, onSolve); break;
-            case 3: renderPuzzle3(dynamicDiv, onSolve); break;
-            case 4: renderPuzzle4(dynamicDiv, onSolve); break;
+            case 4: renderPuzzle1(dynamicDiv, onSolve); break; // ID 4 (Torch) -> function 1
+            case 1: renderPuzzle2(dynamicDiv, onSolve); break; // ID 1 (Grid) -> function 2
+            case 2: renderPuzzle3(dynamicDiv, onSolve); break; // ID 2 (Poem) -> function 3
+            case 3: renderPuzzle4(dynamicDiv, onSolve); break; // ID 3 (Emails) -> function 4
+            case 5: renderPuzzle5(dynamicDiv, onSolve); break; // ID 5 (New) -> function 5
             default: dynamicDiv.innerHTML = '<p>Puzzle not found.</p>';
         }
-
         modalOverlay.style.display = 'flex';
     }
 
