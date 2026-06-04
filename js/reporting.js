@@ -1,34 +1,28 @@
-// reporting.js – sends success data to Google Sheet (custom URL support)
-function getReportingUrl() {
-    // Check if facilitator has saved a custom URL via admin page
-    const custom = localStorage.getItem('customGoogleScriptUrl');
-    if (custom && custom.startsWith('https://script.google.com/')) {
-        return custom;
-    }
-    // Fallback to config.json URL
-    return appConfig && appConfig.googleScriptUrl ? appConfig.googleScriptUrl : null;
+function logSuccessLocally(teamName, code, timeString) {
+    const log = JSON.parse(localStorage.getItem('winners_log') || '[]');
+    log.push({
+        team: teamName,
+        code: code,
+        time: new Date().toISOString(),
+        duration: timeString,
+        sessionId: sessionStorage.getItem('gameSessionId') || 'unknown'
+    });
+    localStorage.setItem('winners_log', JSON.stringify(log));
 }
 
-function reportSuccess(team, code, timeTaken) {
-    const url = getReportingUrl();
-    if (!url) {
-        console.warn('No Google Script URL configured – reporting disabled');
-        return;
+// In reportSuccess(), call this first
+function reportSuccess(teamName, code, timeString) {
+    // 1. Always save locally first
+    logSuccessLocally(teamName, code, timeString);
+    
+    // 2. Try Google Sheets if available
+    const url = localStorage.getItem('googleScriptUrl') || appConfig.googleScriptUrl;
+    if (url) {
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ team: teamName, code, time: timeString })
+        }).catch(() => console.warn('Google sheet failed – using local backup'));
     }
-    fetch(url, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            team: team,
-            code: code,
-            timestamp: new Date().toISOString(),
-            timeTaken: timeTaken   // e.g., "2m 34s"
-        })
-    }).catch(err => console.error('Reporting error:', err));
-}
-
-function reportWrongAttempt(puzzleId, wrongAnswer, clueShown) {
-    // wrong attempt logging is optional; we keep console logging for now
-    console.log(`Wrong attempt: Puzzle ${puzzleId}, entered "${wrongAnswer}", clue: "${clueShown}"`);
 }

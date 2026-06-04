@@ -1,458 +1,8 @@
 // Puzzle implementations (each receives a container and an onSolve callback)
 
-// ------------------- Puzzle 1: Check it, Return it, Laptop Locker it! -------------------
+// ------------------- Puzzle 1 (NEW): Open All Hours (was old Puzzle 4) -------------------
 function renderPuzzle1(container, onSolve) {
-    const puzzleId = 1;
-    const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
-    const hintText = puzzleConfig.hintText;
-    const hintTimerSeconds = puzzleConfig.hintTimer;
-    let hintTimeoutId = null;
-    let solved = false;
-    let wrongAttempts = 0;
-
-    const TARGETS = [1, 5, 8];
-    const ANSWER = "158";
-    let selectedTargets = new Set();
-    let lockedCells = new Set();
-
-    container.innerHTML = `
-        <div style="text-align: center;">
-            <h3>📇 Check it, Return it, Laptop Locker it!</h3>
-            <p style="margin-bottom: 15px; font-weight: bold; color: var(--text-secondary);">🔍 What's the pattern? Look closely...</p>
-            <p style="margin-bottom: 20px; font-style: italic; color: var(--text-secondary);">“Don't feel Blue, just find what looks the same to you.”</p>
-            <div id="puzzle1Grid" class="puzzle1-grid"></div>
-            <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
-            <div id="puzzle1Status" class="puzzle1-status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
-            <div id="puzzle1HintContainer" style="margin-top: 10px;"></div>
-        </div>
-    `;
-
-    const gridContainer = container.querySelector('#puzzle1Grid');
-    const resetBtn = container.querySelector('#puzzle1ResetBtn');
-    const statusDiv = container.querySelector('#puzzle1Status');
-    const hintContainer = container.querySelector('#puzzle1HintContainer');
-
-    for (let i = 1; i <= 9; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'puzzle1-cell';
-        cell.dataset.pos = i;
-        const img = document.createElement('img');
-        img.src = `images/puzzle1/${i}.jpg`;
-        img.alt = `Grid cell ${i}`;
-        cell.appendChild(img);
-        cell.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (!solved) handleCellClick(i);
-        });
-        gridContainer.appendChild(cell);
-    }
-
-    function updateUI() {
-        const cells = container.querySelectorAll('.puzzle1-cell');
-        cells.forEach(cell => {
-            const pos = parseInt(cell.dataset.pos);
-            if (lockedCells.has(pos)) cell.classList.add('correct');
-            else cell.classList.remove('correct');
-        });
-        if (selectedTargets.size === 3 && !solved) {
-            solved = true;
-            statusDiv.innerHTML = '✅ Well done! You found the three matching images.';
-            if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            
-            if (container.querySelector('.claim-code-btn')) return;
-            
-            const claimBtn = document.createElement('button');
-            claimBtn.className = 'claim-code-btn';
-            claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
-            claimBtn.onclick = () => onSolve(ANSWER);
-            container.appendChild(claimBtn);
-            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-            if (hintContainer) hintContainer.innerHTML = '';
-        } else if (!solved) {
-            statusDiv.innerHTML = `Found ${selectedTargets.size} of 3 special images...`;
-        }
-    }
-
-    function resetPuzzle() {
-        if (solved) return;
-        selectedTargets.clear();
-        lockedCells.clear();
-        wrongAttempts = 0;
-        updateUI();
-        statusDiv.innerHTML = '';
-        const cells = container.querySelectorAll('.puzzle1-cell');
-        cells.forEach(cell => cell.classList.remove('wrong-flash'));
-        if (hintContainer) hintContainer.innerHTML = '';
-        if (hintTimeoutId) clearTimeout(hintTimeoutId);
-        if (selectedTargets.size !== 3) {
-            hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
-        }
-    }
-
-    function showHintButton() {
-        if (!document.body.contains(container)) return;
-        if (hintContainer && !hintContainer.innerHTML && !solved && selectedTargets.size !== 3) {
-            hintContainer.innerHTML = `<button id="puzzle1HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
-            const hintBtn = hintContainer.querySelector('#puzzle1HintBtn');
-            hintBtn.addEventListener('click', () => {
-                statusDiv.innerHTML = `💡 Hint: ${hintText}`;
-                hintBtn.disabled = true;
-                hintBtn.style.opacity = '0.5';
-            });
-        }
-    }
-
-    function handleCellClick(pos) {
-        if (solved) return;
-        if (!TARGETS.includes(pos)) {
-            const clickedCell = container.querySelector(`.puzzle1-cell[data-pos='${pos}']`);
-            if (clickedCell) {
-                clickedCell.classList.add('wrong-flash');
-                setTimeout(() => clickedCell.classList.remove('wrong-flash'), 400);
-            }
-            
-            wrongAttempts++;
-            if (wrongAttempts >= 3) {
-                statusDiv.innerHTML = '❌ Too many wrong attempts. Resetting puzzle...';
-                resetPuzzle();
-            } else {
-                statusDiv.innerHTML = `❌ Wrong image. ${3 - wrongAttempts} attempts remaining.`;
-            }
-            return;
-        }
-        if (selectedTargets.has(pos)) {
-            statusDiv.innerHTML = `❌ You already selected that one. Try another.`;
-            return;
-        }
-        selectedTargets.add(pos);
-        lockedCells.add(pos);
-        updateUI();
-        if (selectedTargets.size !== 3) {
-            statusDiv.innerHTML = `Good! Found ${selectedTargets.size}. Keep going.`;
-        }
-    }
-
-    resetBtn.addEventListener('click', resetPuzzle);
-    hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
-}
-
-// ------------------- Puzzle 2: Library Layers -------------------
-function renderPuzzle2(container, onSolve) {
-    const puzzleId = 2;
-    const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
-    const hintText = puzzleConfig.hintText;
-    const hintTimerSeconds = puzzleConfig.hintTimer;
-    let hintTimeoutId = null;
-
-    const EXPECTED_WORDS = ['first', 'fourth', 'second', 'third'];
-    const ANSWER = "1423";
-    const wordToFloor = { first: '1', fourth: '4', second: '2', third: '3' };
-
-    const floorSlots = [
-        { floor: 1, word: 'first', filled: false, value: '' },
-        { floor: 2, word: 'second', filled: false, value: '' },
-        { floor: 3, word: 'third', filled: false, value: '' },
-        { floor: 4, word: 'fourth', filled: false, value: '' }
-    ];
-    let clickSequence = [];
-    let puzzleSolved = false;
-    let wrongAttempts = 0;
-
-    const poemHTML = `
-        <p>"A Library of Layers"</p>
-        <p>The <span class="highlight" data-word="first">first</span> and <span class="highlight" data-word="fourth">fourth</span> floors are calm and still,<br>
-        Quiet spaces shaped for focussed thought,<br>
-        Where minds can settle, read, and write,<br>
-        And silence helps ideas form.</p>
-        <p>The <span class="highlight" data-word="second">second</span> and <span class="highlight" data-word="third">third</span> invite the crowd,<br>
-        Where thinking happens out loud,<br>
-        Through teamwork, talk, and common ground,<br>
-        New ideas are easily found.</p>
-    `;
-
-    container.innerHTML = `
-        <div class="puzzle2-container" style="text-align: center; max-width: 700px; margin: 0 auto;">
-            <p style="margin-bottom: 20px; font-weight: bold; color: var(--text-secondary);">📖 Click the highlighted words in the poem to reveal the floor order.</p>
-            <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 20px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.8; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
-                ${poemHTML}
-            </div>
-            <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
-            <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
-            <div id="puzzle2Status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
-            <div id="puzzle2HintContainer" style="margin-top: 10px;"></div>
-        </div>
-    `;
-
-    const buildingSlots = document.getElementById('buildingSlots');
-    const resetBtn = document.getElementById('puzzle2ResetBtn');
-    const statusDiv = document.getElementById('puzzle2Status');
-    const hintContainer = document.getElementById('puzzle2HintContainer');
-    const highlights = container.querySelectorAll('.highlight');
-
-    highlights.forEach(span => {
-        span.style.fontWeight = 'bold';
-        span.style.textDecoration = 'underline';
-        span.style.textTransform = 'capitalize';
-        span.style.cursor = 'pointer';
-        span.style.display = 'inline-block';
-        span.style.padding = '0 4px';
-        span.style.borderRadius = '12px';
-        span.style.transition = '0.1s';
-    });
-
-    function renderBuilding() {
-        buildingSlots.style.display = 'flex';
-        buildingSlots.style.flexDirection = 'row';
-        buildingSlots.style.alignItems = 'center';
-        buildingSlots.style.justifyContent = 'center';
-        buildingSlots.style.gap = '15px';
-        buildingSlots.innerHTML = '';
-        for (let floor of [1,2,3,4]) {
-            const slotData = floorSlots.find(s => s.floor === floor);
-            const slotDiv = document.createElement('div');
-            slotDiv.style.background = slotData.filled ? 'var(--accent-green)' : 'var(--input-bg)';
-            slotDiv.style.width = '60px';
-            slotDiv.style.height = '60px';
-            slotDiv.style.display = 'flex';
-            slotDiv.style.alignItems = 'center';
-            slotDiv.style.justifyContent = 'center';
-            slotDiv.style.borderRadius = '12px';
-            slotDiv.style.border = '2px solid var(--card-border)';
-            slotDiv.style.fontSize = '1.8rem';
-            slotDiv.style.fontWeight = 'bold';
-            slotDiv.style.color = 'var(--text-primary)';
-            slotDiv.textContent = slotData.filled ? slotData.value : '□';
-            buildingSlots.appendChild(slotDiv);
-        }
-    }
-
-    function updateSequenceDisplay() {
-        if (clickSequence.length === 4 && !puzzleSolved) {
-            puzzleSolved = true;
-            if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ Well done! Correct order.';
-            
-            if (container.querySelector('.claim-code-btn')) return;
-            
-            const claimBtn = document.createElement('button');
-            claimBtn.className = 'claim-code-btn';
-            claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
-            claimBtn.onclick = () => onSolve(ANSWER);
-            container.appendChild(claimBtn);
-            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-            if (hintContainer) hintContainer.innerHTML = '';
-        }
-    }
-
-    function fillSlot(word) {
-        const floorNumber = wordToFloor[word];
-        const slot = floorSlots.find(s => s.floor === parseInt(floorNumber));
-        if (slot && !slot.filled) {
-            slot.filled = true;
-            slot.value = floorNumber;
-            renderBuilding();
-        }
-    }
-
-    function resetPuzzle() {
-        clickSequence = [];
-        puzzleSolved = false;
-        floorSlots.forEach(slot => { slot.filled = false; slot.value = ''; });
-        renderBuilding();
-        statusDiv.innerHTML = '';
-        highlights.forEach(span => {
-            span.style.opacity = '1';
-            span.style.pointerEvents = 'auto';
-            span.style.backgroundColor = '';
-            span.style.boxShadow = '';
-        });
-        if (hintContainer) hintContainer.innerHTML = '';
-        if (hintTimeoutId) clearTimeout(hintTimeoutId);
-        hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
-    }
-
-    function highlightWords() {
-        if (!document.body.contains(container)) return;
-        if (puzzleSolved) return;
-        highlights.forEach(span => {
-            span.style.boxShadow = '0 0 8px 2px gold';
-            span.style.backgroundColor = '#fff3c9';
-            span.style.transition = '0.2s';
-        });
-        statusDiv.innerHTML = '💡 The four highlighted words are the key – click them in any order.';
-    }
-
-    function handleWordClick(e) {
-        if (puzzleSolved) return;
-        const span = e.currentTarget;
-        const word = span.getAttribute('data-word');
-        if (clickSequence.includes(word)) {
-            statusDiv.innerHTML = `❌ Already used "${word}". Reset and try again.`;
-            wrongAttempts++;
-            return;
-        }
-        clickSequence.push(word);
-        fillSlot(word);
-        updateSequenceDisplay();
-        statusDiv.innerHTML = `✓ Correct! "${word}" added.`;
-        span.style.opacity = '0.5';
-        span.style.cursor = 'default';
-        span.style.backgroundColor = 'var(--accent-green)';
-        span.style.boxShadow = 'none';
-        span.style.pointerEvents = 'none';
-    }
-
-    highlights.forEach(span => {
-        span.addEventListener('click', handleWordClick);
-    });
-
-    resetBtn.addEventListener('click', resetPuzzle);
-    renderBuilding();
-    hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
-}
-
-// ------------------- Puzzle 3: Email Exchange -------------------
-function renderPuzzle3(container, onSolve) {
-    const puzzleId = 3;
-    const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
-    const hintText = puzzleConfig.hintText;
-    const hintTimerSeconds = puzzleConfig.hintTimer;
-    let hintTimeoutIdLocal = null;
-    let solved = false;
-    let wrongAttempts = 0;
-
-    const expectedYear = puzzleConfig.expectedAnswer; // "2024"
-
-    const emailsHTML = `
-        <div style="font-family: 'Segoe UI', 'Helvetica', sans-serif; max-width: 600px; margin: 0 auto;">
-            <!-- Email 1: Mark to Professor -->
-            <div style="border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px; background: #fff;">
-                <div class="puzzle3-email-header" style="padding: 12px 16px; border-bottom: 1px solid #ccc; background: #e8e8e8; border-radius: 8px 8px 0 0; color: #111;">
-                    <span style="font-weight: bold; color: #004c6e;">From:</span> Mark Burgess &lt;library@mmu.ac.uk&gt;<br>
-                    <span style="font-weight: bold; color: #004c6e;">To:</span> Professor Al Beback &lt;a.beback@mmu.ac.uk&gt;<br>
-                    <span style="font-weight: bold; color: #004c6e;">Subject:</span> Recommended Resource for Student Study Skills
-                </div>
-                <div style="padding: 16px; color: #222; line-height: 1.5;">
-                    <p>Dear Professor Beback,</p>
-                    <p>I hope your research into botanical adaptations and human night vision is progressing well – sounds like a fascinating intersection of biology and perception!</p>
-                    <p>I wanted to signpost a resource that could be particularly useful for your students: <strong><em>The Study Skills Handbook</em> (6th edition)</strong> by Stella Cottrell. It's a well-regarded guide that covers a wide range of academic skills, from managing time effectively to developing critical thinking.</p>
-                    <p>It's available through the MMU Library. You might want to take a look in the usual way by visiting the Library Website and looking on Library Search.</p>
-                    <p>Talk soon,<br><strong>Mark Burgess</strong><br>Academic Liaison Librarian | Manchester Metropolitan University Library</p>
-                </div>
-            </div>
-            <!-- Email 2: Professor to Mark -->
-            <div style="border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px; background: #fff;">
-                <div class="puzzle3-email-header" style="padding: 12px 16px; border-bottom: 1px solid #ccc; background: #e8e8e8; border-radius: 8px 8px 0 0; color: #111;">
-                    <span style="font-weight: bold; color: #004c6e;">From:</span> Professor Al Beback &lt;a.beback@mmu.ac.uk&gt;<br>
-                    <span style="font-weight: bold; color: #004c6e;">To:</span> Mark Burgess &lt;library@mmu.ac.uk&gt;<br>
-                    <span style="font-weight: bold; color: #004c6e;">Subject:</span> RE: Recommended Resource for Student Study Skills
-                </div>
-                <div style="padding: 16px; color: #222; line-height: 1.5;">
-                    <p>Dear Mark,</p>
-                    <p>Thanks for the recommendation – <em>The Study Skills Handbook</em> is an excellent choice. I've seen how it helps students sharpen their academic focus, even if it doesn't quite help them see in the dark!</p>
-                    <p>However, I noticed you didn't include <u>the year of publication</u>. I do like to keep things up‑to‑date – especially when it comes to student resources.</p>
-                    <p>I'll encourage my students to head over to Library Search and track down the most recent edition.</p>
-                    <p>All the best,<br><strong>Professor Al Beback</strong><br>Faculty of Health and Education | Manchester Metropolitan University</p>
-                </div>
-            </div>
-        </div>
-    `;
-
-    container.innerHTML = `
-        <div style="max-height: 70vh; overflow-y: auto; padding: 10px;">
-            <p style="margin-bottom: 20px; font-weight: bold; color: var(--text-secondary);">📅 Find the year of publication mentioned in the emails.</p>
-            ${emailsHTML}
-            <div style="text-align: center; margin: 20px 0;">
-                <p>🔍 <strong>Are your study skills up to date?</strong></p>
-                <a href="https://www.mmu.ac.uk/library/search-tools/library-search" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #3c6e47; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; margin: 10px 0;">📚 Open Library Search</a>
-            </div>
-            <div id="puzzle3AnswerArea" style="margin-top: 20px; text-align: center;">
-                <div style="margin-top: 10px;">
-                    <input type="text" id="yearInput" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 8px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc;">
-                    <button id="submitYearBtn" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin-left: 10px;">Submit</button>
-                </div>
-                <div id="puzzle3Feedback" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
-            </div>
-            <div id="puzzle3HintContainer" style="margin-top: 15px; text-align: center;"></div>
-        </div>
-    `;
-
-    const submitBtn = container.querySelector('#submitYearBtn');
-    const yearInput = container.querySelector('#yearInput');
-    const feedback = container.querySelector('#puzzle3Feedback');
-    const hintContainer = container.querySelector('#puzzle3HintContainer');
-
-    function showHintButton() {
-        if (!document.body.contains(container)) return;
-        if (hintContainer && !hintContainer.innerHTML && !solved) {
-            hintContainer.innerHTML = `<button id="puzzle3HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
-            const hintBtn = hintContainer.querySelector('#puzzle3HintBtn');
-            hintBtn.addEventListener('click', () => {
-                feedback.innerHTML = `💡 Hint: ${hintText}`;
-                hintBtn.disabled = true;
-                hintBtn.style.opacity = '0.5';
-            });
-        }
-    }
-
-    function cleanup() {
-        if (hintTimeoutIdLocal) clearTimeout(hintTimeoutIdLocal);
-    }
-
-    submitBtn.addEventListener('click', () => {
-        if (solved) return;
-        const entered = yearInput.value.trim();
-        if (entered === expectedYear) {
-            solved = true;
-            cleanup();
-            feedback.innerHTML = '✅ Well done! Correct year.';
-            
-            if (container.querySelector('.claim-code-btn')) return;
-            
-            const claimBtn = document.createElement('button');
-            claimBtn.className = 'claim-code-btn';
-            claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'display:block; margin:15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
-            claimBtn.onclick = () => onSolve(expectedYear);
-            const answerArea = container.querySelector('#puzzle3AnswerArea');
-            answerArea.appendChild(claimBtn);
-            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-        } else {
-            wrongAttempts++;
-            feedback.innerHTML = `❌ Wrong year. Try searching again.`;
-            reportWrongAttempt(3, entered, "Wrong year");
-            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
-                showHintButton();
-            }
-        }
-    });
-
-    hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
-
-    // Reset Button
-    const resetBtn = document.createElement('button');
-    resetBtn.id = 'puzzle3ResetBtn';
-    resetBtn.textContent = 'Reset Puzzle';
-    resetBtn.style.cssText = 'background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px; cursor: pointer;';
-    resetBtn.addEventListener('click', function() {
-        if (solved) return;
-        yearInput.value = '';
-        feedback.innerHTML = '';
-        wrongAttempts = 0;
-        if (hintContainer) hintContainer.innerHTML = '';
-        if (hintTimeoutIdLocal) clearTimeout(hintTimeoutIdLocal);
-        hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
-        feedback.innerHTML = '⏳ Ready. Type the year.';
-    });
-    const answerArea = container.querySelector('#puzzle3AnswerArea');
-    answerArea.appendChild(resetBtn);
-}
-
-// ------------------- Puzzle 4: Open All Hours -------------------
-function renderPuzzle4(container, onSolve) {
-    const puzzleId = 4;
+    const puzzleId = 4; // Kept ID 4 to preserve any stored solution data.
     const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
     const hintText = puzzleConfig.hintText;
     const hintTimerSeconds = puzzleConfig.hintTimer;
@@ -481,8 +31,9 @@ function renderPuzzle4(container, onSolve) {
 
     container.innerHTML = `
         <div style="text-align: center;">
-            <h3>🏛️ Open All Hours</h3>
-            <p style="margin-bottom: 20px; font-weight: bold; color: var(--text-secondary);">🔦 Move your torch to catch the three hidden numbers.</p>
+            <div style="background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 30px; display: inline-block; margin-bottom: 10px;">
+                <h3 style="margin: 0;">🏛️ Open All Hours</h3>
+            </div>
             <p>“Here you see the Library, but can you find its opening times?”</p>
             <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">💡 <strong>Move your finger or cursor</strong> around the image to reveal hidden numbers. Tap/click to catch them.</p>
             <div style="position: relative; display: inline-block;">
@@ -529,7 +80,7 @@ function renderPuzzle4(container, onSolve) {
             if (!puzzleSolved && !container.querySelector('.claim-code-btn')) {
                 puzzleSolved = true;
                 if (hintTimeoutId) clearTimeout(hintTimeoutId);
-                statusDiv.innerHTML = '✅ The Library is Open: 24/7!';
+                statusDiv.innerHTML = '✅ Well done! The Library is Open 24/7 so you can use the facilities and resources whenever you need!';
                 const claimBtn = document.createElement('button');
                 claimBtn.className = 'claim-code-btn';
                 claimBtn.textContent = '🔓 Claim Your Code →';
@@ -665,7 +216,7 @@ function renderPuzzle4(container, onSolve) {
             rail.innerHTML = '';
             rail.style.borderColor = 'rgba(255, 255, 255, 0.2)';
         }
-        statusDiv.innerHTML = '';
+        statusDiv.innerHTML = 'Find the hidden numbers on the library entrance.';
         glowTarget = null;
         draw();
         hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
@@ -694,5 +245,546 @@ function renderPuzzle4(container, onSolve) {
     resetBtn.addEventListener('click', resetGame);
 
     updateRailAndCheckCompletion();
+    hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
+}
+
+// ------------------- Puzzle 2 (NEW): Check it, Return it, Laptop Locker it! (was old Puzzle 1) -------------------
+function renderPuzzle2(container, onSolve) {
+    const puzzleId = 1; // Kept ID 1
+    const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
+    const hintText = puzzleConfig.hintText;
+    const hintTimerSeconds = puzzleConfig.hintTimer;
+    let hintTimeoutId = null;
+    let solved = false;
+
+    const TARGETS = [1, 5, 8];
+    const ANSWER = "158";
+    let selectedTargets = [];
+
+    container.innerHTML = `
+        <div style="text-align: center;">
+            <h3>📇 Check it, Return it, Laptop Locker it!</h3>
+            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">🔍 Select 3 images that belong together.</p>
+            <p style="margin-bottom: 15px; font-style: italic; color: var(--text-secondary);">“Don't feel Blue, just find what looks the same to you.”</p>
+            <div id="puzzle1Grid" class="puzzle1-grid"></div>
+            <div style="margin: 15px 0;">
+                <button id="puzzle1CheckBtn" class="puzzle1-check-btn" style="background: var(--button-primary); color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer;">Have we found the match?</button>
+                <button id="puzzle1ResetBtn" class="puzzle1-reset">Reset Puzzle</button>
+            </div>
+            <div id="puzzle1Status" class="puzzle1-status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
+            <div id="puzzle1HintContainer" style="margin-top: 10px;"></div>
+        </div>
+    `;
+
+    const gridContainer = container.querySelector('#puzzle1Grid');
+    const checkBtn = container.querySelector('#puzzle1CheckBtn');
+    const resetBtn = container.querySelector('#puzzle1ResetBtn');
+    const statusDiv = container.querySelector('#puzzle1Status');
+    const hintContainer = container.querySelector('#puzzle1HintContainer');
+
+    for (let i = 1; i <= 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'puzzle1-cell';
+        cell.dataset.pos = i;
+        const img = document.createElement('img');
+        img.src = `images/puzzle1/${i}.jpg`;
+        img.alt = `Grid cell ${i}`;
+        
+        // Add a subtle number overlay
+        const numberOverlay = document.createElement('div');
+        numberOverlay.style.cssText = 'position: absolute; top: 2px; left: 4px; font-size: 0.6rem; color: rgba(0,0,0,0.2); font-weight: bold; pointer-events: none;';
+        numberOverlay.textContent = i;
+        cell.appendChild(img);
+        cell.appendChild(numberOverlay);
+
+        cell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!solved) handleCellClick(i);
+        });
+        gridContainer.appendChild(cell);
+    }
+
+    function updateUI() {
+        const cells = container.querySelectorAll('.puzzle1-cell');
+        cells.forEach(cell => {
+            const pos = parseInt(cell.dataset.pos);
+            cell.classList.remove('selected', 'correct', 'wrong-flash');
+            if (selectedTargets.includes(pos)) {
+                cell.classList.add('selected'); // Amber box
+            }
+        });
+        checkBtn.disabled = selectedTargets.length !== 3;
+    }
+
+    function handleCellClick(pos) {
+        if (solved) return;
+
+        const index = selectedTargets.indexOf(pos);
+        if (index > -1) {
+            selectedTargets.splice(index, 1);
+        } else if (selectedTargets.length < 3) {
+            selectedTargets.push(pos);
+        }
+        updateUI();
+        statusDiv.innerHTML = `Selected ${selectedTargets.length} of 3 images.`;
+    }
+
+    function checkSelection() {
+        if (solved || selectedTargets.length !== 3) return;
+
+        const sortedSelected = [...selectedTargets].sort();
+        const sortedTargets = [...TARGETS].sort();
+
+        if (sortedSelected.join() === sortedTargets.join()) {
+            solved = true;
+            statusDiv.innerHTML = '✅ Well done! You found the three matching images.';
+            if (hintTimeoutId) clearTimeout(hintTimeoutId);
+            
+            if (container.querySelector('.claim-code-btn')) return;
+            
+            const claimBtn = document.createElement('button');
+            claimBtn.className = 'claim-code-btn';
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(ANSWER);
+            container.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            if (hintContainer) hintContainer.innerHTML = '';
+        } else {
+            const cells = container.querySelectorAll('.puzzle1-cell');
+            cells.forEach(cell => {
+                if (selectedTargets.includes(parseInt(cell.dataset.pos))) {
+                    cell.classList.add('wrong-flash');
+                }
+            });
+            statusDiv.innerHTML = '❌ Not quite. Resetting...';
+            setTimeout(() => {
+                selectedTargets = [];
+                updateUI();
+                statusDiv.innerHTML = 'Try again. Select 3 images.';
+                cells.forEach(cell => cell.classList.remove('wrong-flash'));
+            }, 600);
+        }
+    }
+
+    function resetPuzzle() {
+        if (solved) return;
+        selectedTargets = [];
+        updateUI();
+        statusDiv.innerHTML = 'Select 3 images that belong together.';
+        const cells = container.querySelectorAll('.puzzle1-cell');
+        cells.forEach(cell => cell.classList.remove('wrong-flash'));
+        if (hintContainer) hintContainer.innerHTML = '';
+        if (hintTimeoutId) clearTimeout(hintTimeoutId);
+        hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
+    }
+
+    function showHintButton() {
+        if (!document.body.contains(container)) return;
+        if (hintContainer && !hintContainer.innerHTML && !solved) {
+            hintContainer.innerHTML = `<button id="puzzle1HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
+            const hintBtn = hintContainer.querySelector('#puzzle1HintBtn');
+            hintBtn.addEventListener('click', () => {
+                statusDiv.innerHTML = `💡 Hint: ${hintText}`;
+                hintBtn.disabled = true;
+                hintBtn.style.opacity = '0.5';
+            });
+        }
+    }
+
+    checkBtn.addEventListener('click', checkSelection);
+    resetBtn.addEventListener('click', resetPuzzle);
+    hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
+}
+
+// ------------------- Puzzle 3 (NEW): Library Layers (was old Puzzle 2) -------------------
+function renderPuzzle3(container, onSolve) {
+    const puzzleId = 2;
+    const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
+    const hintText = puzzleConfig.hintText;
+    const hintTimerSeconds = puzzleConfig.hintTimer;
+    let hintTimeoutId = null;
+
+    const EXPECTED_WORDS = ['first', 'fourth', 'second', 'third'];
+    const ANSWER = "1423";
+    const wordToFloor = { first: '1', fourth: '4', second: '2', third: '3' };
+
+    const floorSlots = [
+        { floor: 1, word: 'first', filled: false, value: '' },
+        { floor: 2, word: 'second', filled: false, value: '' },
+        { floor: 3, word: 'third', filled: false, value: '' },
+        { floor: 4, word: 'fourth', filled: false, value: '' }
+    ];
+    let clickSequence = [];
+    let puzzleSolved = false;
+    let wrongAttempts = 0;
+
+    const poemHTML = `
+        <p>"A Library of Layers"</p>
+        <p>The <span class="highlight" data-word="first">first</span> and <span class="highlight" data-word="fourth">fourth</span> floors are calm and still,<br>
+        Quiet spaces shaped for focussed thought,<br>
+        Where minds can settle, read, and write,<br>
+        And silence helps ideas form.</p>
+        <p>The <span class="highlight" data-word="second">second</span> and <span class="highlight" data-word="third">third</span> invite the crowd,<br>
+        Where thinking happens out loud,<br>
+        Through teamwork, talk, and common ground,<br>
+        New ideas are easily found.</p>
+    `;
+
+    container.innerHTML = `
+        <div class="puzzle2-container" style="text-align: center; max-width: 700px; margin: 0 auto;">
+            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📖 The library has different types of study spaces.</p>
+            <p style="margin-bottom: 20px; font-style: italic; color: var(--text-secondary);">"There's more to this poem than meets the eye, some of the words might be worth highlighting."</p>
+            <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 20px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.8; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
+                ${poemHTML}
+            </div>
+            <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
+            <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
+            <div id="puzzle2Status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
+            <div id="puzzle2HintContainer" style="margin-top: 10px;"></div>
+        </div>
+    `;
+
+    const buildingSlots = document.getElementById('buildingSlots');
+    const resetBtn = document.getElementById('puzzle2ResetBtn');
+    const statusDiv = document.getElementById('puzzle2Status');
+    const hintContainer = document.getElementById('puzzle2HintContainer');
+    const highlights = container.querySelectorAll('.highlight');
+
+    highlights.forEach(span => {
+        span.style.fontWeight = 'bold';
+        span.style.textDecoration = 'underline';
+        span.style.textTransform = 'capitalize';
+        span.style.cursor = 'pointer';
+        span.style.display = 'inline-block';
+        span.style.padding = '0 4px';
+        span.style.borderRadius = '12px';
+        span.style.transition = '0.1s';
+    });
+
+    function renderBuilding() {
+        buildingSlots.style.display = 'flex';
+        buildingSlots.style.flexDirection = 'row';
+        buildingSlots.style.alignItems = 'center';
+        buildingSlots.style.justifyContent = 'center';
+        buildingSlots.style.gap = '15px';
+        buildingSlots.innerHTML = '';
+        for (let floor of [1,2,3,4]) {
+            const slotData = floorSlots.find(s => s.floor === floor);
+            const slotDiv = document.createElement('div');
+            slotDiv.style.background = slotData.filled ? 'var(--accent-green)' : 'var(--input-bg)';
+            slotDiv.style.width = '60px';
+            slotDiv.style.height = '60px';
+            slotDiv.style.display = 'flex';
+            slotDiv.style.alignItems = 'center';
+            slotDiv.style.justifyContent = 'center';
+            slotDiv.style.borderRadius = '12px';
+            slotDiv.style.border = '2px solid var(--card-border)';
+            slotDiv.style.fontSize = '1.8rem';
+            slotDiv.style.fontWeight = 'bold';
+            slotDiv.style.color = 'var(--text-primary)';
+            slotDiv.textContent = slotData.filled ? slotData.value : '□';
+            buildingSlots.appendChild(slotDiv);
+        }
+    }
+
+    function updateSequenceDisplay() {
+        const sortedSequence = [...clickSequence].sort((a,b) => wordToFloor[a] - wordToFloor[b]);
+        
+        if (sortedSequence.length === 4 && !puzzleSolved) {
+            puzzleSolved = true;
+            if (hintTimeoutId) clearTimeout(hintTimeoutId);
+            statusDiv.innerHTML = '✅ You\'ve found the Libraries various study zones, the final code is set.';
+            
+            if (container.querySelector('.claim-code-btn')) return;
+            
+            const claimBtn = document.createElement('button');
+            claimBtn.className = 'claim-code-btn';
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(ANSWER);
+            container.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            if (hintContainer) hintContainer.innerHTML = '';
+        }
+    }
+
+    function fillSlot(word) {
+        const floorNumber = wordToFloor[word];
+        const slot = floorSlots.find(s => s.floor === parseInt(floorNumber));
+        if (slot && !slot.filled) {
+            slot.filled = true;
+            slot.value = floorNumber;
+            renderBuilding();
+        }
+    }
+
+    function resetPuzzle() {
+        clickSequence = [];
+        puzzleSolved = false;
+        floorSlots.forEach(slot => { slot.filled = false; slot.value = ''; });
+        renderBuilding();
+        statusDiv.innerHTML = '';
+        highlights.forEach(span => {
+            span.style.opacity = '1';
+            span.style.pointerEvents = 'auto';
+            span.style.backgroundColor = '';
+            span.style.boxShadow = '';
+        });
+        if (hintContainer) hintContainer.innerHTML = '';
+        if (hintTimeoutId) clearTimeout(hintTimeoutId);
+        hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
+    }
+
+    function highlightWords() {
+        if (!document.body.contains(container)) return;
+        if (puzzleSolved) return;
+        highlights.forEach(span => {
+            span.style.boxShadow = '0 0 8px 2px gold';
+            span.style.backgroundColor = '#fff3c9';
+            span.style.transition = '0.2s';
+        });
+        statusDiv.innerHTML = '💡 The four highlighted words are the key – click them in any order.';
+    }
+
+    function handleWordClick(e) {
+        if (puzzleSolved) return;
+        const span = e.currentTarget;
+        const word = span.getAttribute('data-word');
+        if (clickSequence.includes(word)) {
+            statusDiv.innerHTML = `❌ Already used "${word}". Reset and try again.`;
+            wrongAttempts++;
+            return;
+        }
+        clickSequence.push(word);
+        fillSlot(word);
+        updateSequenceDisplay();
+        statusDiv.innerHTML = `✓ Correct! "${word}" added.`;
+        span.style.opacity = '0.5';
+        span.style.cursor = 'default';
+        span.style.backgroundColor = 'var(--accent-green)';
+        span.style.boxShadow = 'none';
+        span.style.pointerEvents = 'none';
+    }
+
+    highlights.forEach(span => {
+        span.addEventListener('click', handleWordClick);
+    });
+
+    resetBtn.addEventListener('click', resetPuzzle);
+    renderBuilding();
+    hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
+}
+
+// ------------------- Puzzle 4 (NEW): Email Chain (was old Puzzle 3) -------------------
+function renderPuzzle4(container, onSolve) {
+    const puzzleId = 3;
+    const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
+    const hintText = puzzleConfig.hintText;
+    const hintTimerSeconds = puzzleConfig.hintTimer;
+    let hintTimeoutIdLocal = null;
+    let solved = false;
+    let wrongAttempts = 0;
+
+    const expectedYear = puzzleConfig.expectedAnswer; // "2024"
+
+    const emailsHTML = `
+        <div style="font-family: 'Segoe UI', 'Helvetica', sans-serif; max-width: 600px; margin: 0 auto;">
+            <!-- Email 1: Mark to Professor -->
+            <div style="border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px; background: #fff;">
+                <div class="puzzle3-email-header" style="padding: 12px 16px; border-bottom: 1px solid #ccc; background: #e8e8e8; border-radius: 8px 8px 0 0; color: #111;">
+                    <span style="font-weight: bold; color: #004c6e;">From:</span> Mark Burgess &lt;library@mmu.ac.uk&gt;<br>
+                    <span style="font-weight: bold; color: #004c6e;">To:</span> Professor Al Beback &lt;a.beback@mmu.ac.uk&gt;<br>
+                    <span style="font-weight: bold; color: #004c6e;">Subject:</span> Recommended Resource for Student Study Skills
+                </div>
+                <div style="padding: 16px; color: #222; line-height: 1.5;">
+                    <p>Dear Professor Beback,</p>
+                    <p>I hope your research into botanical adaptations and human night vision is progressing well – sounds like a fascinating intersection of biology and perception!</p>
+                    <p>I wanted to signpost a resource that could be particularly useful for your students: <strong><em>The Study Skills Handbook</em> (6th edition)</strong> by Stella Cottrell. It's a well-regarded guide that covers a wide range of academic skills, from managing time effectively to developing critical thinking.</p>
+                    <p>It's available through the MMU Library. You might want to take a look in the usual way by visiting the Library Website and looking on Library Search.</p>
+                    <p>Talk soon,<br><strong>Mark Burgess</strong><br>Academic Liaison Librarian | Manchester Metropolitan University Library</p>
+                </div>
+            </div>
+            <!-- Email 2: Professor to Mark -->
+            <div style="border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px; background: #fff;">
+                <div class="puzzle3-email-header" style="padding: 12px 16px; border-bottom: 1px solid #ccc; background: #e8e8e8; border-radius: 8px 8px 0 0; color: #111;">
+                    <span style="font-weight: bold; color: #004c6e;">From:</span> Professor Al Beback &lt;a.beback@mmu.ac.uk&gt;<br>
+                    <span style="font-weight: bold; color: #004c6e;">To:</span> Mark Burgess &lt;library@mmu.ac.uk&gt;<br>
+                    <span style="font-weight: bold; color: #004c6e;">Subject:</span> RE: Recommended Resource for Student Study Skills
+                </div>
+                <div style="padding: 16px; color: #222; line-height: 1.5;">
+                    <p>Dear Mark,</p>
+                    <p>Thanks for the recommendation – <em>The Study Skills Handbook</em> is an excellent choice. I've seen how it helps students sharpen their academic focus, even if it doesn't quite help them see in the dark!</p>
+                    <p>However, I noticed you didn't include <u>the year of publication</u>. I do like to keep things up‑to‑date – especially when it comes to student resources.</p>
+                    <p>I'll encourage my students to head over to Library Search and track down the most recent edition.</p>
+                    <p>All the best,<br><strong>Professor Al Beback</strong><br>Faculty of Health and Education | Manchester Metropolitan University</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = `
+        <div style="max-height: 70vh; overflow-y: auto; padding: 10px;">
+            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📅 The clue you seek is within the emails.</p>
+            ${emailsHTML}
+            <div style="text-align: center; margin: 20px 0;">
+                <p>🔍 <strong>Are your study skills up to date?</strong></p>
+                <a href="https://www.mmu.ac.uk/library/search-tools/library-search" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #3c6e47; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; margin: 10px 0;">📚 Open Library Search</a>
+            </div>
+            <div id="puzzle3AnswerArea" style="margin-top: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <div>
+                    <input type="text" id="yearInput" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 8px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc;">
+                    <button id="submitYearBtn" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin-left: 10px;">Submit</button>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Enter the date you have found</p>
+                <div id="puzzle3Feedback" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
+            </div>
+            <div id="puzzle3HintContainer" style="margin-top: 15px; text-align: center;"></div>
+        </div>
+    `;
+
+    const submitBtn = container.querySelector('#submitYearBtn');
+    const yearInput = container.querySelector('#yearInput');
+    const feedback = container.querySelector('#puzzle3Feedback');
+    const hintContainer = container.querySelector('#puzzle3HintContainer');
+
+    function showHintButton() {
+        if (!document.body.contains(container)) return;
+        if (hintContainer && !hintContainer.innerHTML && !solved) {
+            hintContainer.innerHTML = `<button id="puzzle3HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
+            const hintBtn = hintContainer.querySelector('#puzzle3HintBtn');
+            hintBtn.addEventListener('click', () => {
+                feedback.innerHTML = `💡 Hint: ${hintText}`;
+                hintBtn.disabled = true;
+                hintBtn.style.opacity = '0.5';
+            });
+        }
+    }
+
+    function cleanup() {
+        if (hintTimeoutIdLocal) clearTimeout(hintTimeoutIdLocal);
+    }
+
+    submitBtn.addEventListener('click', () => {
+        if (solved) return;
+        const entered = yearInput.value.trim();
+        if (entered === expectedYear) {
+            solved = true;
+            cleanup();
+            feedback.innerHTML = '✅ Well done! Correct year.';
+            
+            if (container.querySelector('.claim-code-btn')) return;
+            
+            const claimBtn = document.createElement('button');
+            claimBtn.className = 'claim-code-btn';
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'display:block; margin:15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(expectedYear);
+            const answerArea = container.querySelector('#puzzle3AnswerArea');
+            answerArea.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        } else {
+            wrongAttempts++;
+            feedback.innerHTML = `❌ Wrong year. Try searching again.`;
+            reportWrongAttempt(3, entered, "Wrong year");
+            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
+                showHintButton();
+            }
+        }
+    });
+
+    hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
+
+    const resetBtn = document.createElement('button');
+    resetBtn.id = 'puzzle3ResetBtn';
+    resetBtn.textContent = 'Reset Puzzle';
+    resetBtn.style.cssText = 'background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 15px; cursor: pointer;';
+    resetBtn.addEventListener('click', function() {
+        if (solved) return;
+        yearInput.value = '';
+        feedback.innerHTML = '';
+        wrongAttempts = 0;
+        if (hintContainer) hintContainer.innerHTML = '';
+        if (hintTimeoutIdLocal) clearTimeout(hintTimeoutIdLocal);
+        hintTimeoutIdLocal = setTimeout(showHintButton, hintTimerSeconds * 1000);
+        feedback.innerHTML = '⏳ Ready. Type the year.';
+    });
+    const answerArea = container.querySelector('#puzzle3AnswerArea');
+    answerArea.appendChild(resetBtn);
+}
+
+// ------------------- Puzzle 5 (NEW): Reading List Roadmap -------------------
+function renderPuzzle5(container, onSolve) {
+    const puzzleId = 5;
+    const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
+    const hintText = puzzleConfig.hintText;
+    const hintTimerSeconds = puzzleConfig.hintTimer;
+    let hintTimeoutId = null;
+    let solved = false;
+
+    // The answer is the number found in the PDF (replace with your actual answer)
+    const ANSWER = "6471"; 
+
+    container.innerHTML = `
+        <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+            <h3>📚 Reading List Roadmap</h3>
+            <p style="margin-bottom: 15px;">Tap or click each link to find the hidden number in the PDF file.</p>
+            <div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 16px;">
+                <p><strong>Your Reading List:</strong></p>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link">Smith, J. (2021). Library Essentials (Chapter 1).</a></li>
+                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link">Johnson, K. (2022). The Art of Study.</a></li>
+                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link">Liu, M. (2023). Digital Literacy and Libraries.</a></li>
+                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link">Williams, P. (2024). Referencing Made Easy.</a></li>
+                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link pdf-link">📄 *Special Resource: Find the PDF (and the hidden number inside).</a></li>
+                </ul>
+            </div>
+            <div id="puzzle5Status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
+            <div id="puzzle5HintContainer" style="margin-top: 10px;"></div>
+        </div>
+    `;
+
+    // Logic to check if the PDF link was clicked and the number was found.
+    // This requires a separate implementation (e.g., the PDF link text contains the number,
+    // or the PDF, when opened, has a user-facing number like "Code: 6471").
+    // For now, the placeholder links do nothing.
+    const statusDiv = container.querySelector('#puzzle5Status');
+    const hintContainer = container.querySelector('#puzzle5HintContainer');
+
+    // Placeholder: Click the PDF link to solve.
+    const pdfLink = container.querySelector('.pdf-link');
+    if (pdfLink) {
+        pdfLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (solved) return;
+            // Simulate finding the number
+            solved = true;
+            if (hintTimeoutId) clearTimeout(hintTimeoutId);
+            statusDiv.innerHTML = '✅ Found the hidden number!';
+            if (container.querySelector('.claim-code-btn')) return;
+            const claimBtn = document.createElement('button');
+            claimBtn.className = 'claim-code-btn';
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background: var(--button-primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-size: 1rem;';
+            claimBtn.onclick = () => onSolve(ANSWER);
+            container.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            if (hintContainer) hintContainer.innerHTML = '';
+        });
+    }
+
+    function showHintButton() {
+        if (!document.body.contains(container)) return;
+        if (hintContainer && !hintContainer.innerHTML && !solved) {
+            hintContainer.innerHTML = `<button id="puzzle5HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
+            const hintBtn = hintContainer.querySelector('#puzzle5HintBtn');
+            hintBtn.addEventListener('click', () => {
+                statusDiv.innerHTML = `💡 Hint: ${hintText}`;
+                hintBtn.disabled = true;
+                hintBtn.style.opacity = '0.5';
+            });
+        }
+    }
+
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }

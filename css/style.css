@@ -639,6 +639,28 @@ body.high-contrast .lockbox-section::before {
         padding: 8px 16px !important;
         font-size: 0.9rem !important;
     }
+
+    /* --- Force 5 Dials on One Line --- */
+.dials-container {
+    flex-wrap: nowrap !important;    /* Prevent wrapping to a new line */
+    gap: 6px !important;             /* Reduce the gap between dials */
+    justify-content: center !important;
+}
+
+.dial {
+    min-width: 40px !important;      /* Make dials slightly smaller */
+    padding: 2px !important;
+}
+
+.dial-value {
+    font-size: 1rem !important;      /* Reduce font size of the number */
+    padding: 0 4px !important;
+}
+
+.dial-up, .dial-down {
+    padding: 2px 4px !important;
+    font-size: 0.7rem !important;
+    }
 }
 
 /* ============================================================
@@ -1373,7 +1395,50 @@ body.high-contrast #lockboxContainer .unlocked-celebration .message.success {
     color: white !important;
 }
 
+/* --- Puzzle 1 New Visual States --- */
+.puzzle1-cell.selected {
+    box-shadow: 0 0 0 3px #ffb347, 0 0 0 6px #ffb34788 !important;
+}
+.puzzle1-cell.correct {
+    box-shadow: 0 0 0 3px #4caf50, 0 0 0 6px #81c784 !important;
+}
+
+/* --- Puzzle 2 Cursor Pointer --- */
+.puzzle2-poem .highlight {
+    cursor: pointer;
+}
+
+/* --- Puzzle 3 Answer Area Alignment --- */
+#puzzle3AnswerArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+#puzzle3AnswerArea > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
 /* Ensure their parent containers don't interfere */
 body, body * {
     isolation: isolate;  /* creates stacking context, but we override with z-index */
+}
+
+/* --- Desktop & Large Tablet (Keep 5 dials on one line) --- */
+.dials-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 15px 10px;
+}
+.dial {
+    min-width: 45px;
+    padding: 4px;
+}
+.dial-value {
+    font-size: 1.4rem;
 }

@@ -1,6 +1,17 @@
 {
   "puzzles": [
     {
+      "id": 4,
+      "title": "Open All Hours",
+      "expectedAnswer": "247",
+      "clues": {
+        "wrongDigits": {},
+        "fallback": "Day and night, weeklong light. Catch the numbers hiding in plain sight."
+      },
+      "hintTimer": 120,
+      "hintText": "Here you see the Library, but can you find its opening times?"
+    },
+    {
       "id": 1,
       "title": "Check it, Return it, Laptop Locker it!",
       "expectedAnswer": "158",
@@ -34,17 +45,17 @@
       "hintText": "Are your Study-Skills up to date? Look for the year-of-publication to find out."
     },
     {
-      "id": 4,
-      "title": "Open All Hours",
-      "expectedAnswer": "247",
+      "id": 5,
+      "title": "Reading List Roadmap",
+      "expectedAnswer": "6471",
       "clues": {
         "wrongDigits": {},
-        "fallback": "A torch reveals what’s always open – three digits tell the tale."
+        "fallback": "One of these links holds a secret code. Follow the PDF."
       },
       "hintTimer": 120,
-      "hintText": "Day and night, weeklong light. Catch the numbers hiding in plain sight."
+      "hintText": "Check the PDF file carefully. The number is hidden in plain sight."
     }
   ],
-  "targetCode": "8227",
+  "targetCode": "21126",
   "googleScriptUrl": "https://script.google.com/macros/s/AKfycbzTpzci0u7Tzz668nY2AgR8akKL5a5kq21KLIYo6YHiyN1OpUQVQRQ5pIp0vcikjXXP/exec"
 }

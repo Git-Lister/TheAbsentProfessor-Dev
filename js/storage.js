@@ -5,11 +5,13 @@ function loadState() {
     if (saved) {
         return JSON.parse(saved);
     }
+    // Determine number of puzzles from config (requires appConfig to be loaded before storage.js)
+    const numPuzzles = (typeof appConfig !== 'undefined' && appConfig.puzzles) ? appConfig.puzzles.length : 5;
     return {
         teamName: '',
-        puzzleAnswers: ['', '', '', ''],
+        puzzleAnswers: new Array(numPuzzles).fill(''),
         lockboxUnlocked: false,
-        startTime: null          // <-- add this line
+        startTime: null
     };
 }
 

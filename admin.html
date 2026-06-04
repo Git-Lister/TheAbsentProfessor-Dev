@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #0a1f1a; color: #fcf3d4; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #b8a35c; padding: 10px; text-align: left; }
+        th { background: #2c3e35; }
+        .download-btn { background: #3c6e47; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Game Winners Dashboard</h1>
+    <button class="download-btn" id="downloadBtn">Download Winners CSV</button>
+    <table id="winnersTable">
+        <thead>
+            <tr>
+                <th>Team</th>
+                <th>Code</th>
+                <th>Time</th>
+                <th>Duration</th>
+                <th>Session ID</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Data injected here -->
+        </tbody>
+    </table>
+
+    <script>
+        function loadWinners() {
+            const data = JSON.parse(localStorage.getItem('winners_log') || '[]');
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No winners recorded yet.</td></tr>';
+                return;
+            }
+            data.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.team}</td>
+                    <td>${entry.code}</td>
+                    <td>${new Date(entry.time).toLocaleString()}</td>
+                    <td>${entry.duration}</td>
+                    <td>${entry.sessionId}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const data = JSON.parse(localStorage.getItem('winners_log') || '[]');
+            const csv = 'Team,Code,Time,Duration,Session ID\n' + 
+                data.map(r => `${r.team},${r.code},${r.time},${r.duration},${r.sessionId}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'winners-report.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        loadWinners();
+    </script>
+</body>
+</html>

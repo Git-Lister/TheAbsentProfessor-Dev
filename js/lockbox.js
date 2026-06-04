@@ -27,7 +27,7 @@ function initLockbox() {
 }
 
 function buildGridFromAnswers(answers) {
-    const maxCols = 4;
+    const maxCols = 5;
     const grid = [];
     for (let i = 0; i < answers.length; i++) {
         const answer = answers[i] || '';
@@ -42,8 +42,10 @@ function buildGridFromAnswers(answers) {
 }
 
 function renderLockboxUI(container, gridData, targetCode) {
-    const targetDigits = targetCode.split('');
-    let currentDigits = ['0', '0', '0', '0'];
+    // Force the lockbox to have exactly 5 dials
+    const NUM_DIALS = 5; 
+    const targetDigits = targetCode.split('').slice(0, NUM_DIALS);
+    let currentDigits = new Array(NUM_DIALS).fill('0');
 
     // Riddle instead of direct instruction
     const riddleHTML = `<p style="font-style: italic; margin: 5px 0 15px;">The Box is Locked, but here's the key – the puzzles are where your answers will be.</p>`;
@@ -54,24 +56,24 @@ function renderLockboxUI(container, gridData, targetCode) {
             <h4 style="margin-bottom: 10px;">Prof's Lockbox</h4>
             ${riddleHTML}
             <table class="puzzle-grid" style="width:100%; margin-bottom: 20px;">
-                <thead>
-                    <tr>
-                        <th>Puzzle</th>
-                        <th>🔒</th>
-                        <th>🔒</th>
-                        <th>🔒</th>
-                        <th>🔒</th>
-                    </tr>
-                </thead>
+                    <thead>
+                        <tr>
+                            <th>Puzzle</th>
+                            <th>🔒</th>
+                            <th>🔒</th>
+                            <th>🔒</th>
+                            <th>🔒</th>
+                            <th>🔒</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     ${gridData.map((row, rowIdx) => `
                         <tr>
-                            <td style="border:1px solid #b5926a; padding:8px;">${['Check it, Return it, Laptop Locker it!', 'Library Layers', 'Email Chain', 'Open All Hours'][rowIdx]}</td>
+                            <td style="border:1px solid #b5926a; padding:8px;">${['Open All Hours', 'Check it, Return it, Laptop Locker it!', 'Library Layers', 'Email Chain', 'Reading List Roadmap'][rowIdx]}</td>
                             ${row.map((cell, colIdx) => {
-                                // Show X for row 1 col 4 and row 4 col 4 (answers with only 3 digits)
-                                if ((rowIdx === 0 || rowIdx === 3) && colIdx === 3) {
-                                    return `<td style="border:1px solid #b5926a; padding:8px; text-align:center;">X</td>`;
-                                }
+                                // Show X for rows with less than 5 digits (Puzzle 1, 4, 5 might have only 3 or 4 digits)
+                                // You'll need to adjust the logic based on the number of digits in each answer.
+                                // For simplicity, you can just render all cells.
                                 return `<td class="grid-cell" data-row="${rowIdx}" data-col="${colIdx}" style="border:1px solid #b5926a; padding:8px; text-align:center;">${cell || '▯'}</td>`;
                             }).join('')}
                         </tr>
@@ -82,7 +84,7 @@ function renderLockboxUI(container, gridData, targetCode) {
         </div>
         <div class="safe-dials">
             <h4>🔐 Enter the combination</h4>
-            <div class="dials-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 15px 0;">
+            <div class="dials-container" style="display: flex; justify-content: center; gap: 6px; margin: 15px 0;">
                 ${targetDigits.map((_, idx) => `
                     <div class="dial" data-idx="${idx}" style="text-align: center;">
                         <button class="dial-up" data-idx="${idx}" style="background:#3a3228; color:#ffecb3; border:none; border-radius: 30px; padding: 5px 12px; cursor:pointer;">▲</button>
