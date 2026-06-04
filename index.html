@@ -12,16 +12,19 @@
 </head>
 <body>
     <!-- Help button (top left) -->
-    <button id="globalHelpToggle" class="help-btn global-help" title="Help">❓</button>
+    <button id="globalHelpToggle" class="help-btn global-help" title="Help" aria-label="Open Help Modal">❓</button>
 
     <!-- Help modal (hidden initially) -->
-    <div id="helpModal" class="help-overlay" style="display: none;">
+    <div id="helpModal" class="help-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
         <div class="help-card">
-            <button id="closeHelpBtn" class="close-help">✖</button>
+            <!-- Added aria-hidden="true" to the decorative icon so screen readers read the aria-label on the button instead -->
+            <button id="closeHelpBtn" class="close-help" aria-label="Close help modal">
+                <span aria-hidden="true">✖</span>
+            </button>
             <div class="help-header">
                 <div class="help-portrait"></div>
                 <div class="help-title">
-                    <h2>Professor Al Beback's Notebook</h2>
+                    <h2 id="helpModalTitle">Professor Al Beback's Notebook</h2>
                     <p>“A little nudge never hurt anybody.”</p>
                 </div>
             </div>
@@ -39,48 +42,48 @@
             </div>
         </div>
     </div>
-    <button id="globalAccessibilityToggle" class="accessibility-btn global-a11y" title="Toggle high contrast mode">♿</button>
-<!-- New & improved Team Entry Screen -->
-<div id="teamEntryScreen" class="team-entry-overlay">
 
+    <button id="globalAccessibilityToggle" class="accessibility-btn global-a11y" title="Toggle high contrast mode" aria-label="Toggle High Contrast Mode">♿</button>
 
-    <!-- University branding – outside the card, fixed at top -->
-    <div class="uni-header">
-        <div class="uni-name">Manchester Metropolitan University</div>
-        <img src="images/mmu-logo.png" alt="MMU Logo" class="uni-logo">
-    </div>
-
-    <!-- Centered content card (no logo inside) -->
-    <div class="team-entry-card">
-        <div class="game-title-hero">Library Unlocked</div>
-        <div class="game-subtitle">The Case of the Absent Professor</div>
-        <p class="entry-instruction">Enter your team name to begin:</p>
-        <input type="text" id="initialTeamName" placeholder="e.g., Brainy Bunch" autocomplete="off">
-        <button id="startGameBtn">Start Quest</button>
-    </div>
-</div>
-
-<!-- Story introduction modal (hidden initially) -->
-<div id="storyModal" class="story-overlay" style="display: none;">
-    <div class="story-card story-card-with-image">
-        <div class="professor-portrait"></div>
-        <div class="story-main">
-            <h2>📜 The Case of the Absent Professor</h2>
-        <div class="story-content">
-            <p><strong>Results day is here…</strong></p>
-            <p>You’ve spent weeks working hard on your last assignment and now it’s time to learn whether all your hard work has paid off…</p>
-            <p>But there’s a problem!</p>
-            <p>Professor Al Beback, on hearing of a rare Amazonian plant that could aid her research into humans developing the ability to see in the dark, has taken off (University permission still pending)!</p>
-            <p>All your grades are locked away somewhere on her desk and you need to find them. She’s known to be a little eccentric so it may not be as easy as it sounds.</p>
-            <p>She has, however, left one clue: <em>“the road to success starts by turning on the light.”</em> Odd for someone who wants to see in the dark!</p>
-            <hr>
-            <p><strong>Your mission:</strong> Solve the four puzzles on the professor’s desk. Each solution reveals a number string to enter into her lockbox. Complete all four puzzles to find the correct numbers and unlock the safe to retrieve your grades!</p>
-            <p>Work together, explore every clue, and when you're ready – begin your investigation.</p>
+    <!-- New & improved Team Entry Screen -->
+    <div id="teamEntryScreen" class="team-entry-overlay">
+        <!-- University branding – outside the card, fixed at top -->
+        <div class="uni-header">
+            <div class="uni-name">Manchester Metropolitan University</div>
+            <img src="images/mmu-logo.png" alt="MMU Logo" class="uni-logo">
         </div>
-        <button id="beginGameBtn">🔍 Begin Investigation</button>
+
+        <!-- Centered content card (no logo inside) -->
+        <div class="team-entry-card">
+            <div class="game-title-hero">Library Unlocked</div>
+            <div class="game-subtitle">The Case of the Absent Professor</div>
+            <p class="entry-instruction">Enter your team name to begin:</p>
+            <input type="text" id="initialTeamName" placeholder="e.g., Brainy Bunch" autocomplete="off">
+            <button id="startGameBtn">Start Quest</button>
         </div>
     </div>
-</div>
+
+    <!-- Story introduction modal (hidden initially) -->
+    <div id="storyModal" class="story-overlay" style="display: none;">
+        <div class="story-card story-card-with-image">
+            <div class="professor-portrait"></div>
+            <div class="story-main">
+                <h2>📜 The Case of the Absent Professor</h2>
+                <div class="story-content">
+                    <p><strong>Results day is here…</strong></p>
+                    <p>You’ve spent weeks working hard on your last assignment and now it’s time to learn whether all your hard work has paid off…</p>
+                    <p>But there’s a problem!</p>
+                    <p>Professor Al Beback, on hearing of a rare Amazonian plant that could aid her research into humans developing the ability to see in the dark, has taken off (University permission still pending)!</p>
+                    <p>All your grades are locked away somewhere on her desk and you need to find them. She’s known to be a little eccentric so it may not be as easy as it sounds.</p>
+                    <p>She has, however, left one clue: <em>“the road to success starts by turning on the light.”</em> Odd for someone who wants to see in the dark!</p>
+                    <hr>
+                    <p><strong>Your mission:</strong> Solve the four puzzles on the professor’s desk. Each solution reveals a number string to enter into her lockbox. Complete all four puzzles to find the correct numbers and unlock the safe to retrieve your grades!</p>
+                    <p>Work together, explore every clue, and when you're ready – begin your investigation.</p>
+                </div>
+                <button id="beginGameBtn">🔍 Begin Investigation</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Main game UI (hidden until team name is set) -->
     <div id="mainGameUI" style="display: none;">

@@ -313,6 +313,7 @@ h1 {
     box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
 
+/* Note: Keeping your second background rule separate to ensure it works */
 .puzzle-card {
     background: rgba(22, 36, 32, 0.6);
     backdrop-filter: blur(2px);
@@ -337,7 +338,6 @@ h1 {
     font-size: 0.8rem;
     color: var(--text-secondary);
 }
-
 
 /* ---------- LOCKBOX & GRID ---------- */
 .lockbox-section {
@@ -411,15 +411,6 @@ h1 {
     color: white;
 }
 
-/* Metallic / steel texture for the lockbox outer area */
-.lockbox-section {
-    background: var(--card-bg);  /* fallback */
-    position: relative;
-    overflow: hidden;            /* keeps any pseudo-element inside */
-}
-
-
-
 /* Ensure the inner container stays above the pattern */
 .lockbox-section .lootbox-container {
     position: relative;
@@ -430,7 +421,6 @@ h1 {
 body.high-contrast .lockbox-section::before {
     background-image: none !important;
 }
-
 
 /* -------------------- Lockbox Inner "Pad" Styling -------------------- */
 /* Recessed inset shadow for the whole lockbox container */
@@ -560,16 +550,23 @@ body.high-contrast .lockbox-section::before {
     color: #004c6e !important;
 }
 
-/* ---------- RESPONSIVE ---------- */
+/* ---------- RESPONSIVE (MOBILE FIXES & CLEANUP) ---------- */
 @media (max-width: 600px) {
     .puzzles-grid {
         grid-template-columns: 1fr;
     }
 
+    .uni-header {
+        top: 10px;
+        padding: 0 15px;
+    }
     .uni-logo {
-        height: 80px;
-        max-width: 80px;
+        height: 40px;
+        max-width: 40px;
         padding: 2px;
+    }
+    .team-entry-card {
+        margin-top: 70px;
     }
 
     .dials-container {
@@ -618,51 +615,34 @@ body.high-contrast .lockbox-section::before {
         gap: 10px;
     }
     
-
-    /* Prevent MMU logo from overlapping team entry card on small screens */
-@media (max-width: 600px) {
-    .uni-header {
-        top: 10px;
-        padding: 0 15px;
+    /* --- Mobile Lockbox Dials Fix --- */
+    .dials-container {
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+        justify-content: center;
+        padding: 10px 5px !important;
     }
-    .uni-logo {
-        height: 40px;
-        max-width: 40px;
+    .dial {
+        min-width: 35px !important;
+        padding: 3px !important;
     }
-    .team-entry-card {
-        margin-top: 70px;
+    .dial-value {
+        font-size: 1.2rem !important;
+        padding: 0 6px !important;
+    }
+    .dial-up, .dial-down {
+        padding: 2px 6px !important;
+        font-size: 0.7rem !important;
+        min-width: 24px !important;
+    }
+    #checkCombinationBtn {
+        padding: 8px 16px !important;
+        font-size: 0.9rem !important;
     }
 }
 
-
-        /* --- Mobile Lockbox Dials Fix --- */
-    @media (max-width: 600px) {
-        .dials-container {
-            gap: 6px !important;
-            flex-wrap: nowrap !important;
-            justify-content: center;
-            padding: 10px 5px !important;
-        }
-        .dial {
-            min-width: 35px !important;
-            padding: 3px !important;
-        }
-        .dial-value {
-            font-size: 1.2rem !important;
-            padding: 0 6px !important;
-        }
-        .dial-up, .dial-down {
-            padding: 2px 6px !important;
-            font-size: 0.7rem !important;
-            min-width: 24px !important;
-        }
-        #checkCombinationBtn {
-            padding: 8px 16px !important;
-            font-size: 0.9rem !important;
-        }
-    }
 /* ============================================================
-   NEW: CANVAS RESPONSIVENESS
+   CANVAS RESPONSIVENESS (PUZZLE 4)
    ============================================================ */
 #puzzle4Canvas {
     max-width: 100%;
@@ -681,7 +661,6 @@ body.high-contrast .caught-number {
     color: #1e2a3a !important;
     border-color: #1e2a3a !important;
     background: #e9ecef !important;
-    }
 }
 
 /* ---------- ACCESSIBILITY BUTTON ---------- */
@@ -860,6 +839,7 @@ body.high-contrast #checkCombinationBtn {
     border-color: #1e2a3a !important;
     color: #1e2a3a !important;
 }
+
 /* --- Lockbox & Case Solved High Contrast Fix --- */
 body.high-contrast .lockbox-section h2,
 body.high-contrast .lockbox-section h4,
@@ -925,8 +905,6 @@ body.high-contrast .unlocked-celebration .message.success {
 .puzzle1-cell.correct {
     box-shadow: 0 0 0 3px #4caf50, 0 0 0 6px #81c784;
 }
-
-
 
 .puzzle1-cell.wrong-flash {
     animation: shakeFlash 0.3s ease;
@@ -1217,8 +1195,6 @@ body.high-contrast .unlocked-celebration .message.success {
     }
 }
 
-
-
 /* High‑contrast mode override – make buttons solid white with black text */
 body.high-contrast .global-help,
 body.high-contrast .global-a11y {
@@ -1342,6 +1318,59 @@ body.high-contrast #lockboxContainer .unlocked-celebration .message.success {
 .global-a11y {
     right: 15px !important;
     left: auto !important;
+}
+
+/* --- FIX: Align close buttons centrally and keep them out of the scrollable area --- */
+
+/* For Help Modal */
+.help-card {
+    /* We add extra top padding so the X doesn't fight with the scrollbar */
+    padding-top: 60px !important; 
+    position: relative;
+}
+
+.close-help {
+    /* Force the X to be outside the scrollable content */
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    /* Centering the X inside the circle */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 1 !important;
+    font-size: 1.8rem !important; 
+    border-radius: 50% !important;
+    z-index: 10001 !important; 
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid var(--card-border) !important;
+    color: var(--text-primary) !important;
+}
+
+/* For generic modals (Puzzle overlays, etc.) */
+.modal-content {
+    padding-top: 60px !important; /* Space for the X */
+}
+
+.close-modal {
+    /* Force the X to the top-right */
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    /* Centering the X inside the circle */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 1 !important;
+    font-size: 1.8rem !important;
+    border-radius: 50% !important;
+    z-index: 10 !important;
+    background: rgba(0,0,0,0.5) !important;
+    color: white !important;
 }
 
 /* Ensure their parent containers don't interfere */
