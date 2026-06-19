@@ -22,7 +22,7 @@ function initLockbox() {
 
     const answers = loadState().puzzleAnswers;
     const gridData = buildGridFromAnswers(answers);
-    const targetCode = appConfig.targetCode; // "8227"
+    const targetCode = appConfig.targetCode; // "82277"
     renderLockboxUI(container, gridData, targetCode);
 }
 

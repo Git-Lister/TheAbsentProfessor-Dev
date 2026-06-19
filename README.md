@@ -2,7 +2,7 @@
 # 🧩 The Case of the Absent Professor – Digital Escape Room
 
 A web‑based version of the in‑person escape room by **Mark Burgess** (MMU Library).  
-Students solve four puzzles, fill a 4×4 grid, and unlock a safe when the third column spells `8227`.  
+Students solve four puzzles, fill a 4×4 grid, and unlock a safe when the third column spells `82277`.  
 Results are sent live to a Google Sheet.
 
 ---
@@ -29,7 +29,7 @@ Results are sent live to a Google Sheet.
 
 ## 🏆 How the winner is decided
 
-The **first team to unlock the lockbox** (by entering the correct `8227` code) wins.  
+The **first team to unlock the lockbox** (by entering the correct `82277` code) wins.  
 Winner is determined by **submission timestamp**, not by total time spent.  
 Each successful unlock writes a row to the Google Sheet containing:
 
@@ -64,7 +64,7 @@ Install the “Live Server” extension, right‑click `index.html`, and choose 
 
 ### 1. Configure puzzles & answers
 Edit `data/config.json` – set each puzzle’s `expectedAnswer` (e.g., `"2024"`), clues, and hint text.  
-Keep `targetCode` as `"82277"`.
+Keep `targetCode` as `"822777"`.
 
 ### 2. Set up Google Sheets reporting
 
@@ -111,7 +111,7 @@ Paste the URL and click **Save** – the game will use this URL (overrides `conf
 ### 5. Test the game
 
 - Enter a team name, read the story, solve puzzles in any order.
-- The 4×4 grid fills automatically. When column 3 shows `8227`, use the dials to enter that code and click **Check Combination**.
+- The 4×4 grid fills automatically. When column 3 shows `82277`, use the dials to enter that code and click **Check Combination**.
 - The lockbox unlocks and reports success to the Google Sheet.
 
 ---
@@ -170,7 +170,7 @@ TheAbsentProfessor-Dev/
 | Problem | Likely fix |
 |---------|-------------|
 | Grid doesn’t appear | Use a local web server (not `file://`). |
-| Lockbox won’t unlock | Verify the four answers in `config.json` produce `8227` in column 3 (e.g., `158`, `1423`, `2024`, `247`). |
+| Lockbox won’t unlock | Verify the four answers in `config.json` produce `82277` in column 3 (e.g., `158`, `1423`, `2024`, `247`). |
 | Google Sheets reporting fails | Check the Apps Script URL is correct, redeployed, and has write access. |
 | High‑contrast mode missing some elements | Hard refresh (`Ctrl+Shift+R`); ensure CSS selectors are up to date. |
 | Puzzle 1 images 404 | Name your images `1.jpg` … `9.jpg` and place them in `images/puzzle1/`. |
