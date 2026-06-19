@@ -27,7 +27,8 @@ function initLockbox() {
 }
 
 function buildGridFromAnswers(answers) {
-    const maxCols = 5;
+    // 4 columns, as the longest answer is 4 digits
+    const maxCols = 4; 
     const grid = [];
     for (let i = 0; i < answers.length; i++) {
         const answer = answers[i] || '';
@@ -63,7 +64,6 @@ function renderLockboxUI(container, gridData, targetCode) {
                             <th>🔒</th>
                             <th>🔒</th>
                             <th>🔒</th>
-                            <th>🔒</th>
                         </tr>
                     </thead>
                 <tbody>
@@ -71,9 +71,10 @@ function renderLockboxUI(container, gridData, targetCode) {
                         <tr>
                             <td style="border:1px solid #b5926a; padding:8px;">${['Open All Hours', 'Check it, Return it, Laptop Locker it!', 'Library Layers', 'Email Chain', 'Reading List Roadmap'][rowIdx]}</td>
                             ${row.map((cell, colIdx) => {
-                                // Show X for rows with less than 5 digits (Puzzle 1, 4, 5 might have only 3 or 4 digits)
-                                // You'll need to adjust the logic based on the number of digits in each answer.
-                                // For simplicity, you can just render all cells.
+                                // TARGETED LOGIC: Only render an X for rows 0 and 1 in the 4th column (colIdx 3) if empty
+                                if ((rowIdx === 0 || rowIdx === 1) && colIdx === 3 && cell === '') {
+                                    return `<td class="grid-cell" data-row="${rowIdx}" data-col="${colIdx}" style="border:1px solid #b5926a; padding:8px; text-align:center;">X</td>`;
+                                }
                                 return `<td class="grid-cell" data-row="${rowIdx}" data-col="${colIdx}" style="border:1px solid #b5926a; padding:8px; text-align:center;">${cell || '▯'}</td>`;
                             }).join('')}
                         </tr>
