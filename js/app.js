@@ -1,6 +1,52 @@
 document.addEventListener('DOMContentLoaded', async () => {
     await loadConfig();
 
+    // --- TYPEWRITER ENGINE START ---
+    function typeHTML(element, htmlString, speed = 18) {
+        // Splits HTML into tags and plain text tokens
+        const tokens = htmlString.match(/(<[^>]+>)|([^<]+)/g);
+        let currentTokenIndex = 0;
+        let charIndex = 0;
+        let typedText = '';
+        let intervalId = null;
+
+        function processNext() {
+            if (currentTokenIndex >= tokens.length) {
+                clearInterval(intervalId);
+                element.dataset.typewriterInterval = null;
+                element.dataset.isTypingComplete = 'true';
+                return;
+            }
+
+            let token = tokens[currentTokenIndex];
+            if (token.startsWith('<')) {
+                // Tags are appended instantly
+                typedText += token;
+                element.innerHTML = typedText;
+                currentTokenIndex++;
+                processNext(); // Instantly process next token
+                return;
+            }
+
+            // Type plain text char by char
+            if (charIndex < token.length) {
+                typedText += token[charIndex];
+                element.innerHTML = typedText;
+                charIndex++;
+            } else {
+                charIndex = 0;
+                currentTokenIndex++;
+                processNext();
+            }
+        }
+
+        intervalId = setInterval(processNext, speed);
+        element.dataset.typewriterInterval = intervalId;
+        element.dataset.isTypingComplete = 'false';
+    }
+    // --- TYPEWRITER ENGINE END ---
+
+
     // Team entry screen elements
     const teamEntryScreen = document.getElementById('teamEntryScreen');
     const mainGameUI = document.getElementById('mainGameUI');
@@ -19,6 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         initGame();
     }
 
+// Start Quest Button
 startBtn.addEventListener('click', () => {
     const teamName = initialTeamInput.value.trim();
     if (teamName === "") {
@@ -28,8 +75,30 @@ startBtn.addEventListener('click', () => {
     setTeamName(teamName);
     displayTeamSpan.textContent = teamName;
     teamEntryScreen.style.display = 'none';
-    // Show story modal instead of mainGameUI yet
+    
     const storyModal = document.getElementById('storyModal');
+    const slidesContainer = document.getElementById('storySlidesContainer');
+    const slides = slidesContainer.querySelectorAll('.story-slide');
+    const continueBtn = document.getElementById('storyContinueBtn');
+    const beginBtn = document.getElementById('beginGameBtn');
+
+    if (!slides || slides.length === 0) return;
+
+    // Store original HTML and reset typing state for all slides
+    slides.forEach((slide) => {
+        slide.dataset.originalHtml = slide.innerHTML;
+        slide.innerHTML = '';
+        slide.classList.remove('active-slide');
+        slide.dataset.typewriterInterval = null;
+        slide.dataset.isTypingComplete = 'false';
+    });
+    
+    // Activate Slide 1 and start typing
+    slides[0].classList.add('active-slide');
+    typeHTML(slides[0], slides[0].dataset.originalHtml, 18); // Speed 18ms per char
+    
+    continueBtn.style.display = 'inline-block';
+    beginBtn.style.display = 'none';
     storyModal.style.display = 'flex';
 });
 
@@ -41,6 +110,44 @@ beginBtn.addEventListener('click', () => {
     mainGameUI.style.display = 'block';
     initGame();
     setStartTime(); // start timer now
+});
+
+// "Continue" Button Logic
+document.getElementById('storyContinueBtn').addEventListener('click', function() {
+    const slidesContainer = document.getElementById('storySlidesContainer');
+    const slides = slidesContainer.querySelectorAll('.story-slide');
+    const currentActive = slidesContainer.querySelector('.story-slide.active-slide');
+    
+    if (!slides || slides.length === 0 || !currentActive) return;
+
+    const currentIndex = Array.from(slides).indexOf(currentActive);
+    const isTypingComplete = currentActive.dataset.isTypingComplete === 'true';
+
+    // ACTION 1: If text is still typing, INSTANTLY reveal the full text
+    if (!isTypingComplete) {
+        if (currentActive.dataset.typewriterInterval) {
+            clearInterval(currentActive.dataset.typewriterInterval);
+            currentActive.dataset.typewriterInterval = null;
+        }
+        currentActive.innerHTML = currentActive.dataset.originalHtml;
+        currentActive.dataset.isTypingComplete = 'true';
+        return; // Stop here. They must click "Continue" again to advance.
+    }
+
+    // ACTION 2: Text is fully revealed, ADVANCE to the next slide
+    if (currentIndex < slides.length - 1) {
+        currentActive.classList.remove('active-slide');
+        const nextSlide = slides[currentIndex + 1];
+        nextSlide.classList.add('active-slide');
+        // Start typing on the new slide
+        typeHTML(nextSlide, nextSlide.dataset.originalHtml, 18);
+    }
+    
+    // If we just moved to the LAST slide
+    if (currentIndex + 1 === slides.length - 1) {
+        this.style.display = 'none'; // Hide Continue
+        document.getElementById('beginGameBtn').style.display = 'inline-block'; // Show Begin
+    }
 });
 
     // Reset button logic

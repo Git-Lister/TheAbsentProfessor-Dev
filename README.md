@@ -64,7 +64,7 @@ Install the “Live Server” extension, right‑click `index.html`, and choose 
 
 ### 1. Configure puzzles & answers
 Edit `data/config.json` – set each puzzle’s `expectedAnswer` (e.g., `"2024"`), clues, and hint text.  
-Keep `targetCode` as `"8227"`.
+Keep `targetCode` as `"82277"`.
 
 ### 2. Set up Google Sheets reporting
 

@@ -1442,3 +1442,60 @@ body, body * {
 .dial-value {
     font-size: 1.4rem;
 }
+
+/* --- Story Cutscene Slides --- */
+.story-slide {
+    display: none;
+    animation: fadeInSlide 0.35s ease-out forwards;
+}
+.story-slide.active-slide {
+    display: block;
+}
+
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Story Buttons Area --- */
+#storyButtonContainer {
+    display: flex;
+    justify-content: flex-end; /* Aligns Continue button to the right, like Pokémon */
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
+}
+
+#storyContinueBtn {
+    background: var(--button-primary);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.2s;
+    min-height: var(--tap-min-height);
+}
+
+#storyContinueBtn:hover {
+    background: var(--col3-highlight-bg);
+    transform: scale(1.02);
+}
+
+/* Keep the Begin Button styling consistent */
+#beginGameBtn {
+    background: var(--button-primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.2s;
+    min-height: var(--tap-min-height);
+}
+#beginGameBtn:hover {
+    background: var(--col3-highlight-bg);
+    transform: scale(1.02);
+}
