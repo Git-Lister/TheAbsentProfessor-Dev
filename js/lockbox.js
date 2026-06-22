@@ -27,11 +27,17 @@ function initLockbox() {
 }
 
 function buildGridFromAnswers(answers) {
-    // 4 columns, as the longest answer is 4 digits
-    const maxCols = 4; 
+    // IMPORTANT FIX: Answers are stored by (puzzleId - 1) in storage.js.
+    // This array maps the visual display order to the correct storage indices.
+    // Order: Open All Hours (ID4, idx 3), Check it (ID1, idx 0), Library Layers (ID2, idx 1), Email Chain (ID3, idx 2), Reading List (ID5, idx 4)
+    const displayOrderIndices = [3, 0, 1, 2, 4];
+    
+    const maxCols = 4; // Longest answer is 4 digits
     const grid = [];
-    for (let i = 0; i < answers.length; i++) {
-        const answer = answers[i] || '';
+
+    for (let i = 0; i < displayOrderIndices.length; i++) {
+        const answerIndex = displayOrderIndices[i];
+        const answer = answers[answerIndex] || '';
         const digits = answer.split('');
         const row = [];
         for (let j = 0; j < maxCols; j++) {
@@ -71,7 +77,7 @@ function renderLockboxUI(container, gridData, targetCode) {
                         <tr>
                             <td style="border:1px solid #b5926a; padding:8px;">${['Open All Hours', 'Check it, Return it, Laptop Locker it!', 'Library Layers', 'Email Chain', 'Reading List Roadmap'][rowIdx]}</td>
                             ${row.map((cell, colIdx) => {
-                                // TARGETED LOGIC: Only render an X for rows 0 and 1 in the 4th column (colIdx 3) if empty
+                                // Render 'X' only for Open All Hours and Check it... in the 4th column (colIdx 3)
                                 if ((rowIdx === 0 || rowIdx === 1) && colIdx === 3 && cell === '') {
                                     return `<td class="grid-cell" data-row="${rowIdx}" data-col="${colIdx}" style="border:1px solid #b5926a; padding:8px; text-align:center;">X</td>`;
                                 }
