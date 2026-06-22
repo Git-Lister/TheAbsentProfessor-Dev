@@ -207,15 +207,49 @@ document.getElementById('storyContinueBtn').addEventListener('click', function()
 
         const onSolve = (answerString) => {
             updatePuzzleAnswer(puzzleId, answerString);
+            
             // Update card UI
             const card = document.querySelector(`.puzzle-card[data-id='${puzzleId}']`);
             if (card) {
+                card.classList.add('solved');
+                
                 const displayAnswer = answerString.length > 6 ? answerString.substring(0,6)+'…' : answerString;
                 card.querySelector('.digit').textContent = displayAnswer;
                 card.querySelector('.status').textContent = 'Solved';
+
+                // --- UPDATED NARRATIVE & SPRITE MAP ---
+                const narrativeTexts = {
+                    4: "The Library is open 24/7! Now you've accessed the building, let's access the information...",
+                    1: "The matching images are found! You've uncovered the lockers. Next stop: the floors...",
+                    2: "The study zones are mapped! Quiet and social spaces found. What's next?",
+                    3: "The year is uncovered! Professor's email leads to her reading list...",
+                    5: "The reading list is unlocked! Time to crack the safe."
+                };
+
+                // Map each puzzle ID to its unique high-contrast sprite
+                const spriteMap = {
+                    4: '🌙', // Grey crescent moon for night
+                    1: '🔐', // Gold locker key
+                    2: '📖', // White/blue open book
+                    3: '✉️', // White envelope
+                    5: '📚'  // Stack of books
+                };
+
+                let narrativeDiv = card.querySelector('.completion-narrative');
+                if (!narrativeDiv) {
+                    narrativeDiv = document.createElement('div');
+                    narrativeDiv.className = 'completion-narrative';
+                    card.appendChild(narrativeDiv);
+                }
+                
+                // Inject the specific emoji alongside the text
+                narrativeDiv.innerHTML = `
+                    <span class="sprite-icon">${spriteMap[puzzleId] || '✨'}</span> 
+                    ${narrativeTexts[puzzleId] || "Puzzle complete. Move on to the next!"}
+                `;
             }
+
             modalOverlay.style.display = 'none';
-            // Re-render lockbox grid to show the newly entered digits
             initLockbox();
         };
 

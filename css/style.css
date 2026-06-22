@@ -1499,3 +1499,46 @@ body, body * {
     background: var(--col3-highlight-bg);
     transform: scale(1.02);
 }
+
+/* --- SOLVED CARD STATE & SPRITE ANIMATION --- */
+.puzzle-card.solved {
+    border-color: var(--accent-gold) !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    transform: translateY(-2px);
+    background: rgba(22, 36, 32, 0.8) !important; /* Slightly less transparent when solved */
+}
+
+.completion-narrative {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 10px;
+    text-align: center;
+    font-weight: 300;
+    min-height: 30px; /* Prevents layout shift when appearing */
+}
+
+/* The animated sprite/icon */
+.sprite-icon {
+    display: inline-block;
+    animation: spriteOrbit 3s linear infinite;
+    margin-right: 5px;
+}
+
+/* Dream animation: A continuous, gentle orbit/spin */
+@keyframes spriteOrbit {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.1); }
+    50% { transform: rotate(180deg) scale(1); }
+    75% { transform: rotate(270deg) scale(0.95); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Make it spin even slower on mobile to save battery */
+@media (max-width: 600px) {
+    .sprite-icon {
+        animation-duration: 5s;
+    }
+}
