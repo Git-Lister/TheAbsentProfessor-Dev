@@ -397,7 +397,7 @@ function renderPuzzle2(container, onSolve) {
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }
 
-// ------------------- Puzzle 3 (NEW): Library Layers (was old Puzzle 2) -------------------
+// ------------------- Puzzle 3 (NEW): Library Layers -------------------
 function renderPuzzle3(container, onSolve) {
     const puzzleId = 2;
     const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
@@ -435,17 +435,45 @@ function renderPuzzle3(container, onSolve) {
         <div class="puzzle2-container" style="text-align: center; max-width: 700px; margin: 0 auto;">
             <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📖 The library has different types of study spaces.</p>
             <p style="margin-bottom: 20px; font-style: italic; color: var(--text-secondary);">"There's more to this poem than meets the eye, some of the words might be worth highlighting."</p>
+            
             <div class="puzzle2-poem" style="background: #fff9e8; color: #2c241a; padding: 20px; border-radius: 16px; font-family: 'Georgia', serif; line-height: 1.8; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transform: rotate(-0.3deg);">
                 ${poemHTML}
             </div>
-            <div id="buildingSlots" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;"></div>
-            <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 10px;">Reset Puzzle</button>
+
+            <!-- Library Cutaway Layout -->
+            <div class="library-cutaway">
+                <!-- Floor 1 (Silent) -->
+                <div class="floor-block" data-floor="1">
+                    <div class="floor-indicator">1st Floor</div>
+                    <div class="floor-slot" id="slot1">_</div>
+                    <div class="floor-tag silent">🔇 Silent Study</div>
+                </div>
+                <!-- Floor 2 (Collaborative) -->
+                <div class="floor-block" data-floor="2">
+                    <div class="floor-indicator">2nd Floor</div>
+                    <div class="floor-slot" id="slot2">_</div>
+                    <div class="floor-tag collab">🗣️ Collaborative</div>
+                </div>
+                <!-- Floor 3 (Collaborative) -->
+                <div class="floor-block" data-floor="3">
+                    <div class="floor-indicator">3rd Floor</div>
+                    <div class="floor-slot" id="slot3">_</div>
+                    <div class="floor-tag collab">🗣️ Collaborative</div>
+                </div>
+                <!-- Floor 4 (Silent) -->
+                <div class="floor-block" data-floor="4">
+                    <div class="floor-indicator">4th Floor</div>
+                    <div class="floor-slot" id="slot4">_</div>
+                    <div class="floor-tag silent">🔇 Silent Study</div>
+                </div>
+            </div>
+
+            <button id="puzzle2ResetBtn" style="background: #8b3a3a; color: white; border: none; padding: 8px 16px; border-radius: 30px; margin-top: 20px;">Reset Puzzle</button>
             <div id="puzzle2Status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
             <div id="puzzle2HintContainer" style="margin-top: 10px;"></div>
         </div>
     `;
 
-    const buildingSlots = document.getElementById('buildingSlots');
     const resetBtn = document.getElementById('puzzle2ResetBtn');
     const statusDiv = document.getElementById('puzzle2Status');
     const hintContainer = document.getElementById('puzzle2HintContainer');
@@ -462,36 +490,28 @@ function renderPuzzle3(container, onSolve) {
         span.style.transition = '0.1s';
     });
 
-    function renderBuilding() {
-        buildingSlots.style.display = 'flex';
-        buildingSlots.style.flexDirection = 'row';
-        buildingSlots.style.alignItems = 'center';
-        buildingSlots.style.justifyContent = 'center';
-        buildingSlots.style.gap = '15px';
-        buildingSlots.innerHTML = '';
-        for (let floor of [1,2,3,4]) {
-            const slotData = floorSlots.find(s => s.floor === floor);
-            const slotDiv = document.createElement('div');
-            slotDiv.style.background = slotData.filled ? 'var(--accent-green)' : 'var(--input-bg)';
-            slotDiv.style.width = '60px';
-            slotDiv.style.height = '60px';
-            slotDiv.style.display = 'flex';
-            slotDiv.style.alignItems = 'center';
-            slotDiv.style.justifyContent = 'center';
-            slotDiv.style.borderRadius = '12px';
-            slotDiv.style.border = '2px solid var(--card-border)';
-            slotDiv.style.fontSize = '1.8rem';
-            slotDiv.style.fontWeight = 'bold';
-            slotDiv.style.color = 'var(--text-primary)';
-            slotDiv.textContent = slotData.filled ? slotData.value : '□';
-            buildingSlots.appendChild(slotDiv);
+    function fillSlot(word) {
+        const floorNumber = wordToFloor[word];
+        const slot = floorSlots.find(s => s.floor === parseInt(floorNumber));
+        if (slot && !slot.filled) {
+            slot.filled = true;
+            slot.value = floorNumber;
+            
+            // Update DOM for the specific floor
+            const numElement = document.getElementById('slot' + floorNumber);
+            const floorElement = numElement.closest('.floor-block');
+            
+            if (numElement && floorElement) {
+                numElement.textContent = floorNumber;
+                numElement.classList.add('filled'); // Triggers CSS pop animation
+                floorElement.classList.add('filled'); // Glows the whole block
+            }
         }
     }
 
     function updateSequenceDisplay() {
-        const sortedSequence = [...clickSequence].sort((a,b) => wordToFloor[a] - wordToFloor[b]);
-        
-        if (sortedSequence.length === 4 && !puzzleSolved) {
+        // Check completion based on word count (any order)
+        if (clickSequence.length === 4 && !puzzleSolved) {
             puzzleSolved = true;
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
             statusDiv.innerHTML = '✅ You\'ve found the Libraries various study zones, the final code is set.';
@@ -509,21 +529,22 @@ function renderPuzzle3(container, onSolve) {
         }
     }
 
-    function fillSlot(word) {
-        const floorNumber = wordToFloor[word];
-        const slot = floorSlots.find(s => s.floor === parseInt(floorNumber));
-        if (slot && !slot.filled) {
-            slot.filled = true;
-            slot.value = floorNumber;
-            renderBuilding();
-        }
-    }
-
     function resetPuzzle() {
         clickSequence = [];
         puzzleSolved = false;
         floorSlots.forEach(slot => { slot.filled = false; slot.value = ''; });
-        renderBuilding();
+        
+        // Reset DOM visuals
+        for (let i = 1; i <= 4; i++) {
+            const numEl = document.getElementById('slot' + i);
+            const floorEl = numEl.closest('.floor-block');
+            if (numEl && floorEl) {
+                numEl.textContent = '_';
+                numEl.classList.remove('filled');
+                floorEl.classList.remove('filled');
+            }
+        }
+
         statusDiv.innerHTML = '';
         highlights.forEach(span => {
             span.style.opacity = '1';
@@ -559,7 +580,7 @@ function renderPuzzle3(container, onSolve) {
         clickSequence.push(word);
         fillSlot(word);
         updateSequenceDisplay();
-        statusDiv.innerHTML = `✓ Correct! "${word}" added.`;
+        statusDiv.innerHTML = `✓ "${word}" floor unlocked.`;
         span.style.opacity = '0.5';
         span.style.cursor = 'default';
         span.style.backgroundColor = 'var(--accent-green)';
@@ -572,7 +593,6 @@ function renderPuzzle3(container, onSolve) {
     });
 
     resetBtn.addEventListener('click', resetPuzzle);
-    renderBuilding();
     hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
 }
 
