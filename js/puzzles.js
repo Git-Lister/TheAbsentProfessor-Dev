@@ -576,7 +576,7 @@ function renderPuzzle3(container, onSolve) {
     hintTimeoutId = setTimeout(highlightWords, hintTimerSeconds * 1000);
 }
 
-// ------------------- Puzzle 4 (NEW): Email Chain (was old Puzzle 3) -------------------
+// ------------------- Puzzle 4: Email Chain (was old Puzzle 3) -------------------
 function renderPuzzle4(container, onSolve) {
     const puzzleId = 3;
     const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
@@ -713,7 +713,7 @@ function renderPuzzle4(container, onSolve) {
     answerArea.appendChild(resetBtn);
 }
 
-// ------------------- Puzzle 5 (NEW): Reading List Roadmap -------------------
+// ------------------- Puzzle 5 (NEW): Reading List Roadmap (Talis) -------------------
 function renderPuzzle5(container, onSolve) {
     const puzzleId = 5;
     const puzzleConfig = appConfig.puzzles.find(p => p.id === puzzleId);
@@ -721,57 +721,35 @@ function renderPuzzle5(container, onSolve) {
     const hintTimerSeconds = puzzleConfig.hintTimer;
     let hintTimeoutId = null;
     let solved = false;
+    let wrongAttempts = 0;
 
-    // The answer is the number found in the PDF (replace with your actual answer)
-    const ANSWER = "6471"; 
+    const expectedCode = puzzleConfig.expectedAnswer; // "6471"
+    const talisUrl = "https://rl.talis.com/3/mmu/lists/4f2a6733-53a4-4cfe-88d7-cde497f8a690.html?lang=en-GB&login=1";
 
     container.innerHTML = `
         <div style="text-align: center; max-width: 600px; margin: 0 auto;">
             <h3>📚 Reading List Roadmap</h3>
-            <p style="margin-bottom: 15px;">Tap or click each link to find the hidden number in the PDF file.</p>
-            <div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 16px;">
-                <p><strong>Your Reading List:</strong></p>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link">Smith, J. (2021). Library Essentials (Chapter 1).</a></li>
-                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link">Johnson, K. (2022). The Art of Study.</a></li>
-                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link">Liu, M. (2023). Digital Literacy and Libraries.</a></li>
-                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link">Williams, P. (2024). Referencing Made Easy.</a></li>
-                    <li style="margin-bottom: 10px;">🔗 <a href="#" target="_blank" class="resource-link pdf-link">📄 *Special Resource: Find the PDF (and the hidden number inside).</a></li>
-                </ul>
+            <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📖 The clue you seek is inside your reading list.</p>
+            <p style="font-style: italic; margin-bottom: 20px; color: var(--text-secondary);">"Every good library journey starts with a roadmap."</p>
+            
+            <a href="${talisUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #3c6e47; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; margin: 10px 0; font-weight: bold;">📚 Open Your Reading List</a>
+            
+            <div id="puzzle5AnswerArea" style="margin-top: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <div>
+                    <input type="text" id="puzzle5Input" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 8px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc;">
+                    <button id="puzzle5SubmitBtn" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin-left: 10px;">Submit</button>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Enter the 4-digit number you found</p>
+                <div id="puzzle5Feedback" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
             </div>
-            <div id="puzzle5Status" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
-            <div id="puzzle5HintContainer" style="margin-top: 10px;"></div>
+            <div id="puzzle5HintContainer" style="margin-top: 15px; text-align: center;"></div>
         </div>
     `;
 
-    // Logic to check if the PDF link was clicked and the number was found.
-    // This requires a separate implementation (e.g., the PDF link text contains the number,
-    // or the PDF, when opened, has a user-facing number like "Code: 6471").
-    // For now, the placeholder links do nothing.
-    const statusDiv = container.querySelector('#puzzle5Status');
+    const submitBtn = container.querySelector('#puzzle5SubmitBtn');
+    const inputField = container.querySelector('#puzzle5Input');
+    const feedback = container.querySelector('#puzzle5Feedback');
     const hintContainer = container.querySelector('#puzzle5HintContainer');
-
-    // Placeholder: Click the PDF link to solve.
-    const pdfLink = container.querySelector('.pdf-link');
-    if (pdfLink) {
-        pdfLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (solved) return;
-            // Simulate finding the number
-            solved = true;
-            if (hintTimeoutId) clearTimeout(hintTimeoutId);
-            statusDiv.innerHTML = '✅ Found the hidden number!';
-            if (container.querySelector('.claim-code-btn')) return;
-            const claimBtn = document.createElement('button');
-            claimBtn.className = 'claim-code-btn';
-            claimBtn.textContent = '🔓 Claim Your Code →';
-            claimBtn.style.cssText = 'display: block; margin: 15px auto 0; background: var(--button-primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-size: 1rem;';
-            claimBtn.onclick = () => onSolve(ANSWER);
-            container.appendChild(claimBtn);
-            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-            if (hintContainer) hintContainer.innerHTML = '';
-        });
-    }
 
     function showHintButton() {
         if (!document.body.contains(container)) return;
@@ -779,12 +757,44 @@ function renderPuzzle5(container, onSolve) {
             hintContainer.innerHTML = `<button id="puzzle5HintBtn" style="background:#ffb347; color:#2c241a; border:none; padding:5px 12px; border-radius:30px; cursor:pointer;">💡 Show Hint</button>`;
             const hintBtn = hintContainer.querySelector('#puzzle5HintBtn');
             hintBtn.addEventListener('click', () => {
-                statusDiv.innerHTML = `💡 Hint: ${hintText}`;
+                feedback.innerHTML = `💡 Hint: ${hintText}`;
                 hintBtn.disabled = true;
                 hintBtn.style.opacity = '0.5';
             });
         }
     }
+
+    submitBtn.addEventListener('click', () => {
+        if (solved) return;
+        const entered = inputField.value.trim();
+        if (entered === expectedCode) {
+            solved = true;
+            if (hintTimeoutId) clearTimeout(hintTimeoutId);
+            feedback.innerHTML = '✅ Reading List unlocked! Code confirmed.';
+            
+            if (container.querySelector('.claim-code-btn')) return;
+            
+            const claimBtn = document.createElement('button');
+            claimBtn.className = 'claim-code-btn';
+            claimBtn.textContent = '🔓 Claim Your Code →';
+            claimBtn.style.cssText = 'display:block; margin:15px auto 0; background:#3c6e47; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-size:1rem;';
+            claimBtn.onclick = () => onSolve(expectedCode);
+            container.appendChild(claimBtn);
+            setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            if (hintContainer) hintContainer.innerHTML = '';
+        } else {
+            wrongAttempts++;
+            feedback.innerHTML = `❌ Incorrect code. Keep searching the reading list.`;
+            if (wrongAttempts >= 2 && (!hintContainer || !hintContainer.innerHTML)) {
+                showHintButton();
+            }
+        }
+    });
+
+    // Allow Enter key to submit
+    inputField.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitBtn.click();
+    });
 
     hintTimeoutId = setTimeout(showHintButton, hintTimerSeconds * 1000);
 }
