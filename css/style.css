@@ -313,7 +313,6 @@ h1 {
     box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
 
-/* Note: Keeping your second background rule separate to ensure it works */
 .puzzle-card {
     background: rgba(22, 36, 32, 0.6);
     backdrop-filter: blur(2px);
@@ -623,7 +622,7 @@ body.high-contrast .lockbox-section::before {
         padding: 10px 5px !important;
     }
     .dial {
-        min-width: 35px !important;
+        min-width: 40px !important;
         padding: 3px !important;
     }
     .dial-value {
@@ -638,28 +637,6 @@ body.high-contrast .lockbox-section::before {
     #checkCombinationBtn {
         padding: 8px 16px !important;
         font-size: 0.9rem !important;
-    }
-
-    /* --- Force 5 Dials on One Line --- */
-.dials-container {
-    flex-wrap: nowrap !important;    /* Prevent wrapping to a new line */
-    gap: 6px !important;             /* Reduce the gap between dials */
-    justify-content: center !important;
-}
-
-.dial {
-    min-width: 40px !important;      /* Make dials slightly smaller */
-    padding: 2px !important;
-}
-
-.dial-value {
-    font-size: 1rem !important;      /* Reduce font size of the number */
-    padding: 0 4px !important;
-}
-
-.dial-up, .dial-down {
-    padding: 2px 4px !important;
-    font-size: 0.7rem !important;
     }
 }
 
@@ -747,7 +724,6 @@ body.high-contrast .team-info div,
 body.high-contrast .puzzle1-status,
 body.high-contrast .puzzle2-status,
 body.high-contrast .puzzle4-status,
-body.high-contrast #sequenceDisplay,
 body.high-contrast .puzzle2-slots-container,
 body.high-contrast .puzzle2-slots-container h3 {
     color: #1e2a3a !important;
@@ -1543,92 +1519,6 @@ body, body * {
     }
 }
 
-/* --- PUZZLE 3: LIBRARY LAYERS BUILDING UI --- */
-.puzzle3-library-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    max-width: 400px;
-    margin: 20px auto;
-}
-
-.library-floor {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 20px;
-    border-radius: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    background: rgba(22, 36, 32, 0.4);
-    transition: all 0.3s ease;
-}
-
-/* Floor Label */
-.floor-label {
-    font-weight: bold;
-    font-size: 1rem;
-    width: 70px;
-    text-align: left;
-    color: var(--text-secondary);
-}
-
-/* The central number display */
-.floor-number {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.3);
-    width: 50px;
-    text-align: center;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.floor-number.filled-number {
-    color: var(--accent-gold);
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-    transform: scale(1.1);
-}
-
-/* Zone Tags */
-.floor-zone {
-    font-size: 0.8rem;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-}
-
-/* Color coding for Silent vs Collaborative */
-.floor-zone.silent {
-    background: #2d4a5c;
-    color: #b2d8e8;
-}
-.floor-zone.collaborative {
-    background: #5c4a2d;
-    color: #e8d8b2;
-}
-
-/* Highlighted State when filled */
-.library-floor.filled {
-    transform: scale(1.02);
-    border-color: var(--accent-gold);
-}
-.library-floor.filled .floor-zone.silent {
-    background: rgba(45, 74, 92, 0.9);
-    border: 1px solid #4a7c9c;
-}
-.library-floor.filled .floor-zone.collaborative {
-    background: rgba(92, 74, 45, 0.9);
-    border: 1px solid #b8954a;
-}
-
-/* Mobile adjustments */
-@media (max-width: 600px) {
-    .floor-label { font-size: 0.8rem; width: 50px; }
-    .floor-number { font-size: 2rem; width: 40px; }
-    .floor-zone { font-size: 0.65rem; padding: 4px 8px; }
-}
-
 /* --- PUZZLE 3: LIBRARY CUTAWAY VISUAL --- */
 .library-cutaway {
     display: flex;
@@ -1724,6 +1614,7 @@ body, body * {
     .floor-slot { width: 45px; height: 45px; font-size: 1.5rem; }
     .floor-tag { width: 100px; font-size: 0.65rem; padding: 4px 8px; }
 }
+
 /* --- ENABLE TEXT SELECTION IN READING AREAS --- */
 /* Restore selection for text-heavy areas */
 .story-content,
