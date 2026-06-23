@@ -1724,3 +1724,77 @@ body, body * {
     .floor-slot { width: 45px; height: 45px; font-size: 1.5rem; }
     .floor-tag { width: 100px; font-size: 0.65rem; padding: 4px 8px; }
 }
+/* --- ENABLE TEXT SELECTION IN READING AREAS --- */
+/* Restore selection for text-heavy areas */
+.story-content,
+.help-content,
+.story-card,
+.help-card,
+.puzzle2-poem,
+.puzzle3-email-header,
+.puzzle2-container,
+.lockbox-grid-section p,
+#storySlidesContainer,
+.help-title,
+.help-content p {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    cursor: text;
+}
+
+/* Keep UI elements and interactive components non-selectable */
+button,
+input,
+.puzzle-card,
+.puzzle1-cell,
+.puzzle1-grid,
+.dial,
+.lootbox-container,
+.modal-content,
+.team-entry-card,
+.close-help,
+.close-modal,
+.claim-code-btn,
+.puzzle-card .digit,
+#checkCombinationBtn {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
+/* Update the Help button to look like a notebook */
+.global-help {
+    font-size: 1.5rem; /* Make it slightly larger */
+    padding: 2px 10px 5px 10px; /* Adjust padding so the notebook sits nicely */
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 200, 0.4);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+}
+
+.global-help:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* --- Ground Floor Styling --- */
+.floor-block.ground-floor {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.4);
+    margin-top: 4px; /* A small gap to delineate it from the 1st floor */
+}
+
+.floor-slot.ground-slot {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: normal;
+    width: auto;
+    padding: 0 15px; /* Gives it width to fit the text */
+    cursor: default;
+    border-radius: 12px;
+    box-shadow: none !important; /* Prevent glowing if accidentally clicked */
+}

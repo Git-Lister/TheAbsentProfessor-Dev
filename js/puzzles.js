@@ -442,17 +442,11 @@ function renderPuzzle3(container, onSolve) {
 
             <!-- Library Cutaway Layout -->
             <div class="library-cutaway">
-                <!-- Floor 1 (Silent) -->
-                <div class="floor-block" data-floor="1">
-                    <div class="floor-indicator">1st Floor</div>
-                    <div class="floor-slot" id="slot1">_</div>
+                <!-- Floor 4 (Silent) - Top -->
+                <div class="floor-block" data-floor="4">
+                    <div class="floor-indicator">4th Floor</div>
+                    <div class="floor-slot" id="slot4">_</div>
                     <div class="floor-tag silent">🔇 Silent Study</div>
-                </div>
-                <!-- Floor 2 (Collaborative) -->
-                <div class="floor-block" data-floor="2">
-                    <div class="floor-indicator">2nd Floor</div>
-                    <div class="floor-slot" id="slot2">_</div>
-                    <div class="floor-tag collab">🗣️ Collaborative</div>
                 </div>
                 <!-- Floor 3 (Collaborative) -->
                 <div class="floor-block" data-floor="3">
@@ -460,11 +454,23 @@ function renderPuzzle3(container, onSolve) {
                     <div class="floor-slot" id="slot3">_</div>
                     <div class="floor-tag collab">🗣️ Collaborative</div>
                 </div>
-                <!-- Floor 4 (Silent) -->
-                <div class="floor-block" data-floor="4">
-                    <div class="floor-indicator">4th Floor</div>
-                    <div class="floor-slot" id="slot4">_</div>
+                <!-- Floor 2 (Collaborative) -->
+                <div class="floor-block" data-floor="2">
+                    <div class="floor-indicator">2nd Floor</div>
+                    <div class="floor-slot" id="slot2">_</div>
+                    <div class="floor-tag collab">🗣️ Collaborative</div>
+                </div>
+                <!-- Floor 1 (Silent) -->
+                <div class="floor-block" data-floor="1">
+                    <div class="floor-indicator">1st Floor</div>
+                    <div class="floor-slot" id="slot1">_</div>
                     <div class="floor-tag silent">🔇 Silent Study</div>
+                </div>
+                <!-- Static Ground Floor (Bottom) -->
+                <div class="floor-block ground-floor">
+                    <div class="floor-indicator" style="visibility: hidden;">-</div>
+                    <div class="floor-slot ground-slot">🏛️ MMU Library</div>
+                    <div class="floor-tag" style="background: transparent; border: none; width: auto; color: var(--text-secondary);">Entrance</div>
                 </div>
             </div>
 
