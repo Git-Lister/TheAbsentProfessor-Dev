@@ -337,7 +337,8 @@ function renderPuzzle2(container, onSolve) {
 
         if (sortedSelected.join() === sortedTargets.join()) {
             solved = true;
-            statusDiv.innerHTML = '✅ Well done! You found the three matching images.';
+            // UPDATE: Show the numbers and final code immediately inside the modal
+            statusDiv.innerHTML = '✅ Correct! The grid numbers are <strong>1, 5, 8</strong> - the code is <strong>158</strong>.';
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
             
             if (container.querySelector('.claim-code-btn')) return;
@@ -446,7 +447,8 @@ function renderPuzzle3(container, onSolve) {
                 <div class="floor-block" data-floor="4">
                     <div class="floor-indicator">4th Floor</div>
                     <div class="floor-slot" id="slot4">_</div>
-                    <div class="floor-tag silent">🔇 Silent Study</div>
+                    <!-- UPDATE: Changed 'Silent Study' to 'Focussed Study' -->
+                    <div class="floor-tag silent">🔇 Focussed Study</div>
                 </div>
                 <!-- Floor 3 (Collaborative) -->
                 <div class="floor-block" data-floor="3">
@@ -464,7 +466,8 @@ function renderPuzzle3(container, onSolve) {
                 <div class="floor-block" data-floor="1">
                     <div class="floor-indicator">1st Floor</div>
                     <div class="floor-slot" id="slot1">_</div>
-                    <div class="floor-tag silent">🔇 Silent Study</div>
+                    <!-- UPDATE: Changed 'Silent Study' to 'Focussed Study' -->
+                    <div class="floor-tag silent">🔇 Focussed Study</div>
                 </div>
                 <!-- Static Ground Floor (Bottom) -->
                 <div class="floor-block ground-floor">
@@ -651,7 +654,9 @@ function renderPuzzle4(container, onSolve) {
 
     container.innerHTML = `
         <div style="max-height: 70vh; overflow-y: auto; padding: 10px;">
+            <!-- Reordered to match Instruction -> Quote consistency of other puzzles -->
             <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📅 The clue you seek is within the emails.</p>
+            <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 20px;">“...however, I noticed you didn't include the year of publication.”</p>
             ${emailsHTML}
             <div style="text-align: center; margin: 20px 0;">
                 <p>🔍 <strong>Are your study skills up to date?</strong></p>
@@ -750,7 +755,8 @@ function renderPuzzle5(container, onSolve) {
     let wrongAttempts = 0;
 
     const expectedCode = puzzleConfig.expectedAnswer; // "6471"
-    const talisUrl = "https://rl.talis.com/3/mmu/lists/4f2a6733-53a4-4cfe-88d7-cde497f8a690.html?lang=en-GB&login=1";
+    // UPDATE: Swapped to Mark's new Talis list
+    const talisUrl = "https://rl.talis.com/3/mmu/lists/b71c35d3-9b3e-481d-ba8d-bb51cf3dcfb0.html?lang=en-GB&login=1";
 
     container.innerHTML = `
         <div style="text-align: center; max-width: 600px; margin: 0 auto;">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin – Escape Room Reporting URL</title>
+    <title>Admin – Reporting URL Configuration</title>
     <style>
         body { font-family: monospace; background: #2e3b3e; color: #f7e9c3; padding: 2rem; }
         .container { max-width: 600px; margin: 0 auto; background: #4a3b2c; padding: 2rem; border-radius: 20px; }
@@ -15,8 +15,8 @@
 <body>
 <div class="container">
     <h2>🔐 Admin: Reporting URL</h2>
-    <p>Paste your Google Apps Script Web App URL (ends with <code>/exec</code>).</p>
-    <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/.../exec">
+    <p>Paste your reporting endpoint URL (Google Apps Script, Self-hosted server, or Webhook).</p>
+    <input type="text" id="urlInput" placeholder="https://your-reporting-url.com/endpoint">
     <button id="saveBtn">Save to Browser</button>
     <button id="clearBtn">Clear Custom URL (use config.json)</button>
     <div id="status" class="status"></div>
@@ -25,18 +25,20 @@
 </div>
 <script>
     function displayCurrent() {
+        // Note: Variable name kept as 'customGoogleScriptUrl' for backwards compatibility with reporting.js
         const current = localStorage.getItem('customGoogleScriptUrl');
         document.getElementById('currentUrlDisplay').textContent = current || 'None (using config.json)';
         if (current) document.getElementById('urlInput').value = current;
     }
     document.getElementById('saveBtn').addEventListener('click', () => {
         let url = document.getElementById('urlInput').value.trim();
-        if (url && url.startsWith('https://script.google.com/')) {
+        // Updated validation: now accepts any valid http/https URL
+        if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
             localStorage.setItem('customGoogleScriptUrl', url);
             document.getElementById('status').innerHTML = '✅ Saved! The game will now use this URL.';
             displayCurrent();
         } else {
-            document.getElementById('status').innerHTML = '❌ Invalid URL. Must start with https://script.google.com/';
+            document.getElementById('status').innerHTML = '❌ Invalid URL. Must start with http:// or https://';
         }
     });
     document.getElementById('clearBtn').addEventListener('click', () => {
