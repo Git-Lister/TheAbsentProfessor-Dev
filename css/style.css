@@ -1615,41 +1615,35 @@ body, body * {
     .floor-tag { width: 100px; font-size: 0.65rem; padding: 4px 8px; }
 }
 
-/* --- ENABLE TEXT SELECTION IN READING AREAS --- */
-/* Restore selection for text-heavy areas */
-.story-content,
-.help-content,
-.story-card,
-.help-card,
-.puzzle2-poem,
-.puzzle3-email-header,
-.puzzle2-container,
-.lockbox-grid-section p,
-#storySlidesContainer,
-.help-title,
-.help-content p {
+/* --- ENABLE TEXT SELECTION IN READING & INPUT AREAS --- */
+/* Unlock text areas for copying/reading */
+.story-content, .help-content, .story-card, .help-card,
+.puzzle2-poem, .puzzle3-email-header, .puzzle2-container,
+.lockbox-grid-section p, #storySlidesContainer, .help-title, .help-content p,
+.game-container, .team-entry-card, .uni-header, .team-info, header h1,
+.story-main, .story-slide, .game-title-hero, .game-subtitle {
     user-select: text !important;
     -webkit-user-select: text !important;
     cursor: text;
 }
 
-/* Keep UI elements and interactive components non-selectable */
-button,
-input,
-.puzzle-card,
-.puzzle1-cell,
-.puzzle1-grid,
-.dial,
-.lootbox-container,
-.modal-content,
-.team-entry-card,
-.close-help,
-.close-modal,
-.claim-code-btn,
-.puzzle-card .digit,
-#checkCombinationBtn {
+/* Allow highlighting in input fields so users can edit their team name/text */
+input {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+/* Keep strictly interactive UI elements non-selectable */
+button, .puzzle-card, .puzzle1-cell, .puzzle1-grid,
+.dial, .dials-container, .lootbox-container, .modal-content,
+.close-help, .close-modal, .claim-code-btn, .puzzle-card .digit,
+#checkCombinationBtn, .reset-btn, #startGameBtn, #beginGameBtn,
+#storyContinueBtn, .lockbox-grid-section, .safe-dials,
+#lockboxContainer, .found-rail, .caught-number, .floor-slot,
+.floor-block, .library-cutaway {
     user-select: none !important;
     -webkit-user-select: none !important;
+    cursor: default;
 }
 
 /* Update the Help button to look like a notebook */
