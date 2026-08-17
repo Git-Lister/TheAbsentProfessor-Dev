@@ -490,7 +490,6 @@ function renderPuzzle3(container, onSolve) {
 
     highlights.forEach(span => {
         span.style.fontWeight = 'bold';
-        span.style.textDecoration = 'underline';
         span.style.textTransform = 'capitalize';
         span.style.cursor = 'pointer';
         span.style.display = 'inline-block';

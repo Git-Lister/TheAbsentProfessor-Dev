@@ -1,8 +1,43 @@
-# 🧩 The Case of the Absent Professor – Digital Escape Room
+Here is the complete, fully updated `README.md`. It is rewritten with **facilitators and library staff in mind**—keeping the developer sections neatly separated, while putting the important admin setup steps front and center so anyone can get it running quickly.
 
-A web‑based version of the in‑person escape room by **Mark Burgess** (MMU Library).  
-Students solve five puzzles, fill a 4×4 grid, and unlock a safe when the correct column spells `78227`.  
-Results are sent live to a reporting endpoint (Google Sheets, Webhooks, or Self-hosted).
+You can copy and paste this directly into your `README.md` file.
+
+```markdown
+# 🧩 The Case of the Absent Professor – Digital Escape Room
+*A gamified library induction tool for MMU students.*
+
+This web-based escape room introduces new students to library services through five interactive puzzles. As teams solve each puzzle, they reveal numbers that fill a lockbox grid. The first team to enter the final 5-digit code wins!
+
+Built by **Mark Burgess** and **David Haigh** (MMU Library). 
+
+---
+
+## 👩‍🏫 Quick Start for Facilitators (You are here)
+
+To get this running for your students, you only need to do three things:
+
+### 1. Set up a Reporting Sheet (Google Sheets)
+1. Create a new Google Sheet.
+2. Go to **Extensions → Apps Script**.
+3. Delete any default code and paste the script provided below (under *"Reporting & Data"*).
+4. Click **Deploy → New deployment** → **Web app**:
+   - Description: `Escape Room Reporting`
+   - Execute as: `Me`
+   - Who has access: `Anyone`
+   - Click **Deploy**.
+5. Copy the Web App URL (it will end in `/exec`).
+
+### 2. Tell the game where to send the data
+Open the game's **Admin Configuration Page**:
+> **[https://git-lister.github.io/TheAbsentProfessor-Dev/admin-config.html](https://git-lister.github.io/TheAbsentProfessor-Dev/admin-config.html)**  
+
+Paste your Web App URL into the box and click **Save**. That's it!
+
+### 3. Get the results during/after the session
+Open the **Live Admin Dashboard**:
+> **[https://git-lister.github.io/TheAbsentProfessor-Dev/admin.html](https://git-lister.github.io/TheAbsentProfessor-Dev/admin.html)**
+
+This dashboard shows a live leaderboard of winning teams, their completion times, and unique session IDs. Use the **"Clear Local Logs"** button at the start of each new class to reset the dashboard for your fresh session.
 
 ---
 
@@ -11,173 +46,176 @@ Results are sent live to a reporting endpoint (Google Sheets, Webhooks, or Self-
 | Feature | What it does |
 |---------|---------------|
 | 👥 **Team name entry** | Teams identify themselves before starting. |
-| 📖 **Story modal** | Immersive introduction with professor portrait. |
-| 🧠 **Five interactive puzzles** | Each gives a multi‑digit answer (e.g., `2024`, `6471`). |
-| 📊 **Live 5×4 grid** | Shows how digits fill columns as puzzles are solved. |
-| 🔒 **Safe dial mechanism** | Enter the final 5-digit code with up/down dials. |
-| 🔁 **Reset button** | Clears all progress and restarts the game. |
-| 📈 **Flexible Reporting** | Supports Google Sheets, Webhooks, or self-hosted servers. |
-| 🏆 **Winner determination** | First to unlock wins (by submission timestamp). |
+| 📖 **Immersive story intro** | A Pokémon-style typewriter cutscene introduces the "Absent Professor". |
+| 🧠 **Five interactive puzzles** | A mix of visual matching, poetry, web searching, and a UV torch puzzle. |
+| 📊 **Live 5×4 grid** | As teams solve puzzles, their answers fill the lockbox grid. |
+| 🔒 **Safe dial mechanism** | Enter the final 5-digit code (e.g., `78227`) using up/down dials. |
+| 🔁 **Game reset button** | Restarts the entire game for a new team or class. |
+| 📈 **Flexible Reporting** | Supports Google Sheets, Custom Webhooks, or Self-hosted servers. |
+| 🏆 **Winner determination** | First to unlock the safe wins (logged by submission timestamp). |
 | ♿ **High‑contrast mode** | Toggle with the ♿ button – persists in localStorage. |
-| 📱 **Mobile responsive** | Adapts to small screens. |
+| 📱 **Mobile responsive** | Adapts to small screens and uses large touch targets. |
 | 🛠️ **Admin URL Config** | Change the reporting endpoint without editing code (`admin-config.html`). |
-| 📊 **Admin Dashboard** | View a local leaderboard and download a CSV of winners (`admin.html`). |
-| ❓ **Help modal** | Thematic guide (no spoilers) – click the 📓 button. |
+| 📊 **Admin Dashboard** | View winners, download a CSV, and clear logs for new sessions (`admin.html`). |
+| ❓ **Help modal** | Thematic professor's notebook guide – click the 📓 button. |
 | 🌐 **Custom favicon** | Blends perfectly with dark/light themes. |
 
 ---
 
 ## 🏆 How the winner is decided
 
-The **first team to unlock the lockbox** (by entering the correct `78227` code) wins.  
-Winner is determined by **submission timestamp**, not by total time spent.  
-Each successful unlock writes a row to the reporting endpoint containing:
-
-- Submission order (1st, 2nd, 3rd…)
+The **first team to unlock the lockbox** wins. It is determined by the order of submission timestamp sent to your reporting sheet, not by total time spent.
+Each unlock records:
 - Team name
-- Full concatenated code
+- Full 5-puzzle concatenated code
 - Individual puzzle answers (for debugging)
 - Time taken (e.g., `2m 34s`)
-- Readable timestamp (e.g., `07/05/2026 10:49:15`)
+- Exact timestamp of submission
+- A unique `Session ID` (useful if you run multiple classes on the same device)
 
-> **Facilitator tip:** Sort the sheet by the **Order** column to see the winner instantly.
+> **Facilitator tip:** Sort your Google Sheet by the **Order** column to instantly see the winner.
 
 ---
 
-## 💻 How to run locally (testing)
+## 🛠️ Detailed Setup Instructions (Facilitator)
 
-The game uses `fetch()` to load `config.json`, so you **must** serve it via a web server – not directly from the file system.
+### 1. Configure the 5 Puzzles
+Edit `data/config.json` to set each puzzle's `expectedAnswer`, `hintTimer`, and `hintText`.
+The game automatically calculates the final lockbox code from the **third digit** of each answer. 
+For example:
+- Open All Hours: `247` -> 3rd digit is **7**
+- Check it, Return it...: `158` -> 3rd digit is **8**
+- Library Layers: `1423` -> 3rd digit is **2**
+- Email Chain: `2024` -> 3rd digit is **2**
+- Reading List Roadmap: `6471` -> 3rd digit is **7**
 
-### Option 1: Python 3 (recommended)
-```bash
-cd TheAbsentProfessor-Dev
-python -m http.server 8000
-Then open http://localhost:8000.
+**The final target code is `78227`.** Keep this as your `targetCode` in the config file.
 
-Option 2: VS Code Live Server
-Install the “Live Server” extension, right‑click index.html, and choose “Open with Live Server”.
+### 2. Choose your reporting method
 
-🛠️ Setup instructions (facilitator)
-1. Configure puzzles & answers
-Edit data/config.json – set each puzzle’s expectedAnswer (e.g., "2024", "6471"), clues, and hint text.
-Keep targetCode as "78227".
+**Option A: Google Sheets (Standard)**
+1. Create a new Google Sheet.
+2. **Extensions → Apps Script**.
+3. Paste the script below.
+4. Deploy as a Web App (Execute as: `Me`, Who has access: `Anyone`).
+5. Copy the generated URL.
 
-2. Set up reporting (Choose your method)
-Option A: Google Sheets (Recommended for standard setup)
-
-Create a new Google Sheet.
-
-Extensions → Apps Script.
-
-Paste the script below.
-
-Deploy as a web app: Execute as Me, Who has access Anyone.
-
-Copy the deployment URL (ends with /exec).
-
-Apps Script (enhanced):
-
-javascript
+**Google Apps Script (supports 5 puzzles):**
+```javascript
 function doPost(e) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = JSON.parse(e.postData.contents);
   const lastRow = sheet.getLastRow();
   const order = lastRow === 0 ? 1 : lastRow;
-  // 5-puzzle concat index logic
+  
+  // Extract 5 puzzle answers from the concatenated code
   const puzzle1 = data.code.substring(0, 3);
   const puzzle2 = data.code.substring(3, 7);
   const puzzle3 = data.code.substring(7, 11);
   const puzzle4 = data.code.substring(11, 15);
   const puzzle5 = data.code.substring(15);
+
   const isoDate = new Date(data.timestamp);
   const readableTimestamp = Utilities.formatDate(isoDate, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss");
+  
   sheet.appendRow([order, data.team, data.code, puzzle1, puzzle2, puzzle3, puzzle4, puzzle5, data.timeTaken, readableTimestamp]);
   return ContentService.createTextOutput("OK");
 }
-Option B: Self-hosted Server (Totally independent)
-If you prefer total independence from Google, you can run a simple Node.js server.
-Update reporting.js to point to your server URL (e.g., https://your-server.com/report).
+```
 
-3. Save the reporting URL
-Open: https://your-username.github.io/your-repo-name/admin-config.html
-Paste the reporting URL and click Save. This overrides config.json locally.
+**Option B: Self-hosted Server (Totally Independent)**
+If you prefer not to use Google, you can run a tiny Node.js server on Render.com or your own university network. The game can send data to `https://your-server-url.com/report`.
 
-4. View local winners (No internet required)
-Open: https://your-username.github.io/your-repo-name/admin.html
-This page reads the localStorage backup of winners. You can also download a CSV file of all successful teams.
+### 3. Configure the Admin Endpoint
+Open your live deployment URL (or localhost) and add `/admin-config.html` to the end:
+`https://[your-username].github.io/[repo-name]/admin-config.html`
+Paste your reporting URL (Google Script or Self-hosted) into the box and click **Save**.
 
-5. Deploy to GitHub Pages
-Push all files to your GitHub repository.
+### 4. View Live Results
+Open the Live Dashboard by adding `/admin.html` to your URL:
+`https://[your-username].github.io/[repo-name]/admin.html`
+Here you can view the winners, download a CSV file for record-keeping, and use the **🗑️ Clear Local Logs** button to reset the dashboard for your next class.
 
-In Settings → Pages, set branch to main and folder to / (root).
+### 5. Deploy to GitHub Pages
+1. Push all files to your GitHub repository.
+2. Go to **Settings → Pages**.
+3. Set branch to `main` and folder to `/ (root)`.
+4. Your game will be live at `https://your-username.github.io/repo-name`.
 
-The site will be live at https://your-username.github.io/repo-name.
+---
 
-6. Test the game
-Enter a team name, read the story, solve puzzles in any order.
+## 💻 How to run locally (for testing & editing)
 
-The 4×4 grid fills automatically. When column 3 spells 78227, use the 5 dials to enter that code and click Check Combination.
+The game must be run via a local web server. You cannot open `index.html` directly from your computer's file explorer (browsers block the `fetch()` request).
+Open your terminal (command prompt) and run:
 
-The lockbox unlocks and reports success to your endpoint.
+```bash
+cd TheAbsentProfessor-Dev
+python -m http.server 8000
+```
+Then open `http://localhost:8000` in your browser.
 
-♿ Accessibility
-High‑contrast mode – toggle with the ♿ button. White background, dark text, strong borders – persists in localStorage.
+---
 
-Mobile responsive – adapts to small screens.
+## 📁 Project structure
 
-Keyboard navigation – focus indicators visible, especially in high‑contrast mode.
-
-Help modal – 📓 button (top‑left) opens a thematic guide listing each puzzle’s goal and a hint tip.
-
-📁 Project structure
-text
+```
 TheAbsentProfessor-Dev/
-├── index.html              # Main game page
-├── admin.html              # Dashboard to view/download winners locally
+├── index.html              # The main game interface
+├── admin.html              # Local winners dashboard & CSV download
 ├── admin-config.html       # Page to change the reporting endpoint URL
 ├── css/
-│   └── style.css           # All styling (default + high‑contrast)
+│   └── style.css           # All styles (standard + high‑contrast)
 ├── js/
 │   ├── config.js           # Loads config.json
-│   ├── storage.js          # localStorage helpers
-│   ├── reporting.js        # Sends data to reporting endpoints
-│   ├── puzzles.js          # Puzzle implementations (1–5)
-│   ├── lockbox.js          # Grid, dials, unlock logic
+│   ├── storage.js          # localStorage save/load helpers
+│   ├── reporting.js        # Handles data to Google/Server & Local Backup
+│   ├── puzzles.js          # All 5 puzzle implementations
+│   ├── lockbox.js          # Grid, dials, and safe unlock logic
 │   └── app.js              # Main controller (entry, story, reset)
 ├── data/
-│   └── config.json         # Answers, clues, hints, Reporting URL
+│   └── config.json         # Answers, clues, hints, and endpoint URL
 ├── images/
-│   ├── jungle-bg.jpg       # Jungle background
+│   ├── jungle-bg.jpg
 │   ├── mmu-logo.png
 │   ├── professor-portrait.jpg
 │   ├── puzzle1/            # 1.jpg … 9.jpg
-│   └── puzzle4/
-│       └── library.jpg     # UV torch background
+│   ├── puzzle4/
+│   │   └── library.jpg     # UV torch background
+│   └── lockbox-outer.jpg   # Optional safe textures
 ├── backend/
-│   └── apps-script.js      # Reference copy of Apps Script
+│   └── apps-script.js      # Reference copy of the Google Apps Script
 └── README.md
-🎨 Customisation
-Puzzle content – Edit js/puzzles.js. Each puzzle receives a container and an onSolve(answerString) callback.
+```
 
-Styling – Modify css/style.css. Default theme uses CSS variables (teal, gold, dark overlays). High‑contrast mode is independent.
+---
 
-Answers & clues – Change data/config.json without touching code.
+## 🎨 Customisation
 
-Hints – hintTimer (seconds) and hintText in config.json control timed hints.
+- **Puzzle content** – Edit `js/puzzles.js`. Each puzzle receives a container and an `onSolve(answerString)` callback.
+- **Styling** – Modify `css/style.css`. The theme uses CSS variables (teal, gold, dark overlays). High‑contrast mode is separate.
+- **Answers & clues** – Change `data/config.json` without touching any JavaScript.
+- **Hints** – Set `hintTimer` (in seconds) and `hintText` in `config.json` to control timed hints.
 
-🔧 Troubleshooting
-Problem	Likely fix
-Grid doesn’t appear	Use a local web server (not file://).
-Lockbox won’t unlock	Verify the five answers in config.json produce 78227 in column 3 (e.g., 247, 158, 1423, 2024, 6471).
-Reporting fails	Check the Apps Script URL is correct and has write access. For self-hosted servers, check the console logs.
-High‑contrast mode missing some elements	Hard refresh (Ctrl+Shift+R); ensure CSS selectors are up to date.
-Puzzle 1 images 404	Name your images 1.jpg … 9.jpg and place them in images/puzzle1/.
-Puzzle 4 numbers don’t glow / no claim button	Hard refresh – numbers now glow teal with a black outline when the torch passes over them.
-🙏 Credits
-Original game design: Mark Burgess, Academic Liaison Librarian, MMU
+---
 
-Digital development: David Haigh, Library Services and Discovery Adviser, MMU
+## 🔧 Troubleshooting
 
-Open source – feel free to fork and adapt.
+| Problem | Likely fix |
+|---------|-------------|
+| **Grid doesn’t appear** | You are opening the file directly. Use a local web server (`python -m http.server`). |
+| **Lockbox won’t unlock** | Check that the 3rd digits of the 5 answers in `config.json` correctly make `78227`. |
+| **Reporting fails / no data arrives** | Check your Apps Script URL is correct in `admin-config.html`. Ensure the script is deployed as a **Web app** with access set to **Anyone**. |
+| **High‑contrast mode missing some elements** | Hard refresh (`Ctrl+Shift+R`) to force CSS to reload. |
+| **Puzzle 1 images 404** | Name your images `1.jpg` … `9.jpg` and place them in `images/puzzle1/`. |
+| **Puzzle 4 numbers don’t glow** | Hard refresh the page. Numbers glow teal with a black outline when the torch passes over them. |
+| **The admin dashboard is empty** | Run a test game on the localhost version first to populate `localStorage`. The dashboard reads the local backup. |
 
-Enjoy the hunt for the absent professor’s grades! 🎓🔓
+---
+
+## 🙏 Credits
+
+- **Original escape-room game design:** Mark Burgess,
+- **Digital development:** David Haigh,
+
+
