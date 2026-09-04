@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard - Escape Room Results</title>
+    <!-- Added a fallback CDN link just in case the first one is blocked -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0a1f1a; color: #fcf3d4; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: rgba(22,36,32,0.9); padding: 2rem; border-radius: 20px; border: 1px solid #b8a35c; }
+        h1 { border-bottom: 2px solid #b8a35c; padding-bottom: 10px; }
+        
+        /* Uniform styling for inputs and button */
+        input, button {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 30px;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        button { background: #3c6e47; color: white; cursor: pointer; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #b8a35c; padding: 10px; text-align: left; }
+        th { background: #2c3e35; }
+        
+        #loginSection { max-width: 400px; margin: 0 auto; }
+        #dataSection { display: none; }
+        .error { color: #ff6b6b; margin-top: 10px; }
+        .winner-row { background: rgba(212,175,55,0.1); font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginSection">
+            <h1>🔐 Staff Login</h1>
+            <p>Enter the shared facilitator credentials to view results.</p>
+            <!-- Added type="button" to prevent any weird form submission behavior -->
+            <input type="email" id="emailInput" placeholder="Staff Email" autocomplete="username">
+            <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+            <button type="button" id="loginBtn">Log In</button>
+            <div id="loginMessage" class="error"></div>
+        </div>
+
+        <div id="dataSection">
+            <h1>🏆 Live Results</h1>
+            <button type="button" id="logoutBtn" style="background:#8b3a3a; width:auto; margin:0 0 10px 0;">Log Out</button>
+            <button type="button" id="refreshBtn" style="width:auto;">Refresh</button>
+            <div id="filterBox">
+                <input type="text" id="sessionFilter" placeholder="Filter by Session ID" onkeyup="fetchData()">
+            </div>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Team</th>
+                        <th>Session</th>
+                        <th>Code</th>
+                        <th>Duration</th>
+                        <th>Reported</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 1. Confirm the script is actually loading
+        console.log("Admin Dashboard Script Loaded");
+
+        const SUPABASE_URL = 'https://gvzujgnaozmevlbfhwfq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2enVqZ25hb3ptZXZsYmZod2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NTc1MzksImV4cCI6MjEwNDAzMzUzOX0.EQfgDbZ60jUUzCwguBw5VBpLFKUZvcBe18ezCLEnthE';
+        
+        // 2. Check if the Supabase library loaded
+        if (typeof createClient !== 'function') {
+            console.error("CRITICAL: Supabase library failed to load. Check your internet connection or ad-blocker.");
+            document.getElementById('loginMessage').textContent = "Error: Supabase library failed to load. Please disable your ad-blocker or try an incognito window.";
+        } else {
+            // 3. Initialize the client
+            const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            async function login() {
+                const email = document.getElementById('emailInput').value;
+                const password = document.getElementById('passwordInput').value;
+                
+                document.getElementById('loginMessage').textContent = '';
+
+                const { error } = await sb.auth.signInWithPassword({ email, password });
+                
+                if (error) {
+                    console.error("Login Error:", error);
+                    if (error.message.includes("Invalid login credentials")) {
+                        document.getElementById('loginMessage').textContent = 'Incorrect email or password.';
+                    } else {
+                        document.getElementById('loginMessage').textContent = 'Login failed: ' + error.message;
+                    }
+                } else {
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('dataSection').style.display = 'block';
+                    fetchData();
+                }
+            }
+
+            async function logout() {
+                await sb.auth.signOut();
+                location.reload();
+            }
+
+            async function fetchData() {
+                const sessionFilter = document.getElementById('sessionFilter').value;
+                let query = sb.from('winners').select('*').order('id', { ascending: true });
+                
+                if (sessionFilter) {
+                    query = query.eq('session_id', sessionFilter);
+                }
+
+                const { data, error } = await query;
+                if (error) {
+                    console.error("Fetch Error:", error);
+                    document.getElementById('loginMessage').textContent = 'Failed to load data: ' + error.message;
+                    return;
+                }
+
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6">No winners recorded yet.</td></tr>';
+                    return;
+                }
+
+                data.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    if (index === 0) tr.className = 'winner-row';
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${row.team_name}</td>
+                        <td>${row.session_id}</td>
+                        <td>${row.full_code}</td>
+                        <td>${row.duration}</td>
+                        <td>${new Date(row.reported_at).toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // 4. Use addEventListener instead of inline onclick
+            document.getElementById('loginBtn').addEventListener('click', login);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('refreshBtn').addEventListener('click', fetchData);
+        }
+    </script>
+</body>
+</html>
