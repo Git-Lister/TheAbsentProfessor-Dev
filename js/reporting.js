@@ -8,7 +8,7 @@ function generateSessionId() {
     return id;
 }
 
-// --- LOCAL BACKUP: Store data on the facilitator's device ---
+// --- LOCAL BACKUP ---
 function logSuccessLocally(teamName, code, timeString) {
     const log = JSON.parse(localStorage.getItem('winners_log') || '[]');
     const newEntry = {
@@ -29,7 +29,7 @@ function reportWrongAttempt(puzzleId, wrongInput, context) {
     console.warn(`⚠️ Wrong attempt on Puzzle ${puzzleId}: "${wrongInput}" (${context})`);
 }
 
-// --- MAIN REPORTING TO SUPABASE ---
+// --- SUPABASE & GOOGLE CONFIG ---
 const SUPABASE_URL = 'https://gvzujgnaozmevlbfhwfq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2enVqZ25hb3ptZXZsYmZod2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NTc1MzksImV4cCI6MjEwNDAzMzUzOX0.EQfgDbZ60jUUzCwguBw5VBpLFKUZvcBe18ezCLEnthE';
 
@@ -37,7 +37,7 @@ function reportSuccess(teamName, code, timeString) {
     // 1. Always save locally first
     logSuccessLocally(teamName, code, timeString);
 
-    // 2. Build the payload from loaded state
+    // 2. Build the payload
     const state = loadState();
     const payload = {
         session_id: state.sessionId || 'N/A',
@@ -47,7 +47,7 @@ function reportSuccess(teamName, code, timeString) {
         duration: timeString
     };
 
-    // 3. POST directly to Supabase
+    // 3. Send to Supabase (Primary)
     fetch(`${SUPABASE_URL}/rest/v1/winners`, {
         method: 'POST',
         headers: {
@@ -62,5 +62,16 @@ function reportSuccess(teamName, code, timeString) {
         if (response.ok) console.log('✅ Successfully reported to Supabase');
         else console.error('Supabase error:', response.status, response.statusText);
     })
-    .catch(err => console.warn('⚠️ Network error reporting to Supabase (data saved locally)', err));
+    .catch(err => console.warn('⚠️ Supabase network error (data saved locally)', err));
+
+    // 4. Send to Google Sheets (Backup - if URL is set)
+    const googleUrl = localStorage.getItem('customGoogleScriptUrl') || (typeof appConfig !== 'undefined' ? appConfig.googleScriptUrl : null);
+    if (googleUrl) {
+        fetch(googleUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ team: teamName, code: code, time: timeString, timestamp: new Date().toISOString() })
+        }).catch(() => console.warn('⚠️ Google backup failed (data safe in Supabase/Local)'));
+    }
 }

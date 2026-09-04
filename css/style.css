@@ -13,8 +13,8 @@
     --button-primary: #3c6e47;
     --input-bg: #2c3e35;
     --col3-highlight-bg: #2d5a3a;
-    --lockbox-outer-bg: url('../images/lockbox-outer.jpg'); /* replace with your texture */
-    --lockbox-inner-bg: url('../images/lockbox-inner.jpg'); /* optional */
+    --lockbox-outer-bg: url('../images/lockbox-outer.jpg');
+    --lockbox-inner-bg: url('../images/lockbox-inner.jpg');
 }
 
 /* ---------- RESET & BASE ---------- */
@@ -25,22 +25,18 @@
 
 body {
     font-family: 'Segoe UI', 'Courier New', monospace;
-    background: #0a1f1a;                      /* dark teal fallback */
+    background: #0a1f1a;
     color: var(--text-primary);
     margin: 0;
     padding: 20px;
     min-height: 100vh;
-    position: relative;                       /* needed for pseudo‑elements */
+    position: relative;
 }
 
-/* Jungle image layer */
 body::before {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background-image: var(--jungle-bg);
     background-size: cover;
     background-position: center;
@@ -48,14 +44,10 @@ body::before {
     z-index: -2;
 }
 
-/* Dark teal readability overlay */
 body::after {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: var(--bg-overlay);
     z-index: -1;
 }
@@ -73,7 +65,7 @@ header {
 
 h1 {
     font-size: 2rem;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.6);  /* neutral dark shadow */
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.6);
 }
 
 .team-info {
@@ -89,7 +81,7 @@ h1 {
 }
 
 .reset-btn {
-    background: #8b3a3a;                     /* kept as a deliberate alert colour */
+    background: #8b3a3a;
     color: white;
     border: none;
     padding: 5px 12px;
@@ -97,14 +89,11 @@ h1 {
     cursor: pointer;
 }
 
-/* ---------- TEAM ENTRY SCREEN (merged & cleaned) ---------- */
+/* ---------- TEAM ENTRY SCREEN ---------- */
 .team-entry-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: transparent;                /* global background shows through */
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: transparent;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -112,12 +101,9 @@ h1 {
     overflow: hidden;
 }
 
-/* University header – fixed at top, outside the card */
 .uni-header {
     position: absolute;
-    top: 20px;
-    left: 0;
-    right: 0;
+    top: 20px; left: 0; right: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -141,7 +127,6 @@ h1 {
     object-fit: contain;
 }
 
-/* Content card – no internal logo */
 .team-entry-card {
     position: relative;
     z-index: 2;
@@ -200,10 +185,7 @@ h1 {
 /* ---------- STORY MODAL ---------- */
 .story-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.85);
     backdrop-filter: blur(5px);
     display: flex;
@@ -288,17 +270,10 @@ h1 {
     transform: scale(1.02);
 }
 
-/* ---------- PUZZLE CARDS ---------- */
-.puzzle1-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
+/* ---------- PUZZLE CARDS (BASE) ---------- */
 .puzzle-card {
-    background: var(--card-bg);
+    background: rgba(22, 36, 32, 0.6);
+    backdrop-filter: blur(2px);
     border-radius: 20px;
     padding: 20px;
     cursor: pointer;
@@ -311,13 +286,6 @@ h1 {
 .puzzle-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-}
-
-.puzzle-card {
-    background: rgba(22, 36, 32, 0.6);
-    backdrop-filter: blur(2px);
-}
-.puzzle-card:hover {
     background: rgba(22, 36, 32, 0.95);
 }
 
@@ -330,7 +298,7 @@ h1 {
     font-size: 2rem;
     font-weight: bold;
     margin: 10px 0;
-    color: #6ef0b0;                                /* bright teal accent – kept for pop */
+    color: #6ef0b0;
 }
 
 .puzzle-card .status {
@@ -338,536 +306,70 @@ h1 {
     color: var(--text-secondary);
 }
 
-/* ---------- LOCKBOX & GRID ---------- */
-.lockbox-section {
-    background: var(--card-bg);  /* fallback colour */
-    background-image: var(--lockbox-outer-bg, none);
-    background-size: cover;
-    background-position: center;
-    background-blend-mode: overlay;
-    border-radius: 40px;
-    padding: 20px;
-    text-align: center;
-    border: 1px solid var(--card-border);
-    position: relative;
-    overflow: hidden;
-}
-
-.lootbox-container {
-    background: radial-gradient(circle at 30% 20%, var(--card-bg), #1a2a22);
-    background-image: var(--lockbox-inner-bg, none);
-    background-blend-mode: overlay;
-    background-size: cover;
-    background-position: center;
-    border-radius: 30px;
-    padding: 20px;
-    max-width: 400px;
-    margin: 0 auto;
-    transition: all 0.3s;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,0,0,0.3);
-    border: 2px solid var(--card-border);
-}
-.lootbox-container.unlocked {
-    background: var(--button-primary);
-    border-color: var(--accent-gold);
-    box-shadow: 0 0 20px var(--accent-gold);
-}
-
-.col3-highlight {
-    background-color: var(--col3-highlight-bg) !important;
-    border: 2px solid var(--accent-gold) !important;
-    box-shadow: 0 0 5px var(--accent-gold) !important;
-}
-
-.puzzle-grid {
-    width: 100%;
-    background: var(--card-bg);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.puzzle-grid th, .puzzle-grid td {
-    border: 1px solid var(--card-border);
-    padding: 8px;
-    text-align: center;
-}
-
-.puzzle-grid th {
-    background: var(--card-bg);
-    color: var(--text-primary);
-    font-weight: bold;
-}
-
-.message {
-    background: rgba(0,0,0,0.66);
-    border-radius: 30px;
-    padding: 10px;
-    font-size: 0.9rem;
-}
-
-.message.success {
-    background: var(--accent-green);
-    color: white;
-}
-
-/* Ensure the inner container stays above the pattern */
-.lockbox-section .lootbox-container {
-    position: relative;
-    z-index: 1;
-}
-
-/* High-contrast mode: remove the decorative pattern */
-body.high-contrast .lockbox-section::before {
-    background-image: none !important;
-}
-
-/* -------------------- Lockbox Inner "Pad" Styling -------------------- */
-/* Recessed inset shadow for the whole lockbox container */
-.lootbox-container {
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,0,0,0.3);
-    background: radial-gradient(circle at 30% 20%, var(--card-bg), #1a2a22);
-}
-
-/* Puzzle grid – make it look like a digital keypad */
-.puzzle-grid {
-    background: #0a1a15;
-    border: 1px solid var(--accent-gold);
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
-    border-radius: 12px;
-    overflow: hidden;
-}
-.puzzle-grid th, .puzzle-grid td {
-    background: rgba(0,0,0,0.4);
-    border-color: var(--accent-gold);
-    color: var(--text-primary);
-    font-weight: bold;
-}
-.puzzle-grid th {
-    background: #1e3a2a;
-}
-
-/* Safe dials – metallic / vault style */
-.dials-container {
-    background: rgba(0,0,0,0.3);
-    border-radius: 40px;
-    padding: 15px 10px;
-    margin: 10px 0 !important;
-}
-.dial {
-    background: #2c2a24;
-    border-radius: 20px;
-    padding: 5px;
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.6), 0 2px 4px rgba(255,255,200,0.2);
-}
-.dial-value {
-    background: #000000aa;
-    border-radius: 15px;
-    font-family: monospace;
-    letter-spacing: 2px;
-}
-.dial-up, .dial-down {
-    background: #4a3b2c;
-    color: var(--accent-gold);
-    border: 1px solid var(--accent-gold);
-    transition: 0.05s linear;
-}
-.dial-up:active, .dial-down:active {
-    transform: scale(0.95);
-}
-
-/* Check combination button – metallic finish */
-#checkCombinationBtn {
-    background: linear-gradient(145deg, #5a6b5a, #2a3a2a);
-    border: 1px solid var(--accent-gold);
-    box-shadow: 0 3px 0 #1a2a1a;
-    transition: 0.05s linear;
-}
-#checkCombinationBtn:active {
-    transform: translateY(2px);
-    box-shadow: 0 1px 0 #1a2a1a;
-}
-/* ---------- MODALS ---------- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    position: relative;
-    padding: 25px 20px 20px;
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--card-bg);
-    border-radius: 20px;
-    border: 1px solid var(--card-border);
-    color: var(--text-primary);
-}
-
-.close-modal {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    border-radius: 50%;
-}
-
-.close-modal:hover {
-    background: rgba(0,0,0,0.8);
-}
-
-/* Puzzle 2 container inside modal */
-.puzzle2-container {
-    max-height: 65vh;
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-/* Email header – keep high contrast for readability */
-.puzzle3-email-header {
-    background: #e8e8e8 !important;
-    color: #111 !important;
-}
-
-.puzzle3-email-header span {
-    color: #004c6e !important;
-}
-
-/* ---------- RESPONSIVE (MOBILE FIXES & CLEANUP) ---------- */
-@media (max-width: 600px) {
-    .puzzles-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .uni-header {
-        top: 10px;
-        padding: 0 15px;
-    }
-    .uni-logo {
-        height: 40px;
-        max-width: 40px;
-        padding: 2px;
-    }
-    .team-entry-card {
-        margin-top: 70px;
-    }
-
-    .dials-container {
-        gap: 12px !important;
-    }
-
-    .dial {
-        min-width: 60px;
-    }
-
-    .dial button {
-        padding: 3px 8px !important;
-        font-size: 0.9rem;
-    }
-
-    .dial-value {
-        font-size: 1.5rem !important;
-        padding: 0 10px !important;
-    }
-
-    .puzzle-grid th, .puzzle-grid td {
-        padding: 6px 4px;
-        font-size: 0.85rem;
-    }
-
-    .puzzle-grid th {
-        font-size: 0.75rem;
-    }
-
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    .team-info {
-        flex-direction: column;
-        gap: 10px;
-        padding: 8px 12px;
-    }
-
-    .reset-btn {
-        padding: 4px 10px;
-        font-size: 0.9rem;
-    }
-
-    .puzzle1-grid {
-        gap: 10px;
-    }
-    
-    /* --- Mobile Lockbox Dials Fix --- */
-    .dials-container {
-        gap: 6px !important;
-        flex-wrap: nowrap !important;
-        justify-content: center;
-        padding: 10px 5px !important;
-    }
-    .dial {
-        min-width: 40px !important;
-        padding: 3px !important;
-    }
-    .dial-value {
-        font-size: 1.2rem !important;
-        padding: 0 6px !important;
-    }
-    .dial-up, .dial-down {
-        padding: 2px 6px !important;
-        font-size: 0.7rem !important;
-        min-width: 24px !important;
-    }
-    #checkCombinationBtn {
-        padding: 8px 16px !important;
-        font-size: 0.9rem !important;
-    }
-}
-
-/* ============================================================
-   CANVAS RESPONSIVENESS (PUZZLE 4)
-   ============================================================ */
+/* ---------- PUZZLE 1: OPEN ALL HOURS (Torch) ---------- */
 #puzzle4Canvas {
     max-width: 100%;
     height: auto;
-    touch-action: none; /* Prevents scrolling while dragging torch */
+    touch-action: none;
     display: block;
     margin: 0 auto;
 }
 
-/* High-contrast mode override for the new rail */
-body.high-contrast .found-rail {
-    background: #ffffff !important;
-    border: 2px solid #1e2a3a !important;
-}
-body.high-contrast .caught-number {
-    color: #1e2a3a !important;
-    border-color: #1e2a3a !important;
-    background: #e9ecef !important;
+.puzzle4-canvas {
+    position: relative;
+    cursor: none;
+    background: #1a1f2c;
+    border-radius: 16px;
+    overflow: hidden;
 }
 
-/* ---------- ACCESSIBILITY BUTTON ---------- */
-.accessibility-btn {
-    background: #6a5acd;
-    color: white;
-    border: none;
-    padding: 5px 12px;
+.torch-cursor {
+    position: fixed;
+    pointer-events: none;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,200,0.6) 0%, rgba(255,255,200,0) 70%);
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    mix-blend-mode: screen;
+}
+
+.found-rail {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px;
+    margin: 12px auto 0;
+    min-height: 50px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 30px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    margin: 0 10px;
-    transition: 0.2s;
+    max-width: 300px;
+    transition: all 0.3s;
 }
 
-.accessibility-btn:hover {
-    background: #7b68ee;
+.caught-number {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--accent-gold);
+    text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0 10px;
+    border-radius: 12px;
+    border: 2px solid #00C1D3;
+    box-shadow: 0 0 8px rgba(0, 193, 211, 0.3);
+    animation: popIn 0.2s ease-out;
 }
 
-/* ---------- ENTER OFFICE ANIMATION ---------- */
-@keyframes fadeInOffice {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
 }
 
-#mainGameUI {
-    animation: fadeInOffice 0.8s ease-in;
-}
-
-/* ---------- HIGH CONTRAST MODE ---------- */
-body.high-contrast {
-    background: #f8f9fa !important;
-    color: #1e2a3a !important;
-}
-
-/* Headings on the jungle background keep their original colour (white/gold) */
-body.high-contrast .game-container h1,
-body.high-contrast .lockbox-section h2 {
-    color: white !important;
-    text-shadow: none !important;
-}
-
-body.high-contrast .lockbox-section,
-body.high-contrast .lootbox-container {
-    background-image: none !important;
-    background: #ffffff !important;
-}
-
-/* All other text elements become dark */
-body.high-contrast h3,
-body.high-contrast p,
-body.high-contrast span,
-body.high-contrast div,
-body.high-contrast label,
-body.high-contrast .story-content,
-body.high-contrast .story-card p,
-body.high-contrast .story-card h2,
-body.high-contrast .team-info,
-body.high-contrast #displayTeamName,
-body.high-contrast .team-info span,
-body.high-contrast .team-info div,
-body.high-contrast .puzzle1-status,
-body.high-contrast .puzzle2-status,
-body.high-contrast .puzzle4-status,
-body.high-contrast .puzzle2-slots-container,
-body.high-contrast .puzzle2-slots-container h3 {
-    color: #1e2a3a !important;
-    text-shadow: none !important;
-    background-color: transparent !important;
-}
-
-body.high-contrast .puzzle-card,
-body.high-contrast .modal-content,
-body.high-contrast .story-card,
-body.high-contrast .team-entry-card,
-body.high-contrast .team-info,
-body.high-contrast .lootbox-container,
-body.high-contrast .lockbox-container,
-body.high-contrast .safe-dials,
-body.high-contrast .puzzle2-slots-container,
-body.high-contrast .puzzle4-collected {
-    background: #ffffff !important;
-    border: 2px solid #1e2a3a !important;
-    box-shadow: none !important;
-}
-
-body.high-contrast .puzzle-grid,
-body.high-contrast .puzzle-grid th,
-body.high-contrast .puzzle-grid td,
-body.high-contrast .grid-cell {
-    border: 1px solid #1e2a3a !important;
-    background: #ffffff !important;
-    color: #1e2a3a !important;
-}
-
-body.high-contrast .dial-value {
-    background: #ffffff !important;
-    border: 1px solid #1e2a3a !important;
-    color: #1e2a3a !important;
-}
-
-body.high-contrast .dial-up,
-body.high-contrast .dial-down,
-body.high-contrast button,
-body.high-contrast #checkCombinationBtn,
-body.high-contrast .reset-btn,
-body.high-contrast .team-entry-card input,
-body.high-contrast .team-entry-card button {
-    background: #e9ecef !important;
-    border: 2px solid #1e2a3a !important;
-    color: #1e2a3a !important;
-}
-
-body.high-contrast button:hover {
-    background: #ced4da !important;
-}
-
-body.high-contrast .message {
-    background: #e9ecef !important;
-    border: 1px solid #1e2a3a !important;
-    color: #1e2a3a !important;
-}
-
-body.high-contrast .message.success {
-    background: #d4edda !important;
-    color: #155724 !important;
-    border-color: #155724 !important;
-}
-
-/* Puzzle 2 poem background */
-body.high-contrast .puzzle2-poem {
-    background: #ffffff !important;
-    border: 2px solid #1e2a3a !important;
-    color: #1e2a3a !important;
-}
-
-body.high-contrast .puzzle2-poem .highlight {
-    background: #e9ecef !important;
-    border: 1px solid #1e2a3a !important;
-    box-shadow: none !important;
-    color: #1e2a3a !important;
-}
-
-body.high-contrast .modal-overlay {
-    background: rgba(0, 0, 0, 0.85) !important;
-    backdrop-filter: blur(4px) !important;
-}
-
-body.high-contrast .help-card,
-body.high-contrast .help-portrait {
-    background: #ffffff !important;
-    border: 2px solid #1e2a3a !important;
-}
-body.high-contrast .help-card,
-body.high-contrast .help-title p,
-body.high-contrast .tip-box {
-    color: #1e2a3a !important;
-}
-body.high-contrast .close-help {
-    color: #1e2a3a !important;
-}
-body.high-contrast .tip-box {
-    background: #e9ecef !important;
-}
-
-body.high-contrast .puzzle-grid,
-body.high-contrast .dials-container,
-body.high-contrast .dial,
-body.high-contrast .dial-value,
-body.high-contrast .dial-up,
-body.high-contrast .dial-down,
-body.high-contrast #checkCombinationBtn {
-    background: #ffffff !important;
-    box-shadow: none !important;
-    border-color: #1e2a3a !important;
-    color: #1e2a3a !important;
-}
-
-/* --- Lockbox & Case Solved High Contrast Fix --- */
-body.high-contrast .lockbox-section h2,
-body.high-contrast .lockbox-section h4,
-body.high-contrast .lockbox-section p,
-body.high-contrast .lockbox-section .message,
-body.high-contrast .lockbox-section .column-hint,
-body.high-contrast .lockbox-section .dial-value,
-body.high-contrast .lockbox-section .grid-cell,
-body.high-contrast .lockbox-section .puzzle-grid th,
-body.high-contrast .lockbox-section .puzzle-grid td {
-    color: #1e2a3a !important;
-}
-
-/* --- Unlocked / Case Solved Screen --- */
-body.high-contrast .unlocked-celebration {
-    background: #ffffff !important;
-    border: 2px solid #1e2a3a !important;
-}
-body.high-contrast .unlocked-celebration h3,
-body.high-contrast .unlocked-celebration p,
-body.high-contrast .unlocked-celebration div {
-    color: #1e2a3a !important;
-}
-body.high-contrast .unlocked-celebration .message.success {
-    background: #d4edda !important;
-    color: #155724 !important;
-    border: 2px solid #155724 !important;
-}
-
-/* ---------- PUZZLE 1 SPECIFIC ---------- */
+/* ---------- PUZZLE 2: CHECK IT, RETURN IT, LAPTOP LOCKER IT! (Image Grid) ---------- */
 .puzzle1-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -878,7 +380,7 @@ body.high-contrast .unlocked-celebration .message.success {
 
 .puzzle1-cell {
     aspect-ratio: 1 / 1;
-    background: #f5f0e0;          /* kept light for the image grid */
+    background: #f5f0e0;
     border-radius: 12px;
     cursor: pointer;
     position: relative;
@@ -900,8 +402,12 @@ body.high-contrast .unlocked-celebration .message.success {
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
+.puzzle1-cell.selected {
+    box-shadow: 0 0 0 3px #ffb347, 0 0 0 6px #ffb34788 !important;
+}
+
 .puzzle1-cell.correct {
-    box-shadow: 0 0 0 3px #4caf50, 0 0 0 6px #81c784;
+    box-shadow: 0 0 0 3px #4caf50, 0 0 0 6px #81c784 !important;
 }
 
 .puzzle1-cell.wrong-flash {
@@ -933,10 +439,17 @@ body.high-contrast .unlocked-celebration .message.success {
     color: var(--text-primary);
 }
 
-/* ---------- PUZZLE 2 SPECIFIC ---------- */
+/* ---------- PUZZLE 3: LIBRARY LAYERS (Poem & Floors) ---------- */
+.puzzle2-container {
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
 .puzzle2-poem .highlight {
     display: inline-block;
-    cursor: grab;
+    font-weight: bold;
+    cursor: pointer;
     user-select: none;
 }
 
@@ -944,583 +457,6 @@ body.high-contrast .unlocked-celebration .message.success {
     cursor: grabbing;
 }
 
-.puzzle2-zone {
-    transition: background-color 0.2s;
-}
-
-.puzzle2-zone.drag-over {
-    background-color: var(--col3-highlight-bg);
-    border-color: var(--text-primary);
-}
-
-/* ---------- PUZZLE  – UV TORCH & CATCH ---------- */
-.puzzle4-canvas {
-    position: relative;
-    cursor: none;
-    background: #1a1f2c;
-    border-radius: 16px;
-    overflow: hidden;
-}
-
-.puzzle4-canvas canvas {
-    display: block;
-    width: 100%;
-    height: auto;
-    background: #1a1f2c;
-}
-
-.torch-cursor {
-    position: fixed;
-    pointer-events: none;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,200,0.6) 0%, rgba(255,255,200,0) 70%);
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    mix-blend-mode: screen;
-}
-
-@media (max-width: 600px) {
-    .torch-cursor {
-        width: 100px;
-        height: 100px;
-    }
-}
-
-.puzzle4-catch-container {
-    position: relative;
-    display: inline-block;
-}
-
-.puzzle4-collected {
-    margin-top: 15px;
-    font-size: 1.5rem;
-    letter-spacing: 8px;
-    background: var(--card-bg);
-    display: inline-block;
-    padding: 5px 15px;
-    border-radius: 40px;
-    border: 1px solid var(--card-border);
-    color: var(--text-primary);
-}
-
-/* Global accessibility toggle – always visible */
-.global-a11y {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    z-index: 9999;
-    background: #6a5acd;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-.global-a11y:hover {
-    background: #7b68ee;
-}
-
-/* --- Puzzle 4 Mobile Overrides --- */
-@media (max-width: 600px) {
-    #puzzle4Canvas {
-        max-width: 95vw;
-        height: auto;
-    }
-    .found-rail {
-        gap: 8px;
-        padding: 6px;
-        margin-top: 8px;
-        min-height: 40px;
-    }
-    .caught-number {
-        font-size: 1.8rem;
-        padding: 0 6px;
-    }
-    #caughtDisplay {
-        font-size: 1.2rem;
-    }
-}
-
-/* Help button – top left, opposite accessibility */
-.global-help {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 9999;
-    background: #6a5acd;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-.global-help:hover {
-    background: #7b68ee;
-}
-
-/* Help modal overlay */
-.help-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-}
-.help-card {
-    background: var(--card-bg);
-    border-radius: 30px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
-    padding: 25px;
-    border: 2px solid var(--card-border);
-    position: relative;
-    color: var(--text-primary);
-}
-.close-help {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    font-weight: bold;
-}
-.help-header {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    margin-bottom: 20px;
-}
-.help-portrait {
-    width: 60px;
-    height: 100px;
-    background-image: url('../images/professor-portrait.jpg');
-    background-size: cover;
-    background-position: top center;
-    border-radius: 12px;
-    border: 2px solid var(--card-border);
-}
-.help-title h2 {
-    margin: 0;
-    font-size: 1.4rem;
-}
-.help-title p {
-    margin: 5px 0 0;
-    font-style: italic;
-}
-.help-content {
-    line-height: 1.5;
-}
-.puzzle-list {
-    margin: 15px 0;
-    padding-left: 20px;
-}
-.puzzle-list li {
-    margin: 8px 0;
-}
-.tip-box {
-    background: rgba(0,0,0,0.4);
-    padding: 10px;
-    border-radius: 20px;
-    margin-top: 15px;
-    text-align: center;
-}
-
-/* Global action buttons – help & accessibility */
-.global-help,
-.global-a11y {
-    position: fixed;
-    top: 15px;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.5);   /* semi‑transparent dark background */
-    backdrop-filter: blur(4px);        /* soft blur to blend with background */
-    border: 1px solid rgba(255, 255, 200, 0.4);
-    border-radius: 30px;
-    padding: 5px 12px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: white;
-    box-shadow: none;
-}
-
-.global-help:hover,
-.global-a11y:hover {
-    background: rgba(0, 0, 0, 0.8);
-    border-color: rgba(255, 255, 200, 0.8);
-}
-
-.global-help {
-    left: 15px;
-}
-
-.global-a11y {
-    right: 15px;
-}
-
-/* On mobile, move buttons further from top to avoid overlapping the main title */
-@media (max-width: 600px) {
-    .global-help,
-    .global-a11y {
-        top: 70px;          /* push below the MMU logo / title area */
-        padding: 3px 10px;
-        font-size: 1rem;
-    }
-    .global-help {
-        left: 10px;
-    }
-    .global-a11y {
-        right: 10px;
-    }
-}
-
-/* High‑contrast mode override – make buttons solid white with black text */
-body.high-contrast .global-help,
-body.high-contrast .global-a11y {
-    background: #ffffff !important;
-    border: 2px solid #1e2a3a !important;
-    color: #1e2a3a !important;
-    backdrop-filter: none !important;
-}
-
-/* ============================================================
-   NEW: PUZZLE 4 - FOUND NUMBERS RAIL
-   ============================================================ */
-.found-rail {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    padding: 10px;
-    margin: 12px auto 0;
-    min-height: 50px;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 30px;
-    max-width: 300px;
-    transition: all 0.3s;
-}
-
-.caught-number {
-    font-size: 2.2rem;
-    font-weight: bold;
-    color: var(--accent-gold);
-    text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
-    background: rgba(0, 0, 0, 0.4);
-    padding: 0 10px;
-    border-radius: 12px;
-    border: 2px solid #00C1D3; /* Changed to the glowing blue for better visibility */
-    box-shadow: 0 0 8px rgba(0, 193, 211, 0.3); /* Optional: Added a subtle glow to match the theme */
-    animation: popIn 0.2s ease-out;
-}
-
-@keyframes popIn {
-    0% { transform: scale(0.5); opacity: 0; }
-    80% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-/* ============================================================
-   LOCKBOX IMAGE DEBUG & FORCE SHOW
-   ============================================================ */
-
-/* 1. Outer Box - ensure image shows */
-.lockbox-section {
-    background-image: var(--lockbox-outer-bg, none) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-color: var(--card-bg) !important; /* fallback */
-}
-
-/* 2. Inner Pad - ensure image shows and content is transparent */
-.lootbox-container, #lockboxContainer {
-    background-image: var(--lockbox-inner-bg, none) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-blend-mode: overlay !important;
-    background-color: transparent !important; /* so outer texture is visible */
-}
-
-/* 3. Make the inner HTML elements transparent so the pad shows through */
-.lockbox-grid-section, .safe-dials, #lockboxContainer > * {
-    background: transparent !important;
-    backdrop-filter: blur(2px); /* keeps text readable over image */
-}
-
-/* --- Force high‑contrast on lockbox inner container and text --- */
-body.high-contrast #lockboxContainer,
-body.high-contrast .lootbox-container {
-    background: #ffffff !important;
-    background-image: none !important;
-    border: 2px solid #1e2a3a !important;
-}
-
-/* --- Force all text inside lockbox to be dark --- */
-body.high-contrast #lockboxContainer h2,
-body.high-contrast #lockboxContainer h4,
-body.high-contrast #lockboxContainer p,
-body.high-contrast #lockboxContainer .message,
-body.high-contrast #lockboxContainer .column-hint,
-body.high-contrast #lockboxContainer .dial-value,
-body.high-contrast #lockboxContainer .grid-cell,
-body.high-contrast #lockboxContainer .puzzle-grid th,
-body.high-contrast #lockboxContainer .puzzle-grid td {
-    color: #1e2a3a !important;
-}
-
-/* --- Force high‑contrast on the unlocked / congrats screen too --- */
-body.high-contrast #lockboxContainer .unlocked-celebration {
-    background: #ffffff !important;
-    border: 2px solid #1e2a3a !important;
-}
-body.high-contrast #lockboxContainer .unlocked-celebration h3,
-body.high-contrast #lockboxContainer .unlocked-celebration p,
-body.high-contrast #lockboxContainer .unlocked-celebration div {
-    color: #1e2a3a !important;
-}
-body.high-contrast #lockboxContainer .unlocked-celebration .message.success {
-    background: #d4edda !important;
-    color: #155724 !important;
-    border: 2px solid #155724 !important;
-}
-
-/* --- Force fixed toggles to stay in place --- */
-.global-help, .global-a11y {
-    position: fixed !important;
-    z-index: 99999 !important;   /* Far above everything else */
-    top: 15px !important;
-    transform: translateZ(0);     /* forces GPU layer, stops scrolling drift */
-}
-.global-help {
-    left: 15px !important;
-    right: auto !important;
-}
-.global-a11y {
-    right: 15px !important;
-    left: auto !important;
-}
-
-/* --- FIX: Align close buttons centrally and keep them out of the scrollable area --- */
-
-/* For Help Modal */
-.help-card {
-    /* We add extra top padding so the X doesn't fight with the scrollbar */
-    padding-top: 60px !important; 
-    position: relative;
-}
-
-.close-help {
-    /* Force the X to be outside the scrollable content */
-    position: absolute !important;
-    top: 15px !important;
-    right: 15px !important;
-    /* Centering the X inside the circle */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 44px !important;
-    height: 44px !important;
-    line-height: 1 !important;
-    font-size: 1.8rem !important; 
-    border-radius: 50% !important;
-    z-index: 10001 !important; 
-    background: rgba(0, 0, 0, 0.6) !important;
-    border: 1px solid var(--card-border) !important;
-    color: var(--text-primary) !important;
-}
-
-/* For generic modals (Puzzle overlays, etc.) */
-.modal-content {
-    padding-top: 60px !important; /* Space for the X */
-}
-
-.close-modal {
-    /* Force the X to the top-right */
-    position: absolute !important;
-    top: 10px !important;
-    right: 10px !important;
-    /* Centering the X inside the circle */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 44px !important;
-    height: 44px !important;
-    line-height: 1 !important;
-    font-size: 1.8rem !important;
-    border-radius: 50% !important;
-    z-index: 10 !important;
-    background: rgba(0,0,0,0.5) !important;
-    color: white !important;
-}
-
-/* --- Puzzle 1 New Visual States --- */
-.puzzle1-cell.selected {
-    box-shadow: 0 0 0 3px #ffb347, 0 0 0 6px #ffb34788 !important;
-}
-.puzzle1-cell.correct {
-    box-shadow: 0 0 0 3px #4caf50, 0 0 0 6px #81c784 !important;
-}
-
-/* --- Puzzle 2 Cursor Pointer --- */
-.puzzle2-poem .highlight {
-    cursor: pointer;
-}
-
-/* --- Puzzle 3 Answer Area Alignment --- */
-#puzzle3AnswerArea {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-#puzzle3AnswerArea > div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
-
-/* Ensure their parent containers don't interfere */
-body, body * {
-    isolation: isolate;  /* creates stacking context, but we override with z-index */
-}
-
-/* --- Desktop & Large Tablet (Keep 5 dials on one line) --- */
-.dials-container {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    justify-content: center;
-    padding: 15px 10px;
-}
-.dial {
-    min-width: 45px;
-    padding: 4px;
-}
-.dial-value {
-    font-size: 1.4rem;
-}
-
-/* --- Story Cutscene Slides --- */
-.story-slide {
-    display: none;
-    animation: fadeInSlide 0.35s ease-out forwards;
-}
-.story-slide.active-slide {
-    display: block;
-}
-
-@keyframes fadeInSlide {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Story Buttons Area --- */
-#storyButtonContainer {
-    display: flex;
-    justify-content: flex-end; /* Aligns Continue button to the right, like Pokémon */
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
-}
-
-#storyContinueBtn {
-    background: var(--button-primary);
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    font-size: 1.1rem;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: 0.2s;
-    min-height: var(--tap-min-height);
-}
-
-#storyContinueBtn:hover {
-    background: var(--col3-highlight-bg);
-    transform: scale(1.02);
-}
-
-/* Keep the Begin Button styling consistent */
-#beginGameBtn {
-    background: var(--button-primary);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    font-size: 1.2rem;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: 0.2s;
-    min-height: var(--tap-min-height);
-}
-#beginGameBtn:hover {
-    background: var(--col3-highlight-bg);
-    transform: scale(1.02);
-}
-
-/* --- SOLVED CARD STATE & SPRITE ANIMATION --- */
-.puzzle-card.solved {
-    border-color: var(--accent-gold) !important;
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-    transform: translateY(-2px);
-    background: rgba(22, 36, 32, 0.8) !important; /* Slightly less transparent when solved */
-}
-
-.completion-narrative {
-    margin-top: 12px;
-    font-size: 0.85rem;
-    line-height: 1.4;
-    color: var(--text-secondary);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 10px;
-    text-align: center;
-    font-weight: 300;
-    min-height: 30px; /* Prevents layout shift when appearing */
-}
-
-/* The animated sprite/icon */
-.sprite-icon {
-    display: inline-block;
-    animation: spriteOrbit 3s linear infinite;
-    margin-right: 5px;
-}
-
-/* Dream animation: A continuous, gentle orbit/spin */
-@keyframes spriteOrbit {
-    0% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(90deg) scale(1.1); }
-    50% { transform: rotate(180deg) scale(1); }
-    75% { transform: rotate(270deg) scale(0.95); }
-    100% { transform: rotate(360deg) scale(1); }
-}
-
-/* Make it spin even slower on mobile to save battery */
-@media (max-width: 600px) {
-    .sprite-icon {
-        animation-duration: 5s;
-    }
-}
-
-/* --- PUZZLE 3: LIBRARY CUTAWAY VISUAL --- */
 .library-cutaway {
     display: flex;
     flex-direction: column;
@@ -1593,7 +529,7 @@ body, body * {
 }
 
 .floor-tag.silent {
-    background: #163A4D; 
+    background: #163A4D;
     color: #b2d8e8;
     border: 1px solid #3a7896;
 }
@@ -1610,14 +546,605 @@ body, body * {
     box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
 }
 
-@media (max-width: 600px) {
-    .floor-indicator { width: 40px; font-size: 0.8rem; }
-    .floor-slot { width: 45px; height: 45px; font-size: 1.5rem; }
-    .floor-tag { width: 100px; font-size: 0.65rem; padding: 4px 8px; }
+.floor-block.ground-floor {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.4);
+    margin-top: 4px;
 }
 
-/* --- ENABLE TEXT SELECTION IN READING & INPUT AREAS --- */
-/* Unlock text areas for copying/reading */
+.floor-slot.ground-slot {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: normal;
+    width: auto;
+    padding: 0 15px;
+    cursor: default;
+    border-radius: 12px;
+    box-shadow: none !important;
+}
+
+/* ---------- PUZZLE 4: EMAIL CHAIN ---------- */
+.puzzle3-email-header {
+    background: #e8e8e8 !important;
+    color: #111 !important;
+}
+
+.puzzle3-email-header span {
+    color: #004c6e !important;
+}
+
+#puzzle3AnswerArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#puzzle3AnswerArea > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ---------- LOCKBOX & GRID ---------- */
+.lockbox-section {
+    background-color: var(--card-bg) !important;
+    background-image: var(--lockbox-outer-bg, none) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    border-radius: 40px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.lockbox-section .lootbox-container {
+    position: relative;
+    z-index: 1;
+}
+
+.lootbox-container, #lockboxContainer {
+    background-color: transparent !important;
+    background-image: var(--lockbox-inner-bg, none) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-blend-mode: overlay !important;
+    border-radius: 30px;
+    padding: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    border: 2px solid var(--card-border);
+    transition: all 0.3s;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,0,0,0.3);
+}
+
+.lockbox-grid-section, .safe-dials, #lockboxContainer > * {
+    background: transparent !important;
+    backdrop-filter: blur(2px);
+}
+
+.lootbox-container.unlocked {
+    background: var(--button-primary) !important;
+    border-color: var(--accent-gold) !important;
+    box-shadow: 0 0 20px var(--accent-gold) !important;
+}
+
+.col3-highlight {
+    background-color: var(--col3-highlight-bg) !important;
+    border: 2px solid var(--accent-gold) !important;
+    box-shadow: 0 0 5px var(--accent-gold) !important;
+}
+
+.puzzle-grid {
+    width: 100%;
+    background: #0a1a15;
+    border: 1px solid var(--accent-gold);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.puzzle-grid th, .puzzle-grid td {
+    border: 1px solid var(--accent-gold);
+    padding: 8px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+.puzzle-grid th {
+    background: #1e3a2a;
+}
+
+.message {
+    background: rgba(0,0,0,0.66);
+    border-radius: 30px;
+    padding: 10px;
+    font-size: 0.9rem;
+}
+
+.message.success {
+    background: var(--accent-green);
+    color: white;
+}
+
+/* Safe dials */
+.dials-container {
+    background: rgba(0,0,0,0.3);
+    border-radius: 40px;
+    padding: 15px 10px;
+    margin: 10px 0 !important;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.dial {
+    background: #2c2a24;
+    border-radius: 20px;
+    padding: 5px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.6), 0 2px 4px rgba(255,255,200,0.2);
+    min-width: 45px;
+}
+
+.dial-value {
+    background: #000000aa;
+    border-radius: 15px;
+    font-family: monospace;
+    letter-spacing: 2px;
+    font-size: 1.4rem;
+}
+
+.dial-up, .dial-down {
+    background: #4a3b2c;
+    color: var(--accent-gold);
+    border: 1px solid var(--accent-gold);
+    transition: 0.05s linear;
+}
+
+.dial-up:active, .dial-down:active {
+    transform: scale(0.95);
+}
+
+#checkCombinationBtn {
+    background: linear-gradient(145deg, #5a6b5a, #2a3a2a);
+    border: 1px solid var(--accent-gold);
+    box-shadow: 0 3px 0 #1a2a1a;
+    transition: 0.05s linear;
+}
+
+#checkCombinationBtn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #1a2a1a;
+}
+
+/* ---------- MODALS ---------- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    padding: 60px 20px 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+}
+
+/* ---------- HELP MODAL ---------- */
+.help-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.help-card {
+    background: var(--card-bg);
+    border-radius: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 60px 25px 25px;
+    border: 2px solid var(--card-border);
+    position: relative;
+    color: var(--text-primary);
+}
+
+.help-header {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.help-portrait {
+    width: 60px;
+    height: 100px;
+    background-image: url('../images/professor-portrait.jpg');
+    background-size: cover;
+    background-position: top center;
+    border-radius: 12px;
+    border: 2px solid var(--card-border);
+}
+
+.help-title h2 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.help-title p {
+    margin: 5px 0 0;
+    font-style: italic;
+}
+
+.help-content {
+    line-height: 1.5;
+}
+
+.puzzle-list {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.puzzle-list li {
+    margin: 8px 0;
+}
+
+.tip-box {
+    background: rgba(0,0,0,0.4);
+    padding: 10px;
+    border-radius: 20px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* ---------- GLOBAL TOGGLES ---------- */
+.global-help,
+.global-a11y {
+    position: fixed;
+    top: 15px;
+    z-index: 99999;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 200, 0.4);
+    border-radius: 30px;
+    padding: 5px 12px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+    box-shadow: none;
+}
+
+.global-help:hover,
+.global-a11y:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 200, 0.8);
+    transform: scale(1.1);
+}
+
+.global-help {
+    left: 15px;
+}
+
+.global-a11y {
+    right: 15px;
+}
+
+/* ---------- STORY CUTSCENE ---------- */
+.story-slide {
+    display: none;
+    animation: fadeInSlide 0.35s ease-out forwards;
+}
+
+.story-slide.active-slide {
+    display: block;
+}
+
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#storyButtonContainer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#storyContinueBtn,
+#beginGameBtn {
+    background: var(--button-primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#storyContinueBtn:hover,
+#beginGameBtn:hover {
+    background: var(--col3-highlight-bg);
+    transform: scale(1.02);
+}
+
+/* ---------- SOLVED CARD STATE & SPRITE ---------- */
+.puzzle-card.solved {
+    border-color: var(--accent-gold) !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    transform: translateY(-2px);
+    background: rgba(22, 36, 32, 0.8) !important;
+}
+
+.completion-narrative {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 10px;
+    text-align: center;
+    font-weight: 300;
+    min-height: 30px;
+}
+
+.sprite-icon {
+    display: inline-block;
+    animation: spriteOrbit 3s linear infinite;
+    margin-right: 5px;
+}
+
+@keyframes spriteOrbit {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.1); }
+    50% { transform: rotate(180deg) scale(1); }
+    75% { transform: rotate(270deg) scale(0.95); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* ---------- UNIFORM PUZZLE END FACT ---------- */
+.puzzle-end-fact {
+    margin: 20px auto 0;   /* Changed to auto so it centers horizontally */
+    max-width: 500px;       /* Aligns with the main puzzle content width */
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 4px solid var(--accent-gold);
+    border-radius: 8px;
+    text-align: left;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* ---------- HIGH CONTRAST MODE ---------- */
+body.high-contrast {
+    background: #f8f9fa !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .game-container h1,
+body.high-contrast .lockbox-section h2 {
+    color: white !important;
+    text-shadow: none !important;
+}
+
+body.high-contrast .lockbox-section,
+body.high-contrast .lootbox-container,
+body.high-contrast #lockboxContainer {
+    background-image: none !important;
+    background: #ffffff !important;
+}
+
+body.high-contrast h3, body.high-contrast p,
+body.high-contrast span, body.high-contrast div,
+body.high-contrast label, body.high-contrast .story-content,
+body.high-contrast .story-card p, body.high-contrast .story-card h2,
+body.high-contrast .team-info, body.high-contrast #displayTeamName,
+body.high-contrast .team-info span, body.high-contrast .team-info div,
+body.high-contrast .puzzle1-status, body.high-contrast .puzzle2-status,
+body.high-contrast .puzzle4-status, body.high-contrast .puzzle2-slots-container,
+body.high-contrast .puzzle2-slots-container h3 {
+    color: #1e2a3a !important;
+    text-shadow: none !important;
+    background-color: transparent !important;
+}
+
+body.high-contrast .puzzle-card,
+body.high-contrast .modal-content,
+body.high-contrast .story-card,
+body.high-contrast .team-entry-card,
+body.high-contrast .team-info,
+body.high-contrast .lootbox-container,
+body.high-contrast .lockbox-container,
+body.high-contrast .safe-dials,
+body.high-contrast .puzzle2-slots-container {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+    box-shadow: none !important;
+}
+
+body.high-contrast .puzzle-grid,
+body.high-contrast .puzzle-grid th,
+body.high-contrast .puzzle-grid td,
+body.high-contrast .grid-cell {
+    border: 1px solid #1e2a3a !important;
+    background: #ffffff !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .dial-value {
+    background: #ffffff !important;
+    border: 1px solid #1e2a3a !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .dial-up,
+body.high-contrast .dial-down,
+body.high-contrast button,
+body.high-contrast #checkCombinationBtn,
+body.high-contrast .reset-btn,
+body.high-contrast .team-entry-card input,
+body.high-contrast .team-entry-card button {
+    background: #e9ecef !important;
+    border: 2px solid #1e2a3a !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast button:hover {
+    background: #ced4da !important;
+}
+
+body.high-contrast .message {
+    background: #e9ecef !important;
+    border: 1px solid #1e2a3a !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .message.success {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border-color: #155724 !important;
+}
+
+body.high-contrast .puzzle2-poem {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .puzzle2-poem .highlight {
+    background: #e9ecef !important;
+    border: 1px solid #1e2a3a !important;
+    box-shadow: none !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .modal-overlay,
+body.high-contrast .help-overlay {
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(4px) !important;
+}
+
+body.high-contrast .help-card,
+body.high-contrast .help-portrait {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+}
+
+body.high-contrast .help-card,
+body.high-contrast .help-title p,
+body.high-contrast .tip-box,
+body.high-contrast .close-help {
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .tip-box {
+    background: #e9ecef !important;
+}
+
+body.high-contrast .puzzle-grid,
+body.high-contrast .dials-container,
+body.high-contrast .dial,
+body.high-contrast .dial-value,
+body.high-contrast .dial-up,
+body.high-contrast .dial-down,
+body.high-contrast #checkCombinationBtn {
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border-color: #1e2a3a !important;
+    color: #1e2a3a !important;
+}
+
+body.high-contrast .lockbox-section h2,
+body.high-contrast .lockbox-section h4,
+body.high-contrast .lockbox-section p,
+body.high-contrast .lockbox-section .message,
+body.high-contrast .lockbox-section .column-hint,
+body.high-contrast .lockbox-section .dial-value,
+body.high-contrast .lockbox-section .grid-cell,
+body.high-contrast .lockbox-section .puzzle-grid th,
+body.high-contrast .lockbox-section .puzzle-grid td,
+body.high-contrast #lockboxContainer h2,
+body.high-contrast #lockboxContainer h4,
+body.high-contrast #lockboxContainer p,
+body.high-contrast #lockboxContainer .message,
+body.high-contrast #lockboxContainer .column-hint,
+body.high-contrast #lockboxContainer .dial-value,
+body.high-contrast #lockboxContainer .grid-cell,
+body.high-contrast #lockboxContainer .puzzle-grid th,
+body.high-contrast #lockboxContainer .puzzle-grid td {
+    color: #1e2a3a !important;
+}
+
+body.high-contrast #lockboxContainer .unlocked-celebration {
+    background: #ffffff !important;
+    border: 2px solid #1e2a3a !important;
+}
+
+body.high-contrast #lockboxContainer .unlocked-celebration h3,
+body.high-contrast #lockboxContainer .unlocked-celebration p,
+body.high-contrast #lockboxContainer .unlocked-celebration div {
+    color: #1e2a3a !important;
+}
+
+body.high-contrast #lockboxContainer .unlocked-celebration .message.success {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border: 2px solid #155724 !important;
+}
+
+/* ---------- CLOSE "X" BUTTONS (REGULAR TEXT) ---------- */
+.close-modal,
+.close-help {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--text-primary);
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0.8;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.close-modal:hover,
+.close-help:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+/* ---------- TEXT SELECTION ---------- */
 .story-content, .help-content, .story-card, .help-card,
 .puzzle2-poem, .puzzle3-email-header, .puzzle2-container,
 .lockbox-grid-section p, #storySlidesContainer, .help-title, .help-content p,
@@ -1628,13 +1155,11 @@ body, body * {
     cursor: text;
 }
 
-/* Allow highlighting in input fields so users can edit their team name/text */
 input {
     user-select: text !important;
     -webkit-user-select: text !important;
 }
 
-/* Keep strictly interactive UI elements non-selectable */
 button, .puzzle-card, .puzzle1-cell, .puzzle1-grid,
 .dial, .dials-container, .lootbox-container, .modal-content,
 .close-help, .close-modal, .claim-code-btn, .puzzle-card .digit,
@@ -1647,52 +1172,45 @@ button, .puzzle-card, .puzzle1-cell, .puzzle1-grid,
     cursor: default;
 }
 
-/* Update the Help button to look like a notebook */
-.global-help {
-    font-size: 1.5rem; /* Make it slightly larger */
-    padding: 2px 10px 5px 10px; /* Adjust padding so the notebook sits nicely */
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 200, 0.4);
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: white;
-}
+/* ---------- RESPONSIVE (MOBILE) ---------- */
+@media (max-width: 600px) {
+    .puzzles-grid { grid-template-columns: 1fr; }
+    .uni-header { top: 10px; padding: 0 15px; }
+    .uni-logo { height: 40px; max-width: 40px; padding: 2px; }
+    .team-entry-card { margin-top: 70px; }
 
-.global-help:hover {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.8);
-}
+    h1 { font-size: 1.5rem; }
+    .team-info { flex-direction: column; gap: 10px; padding: 8px 12px; }
+    .reset-btn { padding: 4px 10px; font-size: 0.9rem; }
+    .puzzle1-grid { gap: 10px; }
 
-/* --- Ground Floor Styling --- */
-.floor-block.ground-floor {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.4);
-    margin-top: 4px; /* A small gap to delineate it from the 1st floor */
-}
+    .dials-container {
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+        justify-content: center;
+        padding: 10px 5px !important;
+    }
+    .dial { min-width: 40px !important; padding: 3px !important; }
+    .dial-value { font-size: 1.2rem !important; padding: 0 6px !important; }
+    .dial-up, .dial-down { padding: 2px 6px !important; font-size: 0.7rem !important; min-width: 24px !important; }
+    #checkCombinationBtn { padding: 8px 16px !important; font-size: 0.9rem !important; }
 
-.floor-slot.ground-slot {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    font-size: 1rem;
-    font-weight: normal;
-    width: auto;
-    padding: 0 15px; /* Gives it width to fit the text */
-    cursor: default;
-    border-radius: 12px;
-    box-shadow: none !important; /* Prevent glowing if accidentally clicked */
-}
+    #puzzle4Canvas { max-width: 95vw; height: auto; }
+    .torch-cursor { width: 100px; height: 100px; }
+    .found-rail { gap: 8px; padding: 6px; min-height: 40px; }
+    .caught-number { font-size: 1.8rem; padding: 0 6px; }
 
-/* --- Puzzle End Fact (Uniform across all puzzles) --- */
-.puzzle-end-fact {
-    margin-top: 20px;
-    padding: 12px 15px;
-    background: rgba(0, 0, 0, 0.3);
-    border-left: 4px solid var(--accent-gold);
-    border-radius: 8px;
-    text-align: left;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
+    .floor-indicator { width: 40px; font-size: 0.8rem; }
+    .floor-slot { width: 45px; height: 45px; font-size: 1.5rem; }
+    .floor-tag { width: 100px; font-size: 0.65rem; padding: 4px 8px; }
+
+    .global-help, .global-a11y {
+        top: 70px;
+        padding: 3px 10px;
+        font-size: 1rem;
+    }
+    .global-help { left: 10px; }
+    .global-a11y { right: 10px; }
+
+    .sprite-icon { animation-duration: 5s; }
 }
