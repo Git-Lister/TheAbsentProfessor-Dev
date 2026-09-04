@@ -161,23 +161,26 @@
                 <tbody id="tableBody"></tbody>
             </table>
 
-            <!-- Danger Zone: Delete Results -->
-            <div class="danger-zone">
-                <h3>⚠️ Delete Results</h3>
-                <p><strong>WARNING:</strong> These actions <u>permanently delete results for everyone</u> (from the live database) and cannot be undone. Use with extreme caution.</p>
+            <!-- Danger Zone: Delete Results (Collapsible) -->
+            <details class="danger-zone" id="dangerZone">
+                <summary>
+                    <span style="font-size: 1.2rem; font-weight: bold;">⚠️ Admin Danger Zone (Click to Expand)</span>
+                </summary>
+                
+                <div style="margin-top: 20px;">
+                    <p><strong>WARNING:</strong> These actions <u>permanently delete results for everyone</u> (from the live database) and cannot be undone. Use with extreme caution.</p>
 
-                <input type="text" id="deleteTeamInput" placeholder="Enter exact Team Name to delete">
-                <button type="button" id="deleteTeamBtn" class="danger-btn">Delete by Team Name</button>
+                    <input type="text" id="deleteTeamInput" placeholder="Enter exact Team Name to delete">
+                    <button type="button" id="deleteTeamBtn" class="danger-btn">Delete by Team Name</button>
 
-                <input type="text" id="deleteSessionInput" placeholder="Enter exact Session ID to delete">
-                <button type="button" id="deleteSessionBtn" class="danger-btn">Delete by Session ID</button>
+                    <input type="text" id="deleteSessionInput" placeholder="Enter exact Session ID to delete">
+                    <button type="button" id="deleteSessionBtn" class="danger-btn">Delete by Session ID</button>
 
-                <div class="btn-row" style="margin-top: 15px;">
-                    <button type="button" id="deleteAllBtn" class="danger-btn" style="width: 100%;">Delete ALL Results</button>
+                    <div class="btn-row" style="margin-top: 15px;">
+                        <button type="button" id="deleteAllBtn" class="danger-btn" style="width: 100%;">Delete ALL Results</button>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </details>
 
     <script>
         console.log("Admin Dashboard Script Loaded");

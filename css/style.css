@@ -820,6 +820,37 @@ h1 {
     text-align: center;
 }
 
+/* Collapsible Danger Zone */
+details.danger-zone {
+    border: 2px dashed #8b3a3a;
+    border-radius: 15px;
+    background: rgba(139, 58, 58, 0.1);
+    padding: 15px;
+    margin-top: 30px;
+}
+
+details.danger-zone summary {
+    cursor: pointer;
+    list-style: none; /* Hides default triangle */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #ff6b6b;
+}
+details.danger-zone summary::after {
+    content: '▼'; /* Custom arrow */
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+}
+details[open].danger-zone summary::after {
+    transform: rotate(180deg); /* Flips arrow when open */
+}
+
+/* Keep the red styling only for the actual buttons */
+.danger-zone button { 
+    border: none; 
+}
+
 /* ---------- GLOBAL TOGGLES ---------- */
 .global-help,
 .global-a11y {
