@@ -1,78 +1,38 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual Environments
+# --- Virtual Environments ---
 venv/
 ENV/
 env/
-.venv
+.venv/
 
-# IDE & Editor
+# --- Python (if needed for local server) ---
+__pycache__/
+*.py[cod]
+.Python
+build/
+dist/
+
+# --- IDE & Editor ---
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-.sublime-project
-.sublime-workspace
-*.sublime-settings
 .DS_Store
 Thumbs.db
 
-# Environment & Configuration
+# --- Environment & Secrets ---
 .env
 .env.local
-.env.*.local
-config.local.json
+*.local.json
 
-# OS
+# --- OS Generated ---
 .DS_Store
-.DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
 
-# Node (if npm is added later)
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Testing & Coverage
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Local development
+# --- Local Dev & Caches ---
 *.log
 .cache
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-
-# Google Apps Script deployment metadata (if versioning)
-.clasp.json
+node_modules/
