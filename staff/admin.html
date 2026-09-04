@@ -9,7 +9,6 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            /* Reuse game's jungle background */
             background: #0a1f1a;
             background-image: url('../images/jungle-bg.jpg');
             background-size: cover;
@@ -21,20 +20,17 @@
         .container {
             max-width: 900px;
             margin: 0 auto;
-            /* Reuse game card styling */
             background: rgba(22, 36, 32, 0.94);
             border: 2px solid #b8a35c;
             border-radius: 20px;
             padding: 2rem;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        h1 {
-            border-bottom: 2px solid #b8a35c;
-            padding-bottom: 10px;
-        }
+        h1, h2, h3 { border-bottom: 2px solid #b8a35c; padding-bottom: 10px; }
+
+        /* Buttons and Inputs */
         input, button {
             box-sizing: border-box;
-            width: 100%;
             padding: 12px;
             margin: 10px 0;
             border-radius: 30px;
@@ -42,74 +38,84 @@
             font-size: 1rem;
             background: #ffffff;
             color: #1e2a3a;
+            width: 100%;
         }
         button {
             background: #3c6e47;
             color: white;
             cursor: pointer;
             transition: 0.2s;
-        }
-        button:hover {
-            background: #2d5a3a;
-        }
-        .button-small {
             width: auto;
-            display: inline-block;
-            padding: 8px 16px;
         }
-        .danger-btn {
-            background: #8b3a3a;
-        }
-        .danger-btn:hover {
-            background: #6b2a2a;
-        }
-        .filter-box {
+        button:hover { background: #2d5a3a; }
+        
+        .danger-btn { background: #8b3a3a; }
+        .danger-btn:hover { background: #6b2a2a; }
+
+        /* Filter Bar - Attached Buttons */
+        .filter-group {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 0; /* Zero gap for attached look */
             margin: 15px 0;
         }
-        .filter-box input {
+        .filter-group input {
+            border-radius: 30px 0 0 30px; /* Rounded left */
+            margin: 0;
             flex: 1;
+        }
+        .filter-group button {
+            border-radius: 0; /* Square middle/right */
+            margin: 0;
+            padding: 12px 20px;
+        }
+        .filter-group button:last-child {
+            border-radius: 0 30px 30px 0; /* Rounded right */
+        }
+
+        /* Top Controls */
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .logout-btn {
+            background: #8b3a3a;
             margin: 0;
         }
+
+        /* Table */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            color: #fcf3d4;
         }
         th, td {
             border: 1px solid #b8a35c;
             padding: 10px;
             text-align: left;
         }
-        th {
-            background: #1e3a2a;
+        th { background: #1e3a2a; }
+        tr:nth-child(even) { background: rgba(255,255,255,0.05); }
+        .winner-row { background: rgba(212,175,55,0.1) !important; font-weight: bold; }
+
+        /* Login Section */
+        #loginSection { max-width: 400px; margin: 0 auto; }
+        #dataSection { display: none; }
+        .error { color: #ff6b6b; margin-top: 10px; }
+
+        /* Danger Zone */
+        .danger-zone {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px dashed #8b3a3a;
+            border-radius: 15px;
+            background: rgba(139, 58, 58, 0.1);
         }
-        tr:nth-child(even) {
-            background: rgba(255,255,255,0.05);
-        }
-        #loginSection {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        #dataSection {
-            display: none;
-        }
-        .error {
-            color: #ff6b6b;
-            margin-top: 10px;
-        }
-        .winner-row {
-            background: rgba(212,175,55,0.1) !important;
-            font-weight: bold;
-        }
-        .filter-note {
-            font-size: 0.8rem;
-            color: var(--text-secondary, #c9d1b6);
-            margin-top: 5px;
-        }
+        .danger-zone h3 { border-bottom: 1px solid #8b3a3a; }
+        .danger-zone input { width: 100%; }
+        .danger-zone .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .danger-zone button { flex: 1; min-width: 150px; }
     </style>
 </head>
 <body>
@@ -125,17 +131,22 @@
 
         <div id="dataSection">
             <h1>🏆 Live Results</h1>
-            <div class="filter-box">
-                <input type="text" id="sessionFilter" placeholder="Filter by Session ID" onkeyup="fetchData()">
-                <button type="button" id="clearFilterBtn" class="button-small" title="Clear the current filter and show all results">Clear</button>
-            </div>
-            <div class="filter-note" id="filterNote">Showing all sessions.</div>
             
-            <div style="margin: 15px 0; display: flex; gap: 10px;">
-                <button type="button" id="refreshBtn" class="button-small" title="Refresh the list from the database">Refresh</button>
-                <button type="button" id="logoutBtn" class="button-small danger-btn" title="Log out of the dashboard">Log Out</button>
+            <!-- Top Controls: Refresh and Logout -->
+            <div class="top-controls">
+                <button type="button" id="refreshBtn" title="Refresh the list from the database">🔄 Refresh Table</button>
+                <button type="button" id="logoutBtn" class="logout-btn" title="Log out of the dashboard">Log Out</button>
             </div>
-            
+
+            <!-- Filter Bar -->
+            <div class="filter-group">
+                <input type="text" id="sessionFilter" placeholder="Type Session ID (e.g. SESS-ABC-123)">
+                <button type="button" id="applyFilterBtn">Apply Filter</button>
+                <button type="button" id="clearFilterBtn">Clear Filter</button>
+            </div>
+            <div id="filterNote" style="font-size: 0.85rem; color: #c9d1b6; margin-bottom: 10px;">Showing all sessions.</div>
+
+            <!-- Main Data Table -->
             <table id="resultsTable">
                 <thead>
                     <tr>
@@ -149,6 +160,22 @@
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
+
+            <!-- Danger Zone: Delete Results -->
+            <div class="danger-zone">
+                <h3>⚠️ Delete Results</h3>
+                <p><strong>WARNING:</strong> These actions <u>permanently delete results for everyone</u> (from the live database) and cannot be undone. Use with extreme caution.</p>
+
+                <input type="text" id="deleteTeamInput" placeholder="Enter exact Team Name to delete">
+                <button type="button" id="deleteTeamBtn" class="danger-btn">Delete by Team Name</button>
+
+                <input type="text" id="deleteSessionInput" placeholder="Enter exact Session ID to delete">
+                <button type="button" id="deleteSessionBtn" class="danger-btn">Delete by Session ID</button>
+
+                <div class="btn-row" style="margin-top: 15px;">
+                    <button type="button" id="deleteAllBtn" class="danger-btn" style="width: 100%;">Delete ALL Results</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -159,16 +186,16 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2enVqZ25hb3ptZXZsYmZod2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NTc1MzksImV4cCI6MjEwNDAzMzUzOX0.EQfgDbZ60jUUzCwguBw5VBpLFKUZvcBe18ezCLEnthE';
         
         if (typeof supabase === 'undefined') {
-            console.error("CRITICAL: Supabase library failed to load. Check that supabase.js is in the same folder.");
+            console.error("CRITICAL: Supabase library failed to load.");
             document.getElementById('loginMessage').textContent = "Error: Supabase library failed to load.";
         } else {
             const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+            // Login Logic
             async function login() {
                 const email = document.getElementById('emailInput').value;
                 const password = document.getElementById('passwordInput').value;
                 document.getElementById('loginMessage').textContent = '';
-
                 const { error } = await sb.auth.signInWithPassword({ email, password });
                 if (error) {
                     console.error("Login Error:", error);
@@ -180,34 +207,28 @@
                 }
             }
 
+            // Logout Logic
             async function logout() {
                 await sb.auth.signOut();
                 location.reload();
             }
 
+            // Fetch Data
             async function fetchData() {
-                const sessionFilter = document.getElementById('sessionFilter').value.trim();
                 let query = sb.from('winners').select('*').order('id', { ascending: true });
                 
-                if (sessionFilter) {
-                    // Filter by the exact session ID
-                    query = query.eq('session_id', sessionFilter);
-                    document.getElementById('filterNote').textContent = `Filtering by session: ${sessionFilter}`;
-                } else {
-                    document.getElementById('filterNote').textContent = 'Showing all sessions.';
-                }
-
+                // No implicit filter, Apply button controls this
                 const { data, error } = await query;
                 if (error) {
                     console.error("Fetch Error:", error);
-                    document.getElementById('loginMessage').textContent = 'Failed to load data: ' + error.message;
+                    alert('Failed to load data: ' + error.message);
                     return;
                 }
 
                 const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = '';
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6">No winners recorded for this filter.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6">No winners recorded yet.</td></tr>';
                     return;
                 }
 
@@ -226,14 +247,94 @@
                 });
             }
 
+            // Apply Filter
+            function applyFilter() {
+                const sessionFilter = document.getElementById('sessionFilter').value.trim();
+                let query = sb.from('winners').select('*').order('id', { ascending: true });
+                
+                if (sessionFilter) {
+                    query = query.eq('session_id', sessionFilter);
+                    document.getElementById('filterNote').textContent = `Filtering by session: ${sessionFilter}`;
+                } else {
+                    document.getElementById('filterNote').textContent = 'Showing all sessions.';
+                }
+
+                query.then(({ data, error }) => {
+                    if (error) { console.error(error); alert('Filter failed: ' + error.message); return; }
+                    const tbody = document.getElementById('tableBody');
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6">No winners found for this filter.</td></tr>';
+                        return;
+                    }
+                    data.forEach((row, index) => {
+                        const tr = document.createElement('tr');
+                        if (index === 0) tr.className = 'winner-row';
+                        tr.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${row.team_name}</td>
+                            <td>${row.session_id}</td>
+                            <td>${row.full_code}</td>
+                            <td>${row.duration}</td>
+                            <td>${new Date(row.reported_at).toLocaleString()}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+            }
+
+            // Clear Filter
+            function clearFilter() {
+                document.getElementById('sessionFilter').value = '';
+                fetchData();
+            }
+
+            // Delete by Team Name
+            async function deleteByTeam() {
+                const team = document.getElementById('deleteTeamInput').value.trim();
+                if (!team) return alert("Please enter a team name to delete.");
+                if (!confirm(`⚠️ Are you sure you want to PERMANENTLY delete ALL results for team "${team}"? This affects everyone.`)) return;
+                
+                const { error } = await sb.from('winners').delete().eq('team_name', team);
+                if (error) return alert('Delete failed: ' + error.message);
+                alert('Results deleted successfully.');
+                fetchData();
+            }
+
+            // Delete by Session ID
+            async function deleteBySession() {
+                const session = document.getElementById('deleteSessionInput').value.trim();
+                if (!session) return alert("Please enter a Session ID to delete.");
+                if (!confirm(`⚠️ Are you sure you want to PERMANENTLY delete ALL results for session "${session}"? This affects everyone.`)) return;
+                
+                const { error } = await sb.from('winners').delete().eq('session_id', session);
+                if (error) return alert('Delete failed: ' + error.message);
+                alert('Results deleted successfully.');
+                fetchData();
+            }
+
+            // Delete ALL
+            async function deleteAll() {
+                if (!confirm("⚠️⚠️ DANGER: Are you ABSOLUTELY sure you want to PERMANENTLY delete ALL winners for EVERYONE? This cannot be undone.")) return;
+                if (!confirm("Last chance: Click OK to permanently wipe the entire database.")) return;
+
+                const { error } = await sb.from('winners').delete().gte('id', 0);
+                if (error) return alert('Delete failed: ' + error.message);
+                alert('ALL results deleted successfully.');
+                fetchData();
+            }
+
             // Event Listeners
             document.getElementById('loginBtn').addEventListener('click', login);
             document.getElementById('logoutBtn').addEventListener('click', logout);
             document.getElementById('refreshBtn').addEventListener('click', fetchData);
-            document.getElementById('clearFilterBtn').addEventListener('click', function() {
-                document.getElementById('sessionFilter').value = '';
-                fetchData();
-            });
+            
+            document.getElementById('applyFilterBtn').addEventListener('click', applyFilter);
+            document.getElementById('clearFilterBtn').addEventListener('click', clearFilter);
+
+            document.getElementById('deleteTeamBtn').addEventListener('click', deleteByTeam);
+            document.getElementById('deleteSessionBtn').addEventListener('click', deleteBySession);
+            document.getElementById('deleteAllBtn').addEventListener('click', deleteAll);
         }
     </script>
 </body>
