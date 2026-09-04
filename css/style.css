@@ -1228,7 +1228,8 @@ body.high-contrast .global-a11y {
     background: rgba(0, 0, 0, 0.4);
     padding: 0 10px;
     border-radius: 12px;
-    border: 1px solid var(--accent-gold);
+    border: 2px solid #00C1D3; /* Changed to the glowing blue for better visibility */
+    box-shadow: 0 0 8px rgba(0, 193, 211, 0.3); /* Optional: Added a subtle glow to match the theme */
     animation: popIn 0.2s ease-out;
 }
 

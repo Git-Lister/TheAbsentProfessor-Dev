@@ -89,6 +89,14 @@ function renderPuzzle1(container, onSolve) {
                 container.appendChild(claimBtn);
                 setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
                 if (hintContainer) hintContainer.innerHTML = '';
+
+                // ADD UNIFORM END FACT
+                if (!container.querySelector('.puzzle-end-fact')) {
+                    const factDiv = document.createElement('div');
+                    factDiv.className = 'puzzle-end-fact';
+                    factDiv.innerHTML = '💡 <strong>Did you know?</strong> The Library is Open 24/7 so you can use the facilities and resources whenever you need!';
+                    container.appendChild(factDiv);
+                }
             }
         }
     }
@@ -110,11 +118,21 @@ function renderPuzzle1(container, onSolve) {
             ctx.font = 'bold 42px monospace';
             ctx.shadowBlur = 0;
             if (n.caught) {
+                // Gold fill with blue outline for better visibility (matches found-rail)
                 ctx.fillStyle = '#d4af37';
                 ctx.shadowBlur = 20;
-                ctx.shadowColor = '#d4af37';
+                ctx.shadowColor = '#d4af37'; // Keep the gold glow
+                
+                ctx.strokeStyle = '#00C1D3'; // Blue outline
+                ctx.lineWidth = 3;
+                
+                // Draw the outline first, then fill the text
+                ctx.strokeText(n.symbol, n.x - 20, n.y + 15);
                 ctx.fillText(n.symbol, n.x - 20, n.y + 15);
+                
+                // Reset settings for the next number
                 ctx.shadowBlur = 0;
+                ctx.lineWidth = 1;
                 continue;
             }
             let isGlowing = false;
