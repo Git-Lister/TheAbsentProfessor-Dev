@@ -117,8 +117,8 @@ h1 {
 }
 
 .uni-logo {
-    height: 150px;
-    max-width: 150px;
+    height: 120px;         /* Slightly smaller base size */
+    max-width: 120px;
     width: auto;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     background: rgba(255,255,255,0.1);
@@ -138,6 +138,9 @@ h1 {
     max-width: 450px;
     width: 90%;
     border: 1px solid var(--card-border);
+    /* Remove absolute centering conflict */
+    margin-top: 160px;      /* Clears the logo on ALL screens */
+    margin-bottom: auto;    /* Pushes it slightly up if screen is very tall */
 }
 
 .game-title-hero {
@@ -1208,7 +1211,8 @@ button, .puzzle-card, .puzzle1-cell, .puzzle1-grid,
     .puzzles-grid { grid-template-columns: 1fr; }
     .uni-header { top: 10px; padding: 0 15px; }
     .uni-logo { height: 40px; max-width: 40px; padding: 2px; }
-    .team-entry-card { margin-top: 70px; }
+    /* Updated margin & padding to prevent overlap on small screens */
+    .team-entry-card { margin-top: 90px; padding: 25px; }
 
     h1 { font-size: 1.5rem; }
     .team-info { flex-direction: column; gap: 10px; padding: 8px 12px; }
