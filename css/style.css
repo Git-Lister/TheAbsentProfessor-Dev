@@ -1211,8 +1211,8 @@ button, .puzzle-card, .puzzle1-cell, .puzzle1-grid,
     .puzzles-grid { grid-template-columns: 1fr; }
     .uni-header { top: 10px; padding: 0 15px; }
     .uni-logo { height: 40px; max-width: 40px; padding: 2px; }
-    /* Updated margin & padding to prevent overlap on small screens */
-    .team-entry-card { margin-top: 90px; padding: 25px; }
+    /* Pushed down to 120px to clear the top-fixed buttons */
+    .team-entry-card { margin-top: 120px; padding: 25px; }
 
     h1 { font-size: 1.5rem; }
     .team-info { flex-direction: column; gap: 10px; padding: 8px 12px; }
@@ -1239,8 +1239,9 @@ button, .puzzle-card, .puzzle1-cell, .puzzle1-grid,
     .floor-slot { width: 45px; height: 45px; font-size: 1.5rem; }
     .floor-tag { width: 100px; font-size: 0.65rem; padding: 4px 8px; }
 
+    /* Tied to the top like desktop, safe because the logo is centered */
     .global-help, .global-a11y {
-        top: 70px;
+        top: 15px;
         padding: 3px 10px;
         font-size: 1rem;
     }
