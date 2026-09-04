@@ -4,12 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Dashboard - Escape Room Results</title>
-    <!-- Load the local Supabase library -->
+    <!-- Local Supabase Library (must be in same folder) -->
     <script src="./supabase.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0a1f1a; color: #fcf3d4; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: rgba(22,36,32,0.9); padding: 2rem; border-radius: 20px; border: 1px solid #b8a35c; }
-        h1 { border-bottom: 2px solid #b8a35c; padding-bottom: 10px; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            /* Reuse game's jungle background */
+            background: #0a1f1a;
+            background-image: url('../images/jungle-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fcf3d4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            /* Reuse game card styling */
+            background: rgba(22, 36, 32, 0.94);
+            border: 2px solid #b8a35c;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h1 {
+            border-bottom: 2px solid #b8a35c;
+            padding-bottom: 10px;
+        }
         input, button {
             box-sizing: border-box;
             width: 100%;
@@ -18,15 +40,76 @@
             border-radius: 30px;
             border: none;
             font-size: 1rem;
+            background: #ffffff;
+            color: #1e2a3a;
         }
-        button { background: #3c6e47; color: white; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #b8a35c; padding: 10px; text-align: left; }
-        th { background: #2c3e35; }
-        #loginSection { max-width: 400px; margin: 0 auto; }
-        #dataSection { display: none; }
-        .error { color: #ff6b6b; margin-top: 10px; }
-        .winner-row { background: rgba(212,175,55,0.1); font-weight: bold; }
+        button {
+            background: #3c6e47;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #2d5a3a;
+        }
+        .button-small {
+            width: auto;
+            display: inline-block;
+            padding: 8px 16px;
+        }
+        .danger-btn {
+            background: #8b3a3a;
+        }
+        .danger-btn:hover {
+            background: #6b2a2a;
+        }
+        .filter-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .filter-box input {
+            flex: 1;
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: #fcf3d4;
+        }
+        th, td {
+            border: 1px solid #b8a35c;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #1e3a2a;
+        }
+        tr:nth-child(even) {
+            background: rgba(255,255,255,0.05);
+        }
+        #loginSection {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        #dataSection {
+            display: none;
+        }
+        .error {
+            color: #ff6b6b;
+            margin-top: 10px;
+        }
+        .winner-row {
+            background: rgba(212,175,55,0.1) !important;
+            font-weight: bold;
+        }
+        .filter-note {
+            font-size: 0.8rem;
+            color: var(--text-secondary, #c9d1b6);
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -42,11 +125,17 @@
 
         <div id="dataSection">
             <h1>🏆 Live Results</h1>
-            <button type="button" id="logoutBtn" style="background:#8b3a3a; width:auto; margin:0 0 10px 0;">Log Out</button>
-            <button type="button" id="refreshBtn" style="width:auto;">Refresh</button>
-            <div id="filterBox">
+            <div class="filter-box">
                 <input type="text" id="sessionFilter" placeholder="Filter by Session ID" onkeyup="fetchData()">
+                <button type="button" id="clearFilterBtn" class="button-small" title="Clear the current filter and show all results">Clear</button>
             </div>
+            <div class="filter-note" id="filterNote">Showing all sessions.</div>
+            
+            <div style="margin: 15px 0; display: flex; gap: 10px;">
+                <button type="button" id="refreshBtn" class="button-small" title="Refresh the list from the database">Refresh</button>
+                <button type="button" id="logoutBtn" class="button-small danger-btn" title="Log out of the dashboard">Log Out</button>
+            </div>
+            
             <table id="resultsTable">
                 <thead>
                     <tr>
@@ -64,35 +153,26 @@
     </div>
 
     <script>
-        // 1. Confirm the script is actually loading
         console.log("Admin Dashboard Script Loaded");
 
         const SUPABASE_URL = 'https://gvzujgnaozmevlbfhwfq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2enVqZ25hb3ptZXZsYmZod2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NTc1MzksImV4cCI6MjEwNDAzMzUzOX0.EQfgDbZ60jUUzCwguBw5VBpLFKUZvcBe18ezCLEnthE';
         
-        // 2. CRITICAL FIX: Check for the 'supabase' global object, not 'createClient'!
         if (typeof supabase === 'undefined') {
             console.error("CRITICAL: Supabase library failed to load. Check that supabase.js is in the same folder.");
-            document.getElementById('loginMessage').textContent = "Error: Supabase library failed to load. Check your files.";
+            document.getElementById('loginMessage').textContent = "Error: Supabase library failed to load.";
         } else {
-            // 3. Initialize the client using the supabase global object
             const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             async function login() {
                 const email = document.getElementById('emailInput').value;
                 const password = document.getElementById('passwordInput').value;
-                
                 document.getElementById('loginMessage').textContent = '';
 
                 const { error } = await sb.auth.signInWithPassword({ email, password });
-                
                 if (error) {
                     console.error("Login Error:", error);
-                    if (error.message.includes("Invalid login credentials")) {
-                        document.getElementById('loginMessage').textContent = 'Incorrect email or password.';
-                    } else {
-                        document.getElementById('loginMessage').textContent = 'Login failed: ' + error.message;
-                    }
+                    document.getElementById('loginMessage').textContent = 'Incorrect email or password.';
                 } else {
                     document.getElementById('loginSection').style.display = 'none';
                     document.getElementById('dataSection').style.display = 'block';
@@ -106,11 +186,15 @@
             }
 
             async function fetchData() {
-                const sessionFilter = document.getElementById('sessionFilter').value;
+                const sessionFilter = document.getElementById('sessionFilter').value.trim();
                 let query = sb.from('winners').select('*').order('id', { ascending: true });
                 
                 if (sessionFilter) {
+                    // Filter by the exact session ID
                     query = query.eq('session_id', sessionFilter);
+                    document.getElementById('filterNote').textContent = `Filtering by session: ${sessionFilter}`;
+                } else {
+                    document.getElementById('filterNote').textContent = 'Showing all sessions.';
                 }
 
                 const { data, error } = await query;
@@ -123,7 +207,7 @@
                 const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = '';
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6">No winners recorded yet.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6">No winners recorded for this filter.</td></tr>';
                     return;
                 }
 
@@ -142,10 +226,14 @@
                 });
             }
 
-            // 4. Use addEventListener instead of inline onclick
+            // Event Listeners
             document.getElementById('loginBtn').addEventListener('click', login);
             document.getElementById('logoutBtn').addEventListener('click', logout);
             document.getElementById('refreshBtn').addEventListener('click', fetchData);
+            document.getElementById('clearFilterBtn').addEventListener('click', function() {
+                document.getElementById('sessionFilter').value = '';
+                fetchData();
+            });
         }
     </script>
 </body>
