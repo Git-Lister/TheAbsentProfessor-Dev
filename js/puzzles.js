@@ -337,7 +337,6 @@ function renderPuzzle2(container, onSolve) {
 
         if (sortedSelected.join() === sortedTargets.join()) {
             solved = true;
-            // UPDATE: Show the numbers and final code immediately inside the modal
             statusDiv.innerHTML = '✅ Correct! The grid numbers are <strong>1, 5, 8</strong> - the code is <strong>158</strong>.';
             if (hintTimeoutId) clearTimeout(hintTimeoutId);
             
@@ -351,6 +350,14 @@ function renderPuzzle2(container, onSolve) {
             container.appendChild(claimBtn);
             setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             if (hintContainer) hintContainer.innerHTML = '';
+
+            // ADD UNIFORM END FACT
+            if (!container.querySelector('.puzzle-end-fact')) {
+                const factDiv = document.createElement('div');
+                factDiv.className = 'puzzle-end-fact';
+                factDiv.innerHTML = '💡 <strong>Did you know?</strong> You can borrow and return books using the self-service machines, and borrow laptops from the laptop lockers.';
+                container.appendChild(factDiv);
+            }
         } else {
             const cells = container.querySelectorAll('.puzzle1-cell');
             cells.forEach(cell => {
@@ -447,7 +454,6 @@ function renderPuzzle3(container, onSolve) {
                 <div class="floor-block" data-floor="4">
                     <div class="floor-indicator">4th Floor</div>
                     <div class="floor-slot" id="slot4">_</div>
-                    <!-- UPDATE: Changed 'Silent Study' to 'Focussed Study' -->
                     <div class="floor-tag silent">🔇 Focussed Study</div>
                 </div>
                 <!-- Floor 3 (Collaborative) -->
@@ -466,7 +472,6 @@ function renderPuzzle3(container, onSolve) {
                 <div class="floor-block" data-floor="1">
                     <div class="floor-indicator">1st Floor</div>
                     <div class="floor-slot" id="slot1">_</div>
-                    <!-- UPDATE: Changed 'Silent Study' to 'Focussed Study' -->
                     <div class="floor-tag silent">🔇 Focussed Study</div>
                 </div>
                 <!-- Static Ground Floor (Bottom) -->
@@ -490,6 +495,7 @@ function renderPuzzle3(container, onSolve) {
 
     highlights.forEach(span => {
         span.style.fontWeight = 'bold';
+        // REMOVED UNDERLINE
         span.style.textTransform = 'capitalize';
         span.style.cursor = 'pointer';
         span.style.display = 'inline-block';
@@ -534,6 +540,14 @@ function renderPuzzle3(container, onSolve) {
             container.appendChild(claimBtn);
             setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             if (hintContainer) hintContainer.innerHTML = '';
+
+            // ADD UNIFORM END FACT
+            if (!container.querySelector('.puzzle-end-fact')) {
+                const factDiv = document.createElement('div');
+                factDiv.className = 'puzzle-end-fact';
+                factDiv.innerHTML = '💡 <strong>Did you know?</strong> The library offers a variety of study spaces to suit different needs. Explore them to find the one that works best for you.';
+                container.appendChild(factDiv);
+            }
         }
     }
 
@@ -653,7 +667,7 @@ function renderPuzzle4(container, onSolve) {
 
     container.innerHTML = `
         <div style="max-height: 70vh; overflow-y: auto; padding: 10px;">
-            <!-- Reordered to match Instruction -> Quote consistency of other puzzles -->
+            <!-- Reordered to match Instruction -> Quote consistency -->
             <p style="margin-bottom: 5px; font-weight: bold; color: var(--text-secondary);">📅 The clue you seek is within the emails.</p>
             <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 20px;">“...however, I noticed you didn't include the year of publication.”</p>
             ${emailsHTML}
@@ -661,10 +675,11 @@ function renderPuzzle4(container, onSolve) {
                 <p>🔍 <strong>Are your study skills up to date?</strong></p>
                 <a href="https://www.mmu.ac.uk/library/search-tools/library-search" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #3c6e47; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; margin: 10px 0;">📚 Open Library Search</a>
             </div>
+            <!-- FIXED ALIGNMENT WITH FLEXBOX -->
             <div id="puzzle3AnswerArea" style="margin-top: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <div>
-                    <input type="text" id="yearInput" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 8px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc;">
-                    <button id="submitYearBtn" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin-left: 10px;">Submit</button>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;">
+                    <input type="text" id="yearInput" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 0 10px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc; height: 40px; width: 100px;">
+                    <button id="submitYearBtn" style="background: #3c6e47; color: white; border: none; padding: 0 16px; border-radius: 30px; cursor: pointer; height: 40px;">Submit</button>
                 </div>
                 <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Enter the date you have found</p>
                 <div id="puzzle3Feedback" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
@@ -713,6 +728,14 @@ function renderPuzzle4(container, onSolve) {
             const answerArea = container.querySelector('#puzzle3AnswerArea');
             answerArea.appendChild(claimBtn);
             setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+
+            // ADD UNIFORM END FACT
+            if (!container.querySelector('.puzzle-end-fact')) {
+                const factDiv = document.createElement('div');
+                factDiv.className = 'puzzle-end-fact';
+                factDiv.innerHTML = '💡 <strong>Did you know?</strong> Library Search helps you find books, eBooks, journal articles, and much more.';
+                container.appendChild(factDiv);
+            }
         } else {
             wrongAttempts++;
             feedback.innerHTML = `❌ Wrong year. Try searching again.`;
@@ -766,9 +789,9 @@ function renderPuzzle5(container, onSolve) {
             <a href="${talisUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #3c6e47; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; margin: 10px 0; font-weight: bold;">📚 Open Your Reading List</a>
             
             <div id="puzzle5AnswerArea" style="margin-top: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <div>
-                    <input type="text" id="puzzle5Input" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 8px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc;">
-                    <button id="puzzle5SubmitBtn" style="background: #3c6e47; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin-left: 10px;">Submit</button>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;">
+                    <input type="text" id="puzzle5Input" maxlength="4" pattern="\\d{4}" placeholder="????" style="padding: 0 10px; font-size: 1rem; text-align: center; border-radius: 30px; border: 1px solid #ccc; height: 40px; width: 100px;">
+                    <button id="puzzle5SubmitBtn" style="background: #3c6e47; color: white; border: none; padding: 0 16px; border-radius: 30px; cursor: pointer; height: 40px;">Submit</button>
                 </div>
                 <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Enter the 4-digit number you found</p>
                 <div id="puzzle5Feedback" style="margin-top: 15px; font-style: italic; min-height: 30px;"></div>
@@ -813,6 +836,14 @@ function renderPuzzle5(container, onSolve) {
             container.appendChild(claimBtn);
             setTimeout(() => claimBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             if (hintContainer) hintContainer.innerHTML = '';
+
+            // ADD UNIFORM END FACT
+            if (!container.querySelector('.puzzle-end-fact')) {
+                const factDiv = document.createElement('div');
+                factDiv.className = 'puzzle-end-fact';
+                factDiv.innerHTML = '💡 <strong>Did you know?</strong> Your reading list is more than just a list of books. Use it regularly to guide and support your learning.';
+                container.appendChild(factDiv);
+            }
         } else {
             wrongAttempts++;
             feedback.innerHTML = `❌ Incorrect code. Keep searching the reading list.`;

@@ -1,5 +1,5 @@
 # 🧩 The Case of the Absent Professor – Digital Escape Room
-*A gamified library induction tool for MMU students.*
+*A digitised escape-room and library induction tool for students.*
 
 This web-based escape room introduces new students to library services through five interactive puzzles. As teams solve each puzzle, they reveal numbers that fill a lockbox grid. The first team to enter the final 5-digit code wins!
 

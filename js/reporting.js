@@ -1,9 +1,7 @@
 // --- HELPER: Generate a unique Session ID per browser session ---
 function generateSessionId() {
-    // Uses sessionStorage which clears when the browser tab/window is closed
     let id = sessionStorage.getItem('gameSessionId');
     if (!id) {
-        // Creates a unique code: SESS- + timestamp + random 4 chars
         id = 'SESS-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
         sessionStorage.setItem('gameSessionId', id);
     }
@@ -12,55 +10,57 @@ function generateSessionId() {
 
 // --- LOCAL BACKUP: Store data on the facilitator's device ---
 function logSuccessLocally(teamName, code, timeString) {
-    // Load existing log or create a new empty array
     const log = JSON.parse(localStorage.getItem('winners_log') || '[]');
-    
     const newEntry = {
-        order: log.length + 1, // Auto-calculates submission order (1, 2, 3...)
+        order: log.length + 1,
         team: teamName,
         code: code,
-        time: new Date().toISOString(), // The exact datetime they unlocked
-        duration: timeString, // Time taken (e.g. "2m 34s")
-        sessionId: generateSessionId() // Attach the session ID
+        time: new Date().toISOString(),
+        duration: timeString,
+        sessionId: generateSessionId()
     };
-
     log.push(newEntry);
     localStorage.setItem('winners_log', JSON.stringify(log));
     console.log('📦 Local backup saved:', log.length, 'winners recorded.');
 }
 
-// --- WRONG ATTEMPT LOGGING (used by Puzzle 3 and 4) ---
+// --- WRONG ATTEMPT LOGGING ---
 function reportWrongAttempt(puzzleId, wrongInput, context) {
-    // Currently logs silently to console. Can be expanded to track wrong attempts in future.
     console.warn(`⚠️ Wrong attempt on Puzzle ${puzzleId}: "${wrongInput}" (${context})`);
 }
 
-// --- MAIN REPORTING ENDPOINT ---
+// --- MAIN REPORTING TO SUPABASE ---
+const SUPABASE_URL = 'https://gvzujgnaozmevlbfhwfq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2enVqZ25hb3ptZXZsYmZod2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NTc1MzksImV4cCI6MjEwNDAzMzUzOX0.EQfgDbZ60jUUzCwguBw5VBpLFKUZvcBe18ezCLEnthE';
+
 function reportSuccess(teamName, code, timeString) {
-    // 1. Always save locally first (totally independent fallback)
+    // 1. Always save locally first
     logSuccessLocally(teamName, code, timeString);
 
-    // 2. Try sending to Google Sheets or a self-hosted endpoint
-    // Retrieves the custom URL set via admin-config.html, or falls back to config.json
-    const url = localStorage.getItem('customGoogleScriptUrl') || (typeof appConfig !== 'undefined' ? appConfig.googleScriptUrl : null);
-    
-    if (url) {
-        fetch(url, {
-            method: 'POST',
-            mode: 'no-cors', // Bypasses CORS policies for Google Apps Script
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ 
-                team: teamName, 
-                code: code, 
-                time: timeString,
-                timestamp: new Date().toISOString() 
-            })
-        })
-        .then(() => console.log('✅ Successfully reported to external endpoint.'))
-        .catch((err) => {
-            console.warn('❌ External endpoint unreachable. Data is safe in the local backup.', err);
-        });
-    } else {
-        console.warn('⚠️ No reporting URL configured. Data has been saved locally only.');
-    }
+    // 2. Build the payload from loaded state
+    const state = loadState();
+    const payload = {
+        session_id: state.sessionId || 'N/A',
+        team_name: teamName,
+        full_code: code,
+        puzzle_answers: state.puzzleAnswers,
+        duration: timeString
+    };
+
+    // 3. POST directly to Supabase
+    fetch(`${SUPABASE_URL}/rest/v1/winners`, {
+        method: 'POST',
+        headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (response.ok) console.log('✅ Successfully reported to Supabase');
+        else console.error('Supabase error:', response.status, response.statusText);
+    })
+    .catch(err => console.warn('⚠️ Network error reporting to Supabase (data saved locally)', err));
 }

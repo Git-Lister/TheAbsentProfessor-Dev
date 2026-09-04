@@ -1683,3 +1683,15 @@ button, .puzzle-card, .puzzle1-cell, .puzzle1-grid,
     border-radius: 12px;
     box-shadow: none !important; /* Prevent glowing if accidentally clicked */
 }
+
+/* --- Puzzle End Fact (Uniform across all puzzles) --- */
+.puzzle-end-fact {
+    margin-top: 20px;
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 4px solid var(--accent-gold);
+    border-radius: 8px;
+    text-align: left;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}

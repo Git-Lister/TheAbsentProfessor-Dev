@@ -5,13 +5,12 @@ function loadState() {
     if (saved) {
         return JSON.parse(saved);
     }
-    // Determine number of puzzles from config (requires appConfig to be loaded before storage.js)
-    const numPuzzles = (typeof appConfig !== 'undefined' && appConfig.puzzles) ? appConfig.puzzles.length : 5;
     return {
         teamName: '',
-        puzzleAnswers: new Array(numPuzzles).fill(''),
+        puzzleAnswers: ['', '', '', '', ''],
         lockboxUnlocked: false,
-        startTime: null
+        startTime: null,
+        sessionId: '' // <-- Added
     };
 }
 
@@ -44,6 +43,16 @@ function setTeamName(name) {
 
 function getTeamName() {
     return loadState().teamName;
+}
+
+function setSessionId(id) {
+    const state = loadState();
+    state.sessionId = id;
+    saveState(state);
+}
+
+function getSessionId() {
+    return loadState().sessionId;
 }
 
 function setLockboxUnlocked(unlocked) {
