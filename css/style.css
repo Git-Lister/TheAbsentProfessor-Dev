@@ -96,9 +96,10 @@ h1 {
     background: transparent;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;   /* Changed from center to flex-start */
     z-index: 2000;
-    overflow: hidden;
+    overflow-y: auto;          /* Changed from hidden to auto */
+    padding: 20px;             /* Added padding so it never touches edges */
 }
 
 .uni-header {
@@ -117,7 +118,7 @@ h1 {
 }
 
 .uni-logo {
-    height: 120px;         /* Slightly smaller base size */
+    height: 120px;
     max-width: 120px;
     width: auto;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
@@ -138,9 +139,8 @@ h1 {
     max-width: 450px;
     width: 90%;
     border: 1px solid var(--card-border);
-    /* Remove absolute centering conflict */
-    margin-top: 160px;      /* Clears the logo on ALL screens */
-    margin-bottom: auto;    /* Pushes it slightly up if screen is very tall */
+    /* Use margin to center vertically when there's space, and allow scroll when not */
+    margin: 160px auto 20px;  /* Top margin clears logo, bottom margin allows scroll */
 }
 
 .game-title-hero {
@@ -1212,7 +1212,7 @@ button, .puzzle-card, .puzzle1-cell, .puzzle1-grid,
     .uni-header { top: 10px; padding: 0 15px; }
     .uni-logo { height: 40px; max-width: 40px; padding: 2px; }
     /* Pushed down to 120px to clear the top-fixed buttons */
-    .team-entry-card { margin-top: 120px; padding: 25px; }
+    .team-entry-card { margin: 120px auto 20px; padding: 25px; }
 
     h1 { font-size: 1.5rem; }
     .team-info { flex-direction: column; gap: 10px; padding: 8px 12px; }
