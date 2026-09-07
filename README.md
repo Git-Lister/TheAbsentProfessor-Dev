@@ -133,6 +133,4 @@ Original game design: Mark Burgess, Academic Liaison Librarian, MMU
 
 Digital development: David Haigh, Library Services and Discovery Adviser, MMU
 
-Open source – Feel free to fork and adapt.
-
 Enjoy the hunt for the absent professor’s grades! 🎓🔓
