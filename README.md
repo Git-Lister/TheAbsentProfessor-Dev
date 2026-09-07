@@ -21,7 +21,7 @@ At the start of the session, decide on a unique Session ID (e.g., `MMU-2026`) an
 To see which teams have won, go to:
 > **[https://git-lister.github.io/TheAbsentProfessor-Dev/staff/admin.html](https://git-lister.github.io/TheAbsentProfessor-Dev/staff/admin.html)**
 
-- **Login:** Use the shared staff credentials provided to you by the game administrator (stored securely in Supabase).
+- **Login:** Use the unique facilitator login details provided directly by David or Mark. Please request these directly—do not attempt to access the Supabase dashboard.
 - **Features:** View the winners list, filter results by Session ID, download a CSV, and delete results if necessary.
 
 ---
@@ -36,11 +36,11 @@ To see which teams have won, go to:
 | 📊 **Live 5×4 grid** | As teams solve puzzles, their answers fill the lockbox grid. |
 | 🔒 **Safe dial mechanism** | Enter the final 5-digit code (e.g., `78227`) using up/down dials. |
 | 🔁 **Game reset button** | Restarts the entire game for a new team or class. |
-| 📈 **Live Reporting (Supabase)** | Reports wins to a secure cloud database, accessible by any facilitator. |
+| 📈 **Live Reporting** | Reports wins to a secure cloud database, accessible by any facilitator. |
 | 🏆 **Winner determination** | First to unlock the safe wins (logged by submission timestamp). |
 | ♿ **High‑contrast mode** | Toggle with the ♿ button – persists in localStorage. |
 | 📱 **Mobile responsive** | Adapts to small screens and uses large touch targets. |
-| 📊 **Admin Dashboard** | View winners, filter by session, and manage results. |
+| 📊 **Admin Dashboard** | View winners, filter by session, and manage results. (Staff only). |
 
 ---
 
@@ -77,14 +77,8 @@ For example:
 3. Set branch to `main` and folder to `/ (root)`.
 4. The game will be live at `https://your-username.github.io/repo-name`.
 
-### 3. Set up the Staff Dashboard (Supabase)
-The game uses Supabase as its live database. This requires a one-time setup by a facilitator:
-
-1. Create a free project at [supabase.com](https://supabase.com).
-2. In the **SQL Editor**, run the provided SQL script to create the `winners` table and security policies (see `docs/supabase_setup.sql`).
-3. In **Authentication → Users**, create the shared staff account (email + password).
-4. **CRITICAL:** Update `js/reporting.js` with your specific `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
-5. *Optional:* If you don't want to use Supabase, you can remove the reporting code, and the game will save results purely locally on the facilitator's device.
+### 3. Access the Admin Dashboard
+**The backend and database are fully managed by David and Mark.** You do not need to set up or access any external cloud accounts. If you have any issues accessing the dashboard, please contact them directly.
 
 ---
 
@@ -96,3 +90,49 @@ Open your terminal (command prompt) and run:
 ```bash
 cd TheAbsentProfessor-Dev
 python -m http.server 8000
+Then open http://localhost:8000 in your browser.
+
+
+___________________________________________________
+
+🔧 Technical Setup (Developers Only)
+This section is for the project maintainers only. Do not modify these settings unless you are fully aware of the implications.
+
+The game uses Supabase as its live database. This requires a one-time setup by a facilitator:
+
+Create a free project at supabase.com.
+
+In the SQL Editor, run the provided SQL script to create the winners table and security policies (see docs/supabase_setup.sql).
+
+In Authentication → Users, create the shared staff account (email + password).
+
+CRITICAL: Update js/reporting.js with your specific SUPABASE_URL and SUPABASE_ANON_KEY.
+
+📁 Project structure
+text
+TheAbsentProfessor-Dev/
+├── index.html              # Main game interface
+├── staff/
+│   ├── admin.html          # Live results dashboard (password protected)
+│   └── supabase.js         # Local copy of the Supabase JS library
+├── css/
+│   └── style.css           # All styles (standard + high‑contrast)
+├── js/
+│   ├── config.js           # Loads config.json
+│   ├── storage.js          # localStorage save/load helpers
+│   ├── reporting.js        # Handles data to Supabase & Local Backup
+│   ├── puzzles.js          # All 5 puzzle implementations
+│   ├── lockbox.js          # Grid, dials, and safe unlock logic
+│   └── app.js              # Main controller (entry, story, reset)
+├── data/
+│   └── config.json         # Answers, clues, hints, and endpoint URL
+├── images/                 # All game assets
+└── README.md
+🙏 Credits
+Original game design: Mark Burgess, Academic Liaison Librarian, MMU
+
+Digital development: David Haigh, Library Services and Discovery Adviser, MMU
+
+Open source – Feel free to fork and adapt.
+
+Enjoy the hunt for the absent professor’s grades! 🎓🔓
